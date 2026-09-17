@@ -1,0 +1,68 @@
+# esl_repo 资产注册表（唯一登记源）
+# 约定：只维护 ID、路径、类别与可用状态；详细能力读取各 model.yaml。
+# status: planned = 已规划未实现（不可运行）；available = 已实现且检查通过（可运行）。
+# 实现前一律保持 planned，不得提前标 available。
+schema_version: aixsilicon.esl-registry/v1
+
+assets:
+  - id: aixsilicon:esl:queue:bounded:0.1.0
+    kind: common
+    path: common/resources
+    status: planned
+    description: 有限队列（depth 只计等待项、拒绝不丢请求）
+
+  - id: aixsilicon:esl:resource:service:0.1.0
+    kind: common
+    path: common/resources
+    status: planned
+    description: 非流水服务资源（有限容量、排队、起止与释放）
+
+  - id: aixsilicon:esl:memory:byte_store:0.1.0
+    kind: common
+    path: common/memory
+    status: planned
+    description: 真实字节存储（初始化、边界、byte enable、唯一 owner）
+
+  - id: aixsilicon:esl:buffer:pool:0.1.0
+    kind: common
+    path: common/memory
+    status: planned
+    description: 固定块/slot 分配（原子分配、generation、防提前释放）
+
+  - id: aixsilicon:esl:observe:core:0.1.0
+    kind: common
+    path: common/observability
+    status: planned
+    description: Counter/Gauge/Span/Event 埋点与收集
+
+  - id: aixsilicon:esl:dma:command:0.1.0
+    kind: model
+    path: models/dma
+    status: planned
+    description: 命令式 DMA（真实 copy、共享 load/store 资源）
+
+  - id: aixsilicon:esl:compute:vector_affine:0.1.0
+    kind: model
+    path: models/compute
+    status: planned
+    description: ComputeShell + vector_affine（int32 中间、int16 饱和）
+
+  - id: aixsilicon:esl:system:mini_pipeline:0.1.0
+    kind: example
+    path: examples/mini_pipeline
+    status: planned
+    description: 外存→DMA→Compute→DMA 小系统（单/双缓冲比较）
+
+  - id: aixsilicon:esl:template:compute:0.1.0
+    kind: template
+    path: templates
+    status: planned
+    description: compute 薄骨架模板
+
+  - id: aixsilicon:esl:template:pipeline_system:0.1.0
+    kind: template
+    path: templates
+    status: planned
+    description: pipeline_system 薄骨架模板（system.yaml + oracle + README）
+
+# 实施状态由 TODO（docs/esl_todo.md）跟踪；本文件不另设 Gate。

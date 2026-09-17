@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Build
+build/
+dist/
+*.egg-info/
+cmake-build-*/
+
+# ESL run artifacts（运行时产物，不入库）
+runs/
+*.log
+trace.jsonl
+timeline.json
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store

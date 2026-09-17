@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aixsilicon-esl-repo"
+version = "0.1.0"
+description = "ESL architecture-exploration models and common components (assets only; methods live in esl-development-suite skill)"
+requires-python = ">=3.9"
+license = { text = "Proprietary" }
+
+[project.optional-dependencies]
+# 本地开发/回归统一使用 workflow 根环境（uv sync 于 workflow 根）；
+# 本文件作为 esl_repo 独立 CI 的事实源声明，不用于创建第二个 .venv。
+dev = ["pytest>=7"]
+
+[tool.setuptools.packages.find]
+include = ["esl*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
