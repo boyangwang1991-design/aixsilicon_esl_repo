@@ -1,0 +1,8 @@
+# report 模板（R30）：薄骨架，复用 reporting 工具
+id: aixsilicon:esl:template:report:0.1.0
+target: examples/{name}/
+files:
+  - report.py
+description: 报告薄骨架：一页摘要 + run 产物输出；复用 one_page_summary/write_run_outputs。
+requires:
+  - aixsilicon:esl:template:pipeline_system:0.1.0

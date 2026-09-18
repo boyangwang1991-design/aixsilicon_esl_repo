@@ -1,0 +1,11 @@
+# {{name}} 参数扫描配置（parameter_sweep 模板生成）
+# sweep 保留全部点（含失败/非法）；基线 + 单变量对照，不默认大笛卡尔积。
+schema_version: 1
+system: examples/{{name}}/system.yaml
+baseline:
+  num_slots: 1
+sweep:
+  num_slots: [1, 2]
+metrics:
+  - total_ticks
+  - data_ok

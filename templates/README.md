@@ -16,6 +16,9 @@
 | command_engine | Queue、ServiceResource、Event | accept/execute/complete | queue full、完成唯一性 |
 | buffer_manager | BufferPool、Event | 分配/释放策略 | 用尽、唤醒、重复释放 |
 | memory_target | ByteStore、MemoryPort | 地址/容量配置、响应 hook | 越界、byte enable、数据可见性 |
+| pipeline_system | Factory、ScenarioRunner | system.yaml、oracle、README | 端到端最小样例 |
+| parameter_sweep | SweepRunner、RunComparator | experiment.yaml、sweep 驱动 | 非法点过滤与基线对照 |
+| report | reporting 工具 | 一页摘要 + run 产物 | 报告生成冒烟 |
 
 语言分工（repo-plan §2）：Python 模板做功能 oracle/参考；**C++/SystemC 模板
 （compute_cpp）承载并发/事件/资源竞争/目标仿真时间**，是核心目标模型载体。

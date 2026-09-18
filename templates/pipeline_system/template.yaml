@@ -1,0 +1,10 @@
+# pipeline_system 模板（R30）：薄骨架，复用 Factory/ScenarioRunner
+id: aixsilicon:esl:template:pipeline_system:0.1.0
+target: examples/{name}/
+files:
+  - system.yaml
+  - oracle.py
+  - README.md
+description: 小系统薄骨架：system.yaml + oracle + README；复用既有模型组合，不复制实现。
+requires:
+  - aixsilicon:esl:system:mini_pipeline:0.1.0

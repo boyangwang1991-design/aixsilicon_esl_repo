@@ -1,0 +1,20 @@
+# {{name}} system 配置（pipeline_system 模板生成）
+# 组合既有模型/公共组件；本文件只写实例、连接、地址/slot/参数，不复制实现。
+schema_version: 1
+id: aixsilicon:esl:system:{{name}}:0.1.0
+instances:
+  dma:
+    model: aixsilicon:esl:dma:0.1.0
+    params:
+      dma_queue_depth: 4
+  bmu:
+    model: aixsilicon:esl:bmu:0.1.0
+    params:
+      num_slots: 1
+  compute:
+    model: aixsilicon:esl:compute:0.1.0
+    params: {}
+connections:
+  - {from: dma, to: ext_mem, kind: memory}
+  - {from: dma, to: sram, kind: memory}
+  - {from: compute, to: sram, kind: memory}

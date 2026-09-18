@@ -1,0 +1,9 @@
+# parameter_sweep 模板（R30）：薄骨架，复用 SweepRunner/RunComparator
+id: aixsilicon:esl:template:parameter_sweep:0.1.0
+target: examples/{name}/
+files:
+  - experiment.yaml
+  - sweep.py
+description: 参数扫描薄骨架：experiment.yaml + sweep 驱动；复用 SweepRunner，保留全部点。
+requires:
+  - aixsilicon:esl:template:pipeline_system:0.1.0
