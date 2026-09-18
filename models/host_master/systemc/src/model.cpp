@@ -20,9 +20,10 @@ tlm::tlm_response_status Model::transfer(tlm::tlm_command command, std::uint64_t
                                           std::vector<unsigned char>& data) {
     const auto process = sc_core::sc_get_current_process_handle();
     if (!process.valid() || process.proc_kind() == sc_core::SC_METHOD_PROC_ || data.empty() ||
-        data.size() > std::numeric_limits<unsigned>::max() || !impl_->gate.enter())
+        data.size() > std::numeric_limits<unsigned>::max())
         return tlm::TLM_GENERIC_ERROR_RESPONSE;
     aix::esl::BlockingLease lease(impl_->gate);
+    if (!lease) return tlm::TLM_GENERIC_ERROR_RESPONSE;
     tlm::tlm_generic_payload tx;
     tx.set_command(command); tx.set_address(address); tx.set_data_ptr(data.data());
     tx.set_data_length(data.size()); tx.set_streaming_width(data.size());

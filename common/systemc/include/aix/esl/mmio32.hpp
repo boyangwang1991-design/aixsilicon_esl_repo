@@ -46,8 +46,9 @@ public:
             reject(tlm::TLM_GENERIC_ERROR_RESPONSE); return;
         }
         if (!process.valid() || process.proc_kind() == sc_core::SC_METHOD_PROC_ ||
-            !accepting() || !gate_.enter()) { reject(tlm::TLM_GENERIC_ERROR_RESPONSE); return; }
+            !accepting()) { reject(tlm::TLM_GENERIC_ERROR_RESPONSE); return; }
         BlockingLease lease(gate_);
+        if (!lease) { reject(tlm::TLM_GENERIC_ERROR_RESPONSE); return; }
         const auto epoch = epoch_;
         const auto incoming = delay;
         delay = sc_core::SC_ZERO_TIME;

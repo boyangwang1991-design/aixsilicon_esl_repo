@@ -46,10 +46,11 @@ void Model::transport(int, tlm::tlm_generic_payload& tx, sc_core::sc_time& delay
             tx.get_data_length() <= r.size - (address - r.base)) { region = &r; break; }
     if (!region) { tx.set_response_status(tlm::TLM_ADDRESS_ERROR_RESPONSE); return; }
     const auto process = sc_core::sc_get_current_process_handle();
-    if (!process.valid() || process.proc_kind() == sc_core::SC_METHOD_PROC_ || !impl_->gate.enter()) {
+    if (!process.valid() || process.proc_kind() == sc_core::SC_METHOD_PROC_) {
         tx.set_response_status(tlm::TLM_GENERIC_ERROR_RESPONSE); return;
     }
     aix::esl::BlockingLease lease(impl_->gate);
+    if (!lease) { tx.set_response_status(tlm::TLM_GENERIC_ERROR_RESPONSE); return; }
     if (delay != sc_core::SC_ZERO_TIME) { sc_core::wait(delay); delay = sc_core::SC_ZERO_TIME; }
     impl_->server.lock();
     struct Guard {

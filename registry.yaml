@@ -1,21 +1,26 @@
 # ESL 资产唯一注册表；available 仅限 manifest/README 已验证能力。
 schema_version: aixsilicon.esl-registry/v1
 assets:
-- id: aixsilicon:esl:queue:bounded:0.1.0
+- id: aixsilicon:esl:npu_sram_controller:0.1.0
+  kind: model
+  path: models/npu_sram_controller
+  status: available
+  description: 多端口 SRAM SystemC 性能模型：有限资源、交织、冲突仲裁、同 ID 保序、闭环 NPU 流量
+  evidence: models/npu_sram_controller/reports/20260918/checks.json
+- id: aixsilicon:esl:common:0.1.0
+  aliases:
+  - aixsilicon:esl:queue:bounded:0.1.0
+  - aixsilicon:esl:memory:byte_store:0.1.0
   kind: common
-  path: common/systemc
-  status: planned
-  description: 有限队列（depth 只计等待项、拒绝不丢请求）
+  path: common
+  status: available
+  description: SystemC 公共包；明确能力子集见 common.yaml 与公共合同，完整扩展范围见 TODO
+  evidence: runs/common-architecture-20260918/checks.json
 - id: aixsilicon:esl:resource:service:0.1.0
   kind: common
   path: common/systemc
   status: planned
   description: 非流水服务资源（有限容量、排队、起止与释放）
-- id: aixsilicon:esl:memory:byte_store:0.1.0
-  kind: common
-  path: common/systemc
-  status: planned
-  description: 真实字节存储（初始化、边界、byte enable、唯一 owner）
 - id: aixsilicon:esl:buffer:pool:0.1.0
   kind: common
   path: common/systemc
@@ -26,11 +31,14 @@ assets:
   path: common/systemc
   status: planned
   description: Counter/Gauge/Span/Event 埋点与收集
-- id: aixsilicon:esl:dma:command:0.1.0
+- id: aixsilicon:esl:dma:0.1.0
+  aliases:
+  - aixsilicon:esl:dma:command:0.1.0
   kind: model
   path: models/dma
-  status: planned
+  status: available
   description: 命令式 DMA（真实 copy、共享 load/store 资源）
+  evidence: runs/common-architecture-20260918/checks.json
 - id: aixsilicon:esl:compute:vector_affine:0.1.0
   kind: model
   path: models/compute
@@ -55,25 +63,25 @@ assets:
   kind: model
   path: models/host_master
   status: available
-  evidence: runs/review-fixes-integration-final/checks.json
+  evidence: runs/common-architecture-20260918/checks.json
   description: 可编程事务主设备/测试主机
 - id: aixsilicon:esl:tlm_bus:0.1.0
   kind: model
   path: models/tlm_bus
   status: available
-  evidence: runs/review-fixes-integration-final/checks.json
+  evidence: runs/common-architecture-20260918/checks.json
   description: 基础地址译码互连
 - id: aixsilicon:esl:ram:0.1.0
   kind: model
   path: models/ram
   status: available
-  evidence: runs/review-fixes-integration-final/checks.json
+  evidence: runs/common-architecture-20260918/checks.json
   description: 可读写片上/外部抽象存储
 - id: aixsilicon:esl:rom:0.1.0
   kind: model
   path: models/rom
   status: available
-  evidence: runs/review-fixes-integration-final/checks.json
+  evidence: runs/common-architecture-20260918/checks.json
   description: 只读映像存储
 - id: aixsilicon:esl:bmu:0.1.0
   kind: model
@@ -84,24 +92,26 @@ assets:
   kind: model
   path: models/timer
   status: available
-  evidence: runs/review-fixes-integration-final/checks.json
+  evidence: runs/common-architecture-20260918/checks.json
   description: 基础可编程定时器
 - id: aixsilicon:esl:irq_controller:0.1.0
   kind: model
   path: models/irq_controller
   status: available
-  evidence: runs/review-fixes-integration-final/checks.json
+  evidence: runs/common-architecture-20260918/checks.json
   description: 基础中断汇聚控制器
 - id: aixsilicon:esl:uart:0.1.0
   kind: model
   path: models/uart
-  status: planned
+  status: available
   description: 基础串口外设
+  evidence: runs/common-architecture-20260918/checks.json
 - id: aixsilicon:esl:gpio:0.1.0
   kind: model
   path: models/gpio
-  status: planned
+  status: available
   description: 基础 GPIO 外设
+  evidence: runs/common-architecture-20260918/checks.json
 - id: aixsilicon:esl:banked_sram:0.1.0
   kind: model
   path: models/banked_sram
@@ -111,17 +121,29 @@ assets:
   kind: example
   path: examples/basic_system
   status: available
-  evidence: runs/review-fixes-integration-final/checks.json
-  description: B0 SystemC 双主机/译码总线/RAM/ROM；B1 外设及后续阶段仍 planned
+  evidence: runs/common-architecture-20260918/checks.json
+  description: B0 SystemC 双主机/译码总线/RAM/ROM；B1 外设由其他消费者验证
 - id: aixsilicon:esl:interrupt_system:0.1.0
   kind: example
   path: examples/interrupt_system
   status: available
-  evidence: runs/review-fixes-integration-final/checks.json
-  description: B1 timer/IRQ 子集：双定时器、屏蔽/清除/复位；UART/GPIO 仍 planned
+  evidence: runs/common-architecture-20260918/checks.json
+  description: B1 timer/IRQ 子集：双定时器、屏蔽/清除/复位；UART/GPIO 另见 peripheral_system
 - id: aixsilicon:esl:register_target:0.1.0
   kind: template
   path: templates/register_target
   status: available
-  evidence: runs/review-fixes-template-validated/checks.json
+  evidence: runs/common-template-20260918/checks.json
   description: SystemC 寄存器库模板；源码、安装与搬迁消费者已验证
+- id: aixsilicon:esl:peripheral_system:0.1.0
+  kind: example
+  path: examples/peripheral_system
+  status: available
+  evidence: runs/common-architecture-20260918/checks.json
+  description: B1 UART/GPIO：双实例、字节 FIFO/引脚、IRQ、背压、复位与安装消费
+- id: aixsilicon:esl:dma_system:0.1.0
+  kind: example
+  path: examples/dma_system
+  status: available
+  evidence: runs/common-architecture-20260918/checks.json
+  description: B2 命令式 DMA：共享 RAM/主机竞争、容量、部分错误、复位/排空及标准集成

@@ -8,7 +8,7 @@ SystemC 顶层显式装配 host_master → tlm_bus → timer/irq_controller；�
 | 0x20001000 / 4 KiB | irq_controller |
 | 0x21000000 / 4 KiB | timer1（仅测试用窗口） |
 
-控制器输入：0=timer0，1=测试激励，2=timer1，3=未使用/false。reset 高有效，必需端口显式绑定。仿真上限 1 us，CTest 超时 15 s；结束时所有模型 drain/idle。UART/GPIO 仍 planned，这里仅完成 B1 timer/IRQ 子集。
+控制器输入：0=timer0，1=测试激励，2=timer1，3=未使用/false。reset 高有效，必需端口显式绑定。仿真上限 1 us，CTest 超时 15 s；结束时所有模型 drain/idle。这里仅验证 B1 timer/IRQ 子集，UART/GPIO 由 [peripheral_system](../peripheral_system/README.md) 验证。
 
 从资产仓库根执行，SYSTEMC_HOME 指向已安装的 3.0.2：
 

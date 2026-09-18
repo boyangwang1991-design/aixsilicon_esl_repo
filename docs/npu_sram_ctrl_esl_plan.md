@@ -2,6 +2,8 @@
 
 日期：2026-09-18。状态：规划；文中默认值为实验起点，非硅实现承诺，未宣称任何仿真或 PPA 结果。
 
+硬件候选、默认资源预算、探索变量、benchmark 与选型目标细化见 [候选硬件架构与探索变量](npu_sram_ctrl_architecture.md)。交织主寻优空间见其 §5，NPU 闭环行为流量 N1–N8 见 §9.4，资源/顺序/ECC/前进性补充及审查记录见 §11–§15。当前先完成架构定义；该补充文档中的配置仍是待实现合同。
+
 ## 1. 目标与决策输出
 
 构建 performance-oriented ESL 模型：8 个 1024-bit AXI4 Slave 接口连接 NPU Tile/DMA，访问多 Bank 共享 SRAM。模型应回答交织粒度、Bank 组织、路由拓扑和缓冲策略如何影响 NPU 算子完成时间、计算停顿、吞吐及尾延迟。
@@ -190,19 +192,22 @@ E6 闭环 NPU 评估：使用训练外 shape/layout/seed 作保留集，给出�
 
 ## 13. 代码交付结构与接口
 
-建议新模型位于 esl-repo/models/memory/npu_sram_controller/，以下为本规划建议，不代表现有仓库已采用：
+新模型计划位于 esl-repo/models/npu_sram_controller/，与 suite 的单模型库结构对齐。以下是待实现结构，不代表已存在：
 
 ```
 model.yaml                 # 模型身份、能力、参数、限制、依赖
+CMakeLists.txt             # 公开 SystemC 库、源码/安装包消费
+README.md
 configs/                   # baseline、拓扑、ECC、实验配置
-include/                   # transaction、component contracts
-src/frontend/              # AXI 语义与有限缓冲
-src/mapping/               # 地址策略和独立逆映射
-src/fabric/                # flat、hierarchical、接口抽象
-src/memory/                # Bank、scheduler、ECC
-src/workload/              # microbenchmark、NPU DAG、trace
-src/observe/               # counters、events、report export
-tests/                     # 单元、解析微基准、随机正确性
+systemc/include/npu_sram_controller/  # public model/config/transaction contracts
+systemc/src/frontend/      # AXI 语义与有限缓冲
+systemc/src/mapping/       # 地址策略和独立逆映射
+systemc/src/fabric/        # flat、hierarchical、接口抽象
+systemc/src/memory/        # Bank、scheduler、ECC
+systemc/src/workload/      # microbenchmark、NPU DAG、trace
+systemc/src/observe/       # counters、events、report export
+tests/                    # 单元、解析微基准、随机正确性
+examples/integration/     # 独立源码/安装消费者
 experiments/               # E0–E6、可复现脚本
 docs/                      # 合同、模型限制、校准、实验结论
 ```
@@ -260,6 +265,8 @@ ecc:
 ```
 
 这里 ECC 的四个 64-bit codeword/cycle 与 256-bit Bank 吞吐匹配。其实现可以是并行 lane，模型必须计资源，不得把单个 64-bit/cycle 引擎写成能服务整个 Bank。
+
+此示例对应 ECC 开启的可靠性基线；结构基线 C0 使用 ECC none，二者分开比较。最终 schema 还需表达补充架构文档中的命令/返回/完成网络、ID、服务中容量、credit、RMW context、宏写粒度和 NPU 行为流量，不能将以上示例当作完整参数集。
 
 ## 14. Agent 可执行工作包与验收
 

@@ -1,0 +1,10 @@
+# C0: 8 MiB, 8x1024-bit, aggregate 1024 B/cycle 1RW Bank budget.
+banks: 32
+word_bytes: 32
+stripe_bytes: 32
+mapping: modulo
+topology: flat
+queue: voq
+lanes: 4
+bank_entries: 8
+full_data: 0

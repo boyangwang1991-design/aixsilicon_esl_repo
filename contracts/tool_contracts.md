@@ -10,6 +10,10 @@
 
 ## 明确执行后端
 
+### 历史 ID 兼容
+
+registry 的 aliases 是旧五段 ID 的唯一发现映射；`esl inspect --id <旧或新 ID>` 返回 resolved_id（规范四段 ID），所有规范 ID/别名全局唯一，歧义或非法别名拒绝。DMA 使用 aixsilicon:esl:dma:0.1.0，保留旧 aixsilicon:esl:dma:command:0.1.0 作为发现别名。别名不选择执行后端、不改写历史 Python 配置，不能据此把 legacy_reference 的结果认作 SystemC 验证。尚未实现的其他五段 ID 在各资产首次实现时按此规则迁移。
+
 当前 run/sweep 只接受显式 `legacy-python-mini-pipeline`（配置 backend 或 --backend）。固定系统 ID、dma/bmu/compute 引用、连接和参数所有权均校验；不接受其他系统或 SystemC 后端，不回落到参考实现。SystemC 使用 examples 下的 CMake 消费者和 tools/validate_basic_models.py。
 
 历史 model ID 在这个后端中仅指 reference/legacy_python 实现，不把 registry 中 planned 的 SystemC DMA/Compute 升级可用。结果标记 scope=legacy_reference、target_validation=NOT_RUN。n_elements 必须为 256 的倍数且不超过 32768，num_slots 为 1..8；未知或放错实例的参数拒绝。

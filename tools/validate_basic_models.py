@@ -1,4 +1,4 @@
-"""Build and test B0 and timer/IRQ models through source and relocatable installed consumers."""
+"""Build and test B0/B1/B2 models through source and relocatable installed consumers."""
 from __future__ import annotations
 
 import argparse
@@ -10,6 +10,8 @@ import subprocess
 import time
 import xml.etree.ElementTree as ET
 from pathlib import Path
+
+from esl_contracts import validate_common
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -27,13 +29,15 @@ def main() -> int:
     ctest = str(Path(cmake).with_name('ctest'))
     result = {'status': 'RUNNING', 'steps': [], 'source_sha256': {}, 'test_executions': 0, 'test_cases': []}
     for folder in ['models/ram', 'models/rom', 'models/host_master', 'models/tlm_bus',
-                   'models/timer', 'models/irq_controller', 'common/systemc', 'cmake',
-                   'contracts', 'examples/basic_system', 'examples/interrupt_system']:
+                   'models/timer', 'models/irq_controller', 'models/uart', 'models/gpio', 'models/dma',
+                   'common', 'cmake', 'contracts', 'examples/basic_system',
+                   'examples/interrupt_system', 'examples/peripheral_system', 'examples/dma_system',
+                   'examples/common_primitives']:
         for p in sorted((ROOT / folder).rglob('*')):
             if p.is_file():
                 result['source_sha256'][str(p.relative_to(ROOT))] = hashlib.sha256(p.read_bytes()).hexdigest()
 
-    for filename in ['CMakeLists.txt', 'tools/validate_basic_models.py']:
+    for filename in ['CMakeLists.txt', 'tools/validate_basic_models.py', 'tools/esl_contracts.py']:
         result['source_sha256'][filename] = hashlib.sha256((ROOT / filename).read_bytes()).hexdigest()
 
     def run(label: str, command: list[str]) -> None:
@@ -51,7 +55,7 @@ def main() -> int:
             result['test_cases'] = sorted(set(result['test_cases']) | set(cases))
 
     def consumer(label: str, extra: list[str]) -> None:
-        for example in ['basic_system', 'interrupt_system']:
+        for example in ['common_primitives', 'basic_system', 'interrupt_system', 'peripheral_system', 'dma_system']:
             step = f'{label}-{example}'
             build = str(out / step)
             run(step + '-configure', [cmake, '-S', str(ROOT / 'examples' / example), '-B', build, *extra])
@@ -59,6 +63,7 @@ def main() -> int:
             run(step + '-test', [ctest, '--test-dir', build, '--output-on-failure', '--no-tests=error', '--output-junit', 'results.xml'])
 
     try:
+        common = validate_common(ROOT / 'common/common.yaml')
         run('cmake-version', [cmake, '--version'])
         build = str(out / 'producer')
         prefix = out / 'prefix'
@@ -77,6 +82,13 @@ def main() -> int:
             if str(ROOT) in path.read_text():
                 raise RuntimeError(f'source path leaked into exported package: {path}')
         docroot = relocated / 'share/aix-esl'
+        missing_headers = [h for h in common['headers'] if not
+                           (relocated / 'include' / Path(h).relative_to('systemc/include')).is_file()]
+        private_exported = (relocated / 'include/aix/esl/mmio32.hpp').exists()
+        result['common_package'] = {'missing_public_headers': missing_headers,
+                                    'private_mmio_exported': private_exported}
+        if missing_headers or private_exported:
+            raise RuntimeError('common installed public/private header contract mismatch')
         broken = []
         for doc in docroot.rglob('*.md'):
             for target in re.findall(r'(?<!!)\[[^\]]+\]\(([^)\s]+)\)', doc.read_text()):

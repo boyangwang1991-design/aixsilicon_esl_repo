@@ -1,0 +1,51 @@
+schema_version: 1
+id: aixsilicon:esl:npu_sram_controller:0.1.0
+factory: aix::esl::npu_sram_controller::Model
+model_kinds: [behavioral, performance]
+profiles:
+  resource:
+    timing_model: resource_contention
+    data_modes: [full_data, traffic_only]
+    interface_mode: axi_channel_events
+    transport: direct
+    capabilities:
+      - reversible_bank_mapping
+      - finite_fragment_network
+      - independent_aw_w
+      - in_order_per_id
+      - bank_latency_and_ii
+      - partial_write_rmw
+      - ecc_resource_timing
+      - closed_loop_dag
+ports:
+  channel_events:
+    direction: target
+    type: direct_axi_channel_events
+    transport: direct
+    binding: optional
+    count_parameter: ports
+parameters:
+  ports: {type: integer, default: 8, min: 1, max: 8}
+  banks: {type: integer, default: 32, min: 1, max: 64}
+  capacity: {type: integer, default: 8388608, min: 1}
+  word_bytes: {type: integer, default: 32, min: 8, max: 128}
+  stripe_bytes: {type: integer, default: 32, min: 8, max: 2048}
+  read_latency: {type: integer, default: 2, min: 1}
+  write_latency: {type: integer, default: 1, min: 1}
+  bank_ii: {type: integer, default: 1, min: 1}
+  outstanding: {type: integer, default: 32, min: 1}
+  full_data: {type: integer, default: 0, min: 0, max: 1}
+assumptions:
+  - uniform_1ns_clock
+  - aligned_incr_8_to_128_byte_beats_up_to_32_beats
+  - no_axi_pin_level_or_exclusive_operations
+  - head_transaction_per_id
+  - no_cross_beat_combining_or_multicast
+  - ecc_performance_fault_abstraction_not_bit_level_codec
+  - uncalibrated_resource_model
+build:
+  backend: cmake
+  package: AixEslNpuSramController
+  target: aix::esl::npu_sram_controller
+  cxx_standard: 17
+  entry: CMakeLists.txt

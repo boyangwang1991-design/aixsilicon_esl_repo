@@ -36,6 +36,11 @@ def _use_legacy():
 def cmd_inspect(args):
     assets = contracts.registry(REPO_ROOT)
     selected = [a for a in assets if not args.kind or a['kind'] == args.kind]
+    requested = getattr(args, 'id', None)
+    if requested:
+        selected = [a for a in selected if requested in [a['id'], *a.get('aliases', [])]]
+        if not selected:
+            raise ValueError(f'unknown asset id: {requested}')
     available = []
     for asset in selected:
         if asset['status'] != 'available':
@@ -44,8 +49,11 @@ def cmd_inspect(args):
         item['evidence_status'] = contracts.evidence_status(REPO_ROOT, asset)
         if asset['kind'] == 'model':
             item['manifest'] = contracts.validate_model(REPO_ROOT / asset['path'] / 'model.yaml')
+        elif asset['kind'] == 'common':
+            item['manifest'] = contracts.validate_common(REPO_ROOT / asset['path'] / 'common.yaml')
         available.append(item)
     return _out({'command': 'inspect', 'status': 'PASS', 'available': available,
+                 'resolved_id': selected[0]['id'] if requested else None,
                  'planned_count': sum(a['status'] == 'planned' for a in selected)})
 
 
@@ -206,6 +214,7 @@ def main(argv=None):
     sub.add_parser('doctor')
     inspect = sub.add_parser('inspect')
     inspect.add_argument('--kind', choices=['common', 'model', 'example', 'template'])
+    inspect.add_argument('--id', help='canonical or legacy alias; discovery only, never selects a run backend')
     validate = sub.add_parser('validate')
     validate.add_argument('--model', type=Path, help='model.yaml; otherwise validate available registry assets')
     validate.add_argument('--evidence', action='store_true', help='require current hashes for available assets')
@@ -221,8 +230,17 @@ def main(argv=None):
     compare = sub.add_parser('compare')
     compare.add_argument('run_a')
     compare.add_argument('run_b')
+    npu = sub.add_parser('npu-sram', help='SystemC SRAM model: build, run, validate and architecture exploration')
+    npu.add_argument('action', choices=['run', 'validate', 'explore'])
+    npu.add_argument('--output', type=Path, required=True)
+    npu.add_argument('--config', type=Path, help='flat architecture YAML')
+    npu.add_argument('--workload', type=Path, help='topological DAG trace')
+    npu.add_argument('--quick', action='store_true', help='small search smoke; not full exploration')
     args = parser.parse_args(argv)
     try:
+        if args.command == 'npu-sram':
+            import npu_explore
+            return npu_explore.main(args)
         if args.command == 'doctor':
             import esl_doctor
             return esl_doctor.main()

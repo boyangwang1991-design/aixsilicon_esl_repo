@@ -9,7 +9,9 @@ Skill 仓库的 `esl-development-suite` 承载；两者通过版本化资产 ID�
 
 规划权威文档：[`docs/esl_repo_plan.md`](docs/esl_repo_plan.md)（v1.3.0）。
 
-基础 IP 和基础系统规划见 [模型索引](docs/base_ip_models.md)，RAM、ROM、host_master、tlm_bus 与 B0 basic_system 已可运行；timer/irq_controller 及 [中断示例](examples/interrupt_system/README.md) 已完成 B1 子集，其余规划资产保持 planned。构建入口见 [basic_system](examples/basic_system/README.md)，验证见 [B0 记录](docs/basic_models_validation.md)。
+NPU 多 AXI SRAM 性能探索见 [模型与运行入口](models/npu_sram_controller/README.md)、[架构定义](docs/npu_sram_ctrl_architecture.md) 和 [仿真结果分析](models/npu_sram_controller/reports/20260918/report.md)。
+
+基础 IP 和基础系统规划见 [模型索引](docs/base_ip_models.md)，RAM、ROM、host_master、tlm_bus 与 B0 basic_system 已可运行；timer/irq_controller 与 uart/gpio 分别由 [中断示例](examples/interrupt_system/README.md) 和 [外设示例](examples/peripheral_system/README.md) 验证；命令式 DMA 与 [搬运示例](examples/dma_system/README.md) 已交付 B2，其余规划资产保持 planned。构建入口见 [basic_system](examples/basic_system/README.md)，验证见 [B0 记录](docs/basic_models_validation.md)。
 
 ## 定位
 

@@ -1,0 +1,78 @@
+[
+  {
+    "architecture": "C_ECC",
+    "status": "PASS",
+    "score": 1.0,
+    "worst": 1.0,
+    "families": {
+      "gemm": 1.0,
+      "gemm_tail": 1.0,
+      "prefill": 1.0,
+      "decode": 1.0,
+      "convolution": 1.0,
+      "transpose": 1.0,
+      "concurrent": 1.0,
+      "embedding": 1.0
+    },
+    "ratios": {
+      "gemm": 1.0,
+      "gemm_tail": 1.0,
+      "prefill": 1.0,
+      "decode": 1.0,
+      "convolution": 1.0,
+      "transpose": 1.0,
+      "concurrent": 1.0,
+      "embedding_11": 1.0,
+      "embedding_23": 1.0,
+      "embedding_37": 1.0,
+      "embedding_53": 1.0,
+      "embedding_71": 1.0
+    },
+    "embedding_ratio_95ci": [
+      1.0,
+      1.0
+    ],
+    "buffer_bits": 3866624,
+    "switch_proxy_bits": 825344,
+    "goal_10pct": false,
+    "goal_worst_10pct": true
+  },
+  {
+    "architecture": "ECC_B8_G2048_xor1",
+    "status": "PASS",
+    "score": 1.0271303858284782,
+    "worst": 1.25,
+    "families": {
+      "gemm": 0.861656050955414,
+      "gemm_tail": 0.9586247086247086,
+      "prefill": 0.9996868149076104,
+      "decode": 1.0023243801652892,
+      "convolution": 1.0182348650619986,
+      "transpose": 1.25,
+      "concurrent": 0.9746710060846187,
+      "embedding": 1.2065179154713395
+    },
+    "ratios": {
+      "gemm": 0.861656050955414,
+      "gemm_tail": 0.9586247086247086,
+      "prefill": 0.9996868149076104,
+      "decode": 1.0023243801652892,
+      "convolution": 1.0182348650619986,
+      "transpose": 1.25,
+      "concurrent": 0.9746710060846187,
+      "embedding_11": 1.2251655629139073,
+      "embedding_23": 1.2147651006711409,
+      "embedding_37": 1.2,
+      "embedding_53": 1.1655629139072847,
+      "embedding_71": 1.2281879194630871
+    },
+    "embedding_ratio_95ci": [
+      1.1749827748391484,
+      1.2388994217830853
+    ],
+    "buffer_bits": 3055616,
+    "switch_proxy_bits": 132608,
+    "goal_10pct": false,
+    "goal_worst_10pct": false
+  }
+]

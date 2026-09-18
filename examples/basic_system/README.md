@@ -1,6 +1,6 @@
 # basic_system：B0 可运行基础系统
 
-状态唯一见 registry 的 `aixsilicon:esl:basic_system:0.1.0`。B0 已提供 SystemC 顶层；B1–B4 仍是规划。当前使用 C++ Config 显式装配，不宣称具备通用 system.yaml 构建器。请用以下 CMake 入口，Python mini_pipeline 的 run 后端不能执行此系统。
+状态唯一见 registry 的 `aixsilicon:esl:basic_system:0.1.0`。本顶层交付 B0；B1 外设由 [interrupt_system](../interrupt_system/README.md) 和 [peripheral_system](../peripheral_system/README.md) 验证；B2 命令式 DMA 由 [dma_system](../dma_system/README.md) 验证。B3–B4 仍是规划。当前使用 C++ Config 显式装配，不宣称具备通用 system.yaml 构建器。请用以下 CMake 入口，Python mini_pipeline 的 run 后端不能执行此系统。
 
 ## 目标组成
 
@@ -10,7 +10,7 @@
 host_master.mem ─┐
 dma.mem ────────┼─> tlm_bus ─> rom / ram / 外设 MMIO
 compute.mem ────┘
-timer/uart/gpio/dma/compute irq ─> irq_controller ─> host_master.irq
+timer/uart/gpio/dma/compute irq ─> irq_controller ─> testbench 观察
 上层 testbench ─> clock/reset、输入激励、停止/超时、最终 scoreboard
 ```
 
@@ -31,7 +31,7 @@ socket 数据宽度 32 bit、TLM 地址为 64 bit 字节地址；本例映射位
 | dma | 0x20004000 | 4 KiB | CSR 前端实现后启用；初版命令注入 |
 | compute | 0x20005000 | 4 KiB | 可选，CSR 前端实现后启用 |
 
-IRQ 输入位规划：timer=0、uart=1、gpio=2、dma=3、compute=4；未装配源绑定未触发电平。基础系统只需要前四类外设，算法扩展不是最小系统前置条件。B0 映射目前由 systemc/main.cpp 的 Config 实现；其余映射为后续规划，，硬件兼容需要新明确配置而非悄悄修改示例 ABI。
+完整系统 IRQ 输入位规划：timer=0、uart=1、gpio=2、dma=3、compute=4；未装配源绑定未触发电平。各 B1 消费者的实际编号见自身 README。基础系统只需要前四类外设，算法扩展不是最小系统前置条件。B0 映射目前由 systemc/main.cpp 的 Config 实现；完整系统装配仍待实施，硬件兼容需要新明确配置而非悄悄修改示例 ABI。
 
 ## 分阶段可执行验收
 
@@ -68,4 +68,4 @@ ctest --test-dir build/basic-installed --output-on-failure
 `uv run python tools/validate_basic_models.py --cmake /path/to/cmake`。
 在 workflow 中使用根 uv 环境运行该脚本的完整路径。输出到新 runs 目录，不覆盖历史结果。
 
-B0 实际组件为两个 host、一条串行总线、一个 RAM 和一个 ROM。测试具有 1 us 仿真上限与 15 s 宿主超时。当前总线不提供公平仲裁承诺；host/bus 不支持热 reset，须先 drain。RAM/ROM 提供 reset。B1–B4 接口仅为后续计划，不包含在 available 的 B0 能力中。结果见 [验证记录](../../docs/basic_models_validation.md)。
+B0 实际组件为两个 host、一条串行总线、一个 RAM 和一个 ROM。测试具有 1 us 仿真上限与 15 s 宿主超时。当前总线不提供公平仲裁承诺；host/bus 不支持热 reset，须先 drain。RAM/ROM 提供 reset。B1/B2 在独立消费者交付，不包含在本 B0 顶层中；B3–B4 仍待实现。结果见 [验证记录](../../docs/basic_models_validation.md)。

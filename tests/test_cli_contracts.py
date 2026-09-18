@@ -181,3 +181,54 @@ def test_bad_service_time_fails_sanity(system, monkeypatch):
     result = cli._execute_reference(system, None)
     assert result['data_ok'] is True and result['status'] == 'FAIL'
     assert result['checks'][-1]['status'] == 'FAIL'
+
+
+def test_legacy_alias_resolves_discovery_only(tmp_path, monkeypatch, capsys):
+    template_fixture(tmp_path, monkeypatch)
+    path = tmp_path / 'registry.yaml'
+    data = yaml.safe_load(path.read_text())
+    alias = 'aixsilicon:esl:template:register_target:0.1.0'
+    data['assets'][0]['aliases'] = [alias]
+    path.write_text(yaml.safe_dump(data))
+    assert cli.main(['inspect', '--id', alias]) == 0
+    result = json.loads(capsys.readouterr().out)
+    assert result['resolved_id'] == data['assets'][0]['id']
+    assert result['available'][0]['id'] == data['assets'][0]['id']
+    assert cli.main(['inspect', '--id', 'aixsilicon:esl:missing:0.1.0']) != 0
+
+
+@pytest.mark.parametrize('fault', ['duplicate_alias', 'invalid_alias', 'collision'])
+def test_registry_rejects_ambiguous_alias(tmp_path, monkeypatch, fault):
+    template_fixture(tmp_path, monkeypatch)
+    path = tmp_path / 'registry.yaml'
+    data = yaml.safe_load(path.read_text())
+    alias = 'aixsilicon:esl:template:register_target:0.1.0'
+    data['assets'][0]['aliases'] = [alias]
+    if fault == 'duplicate_alias':
+        data['assets'][0]['aliases'].append(alias)
+    elif fault == 'invalid_alias':
+        data['assets'][0]['aliases'] = ['not-an-id']
+    else:
+        data['assets'].append({'id': alias, 'kind': 'template', 'path': 'templates/register_target', 'status': 'planned'})
+    path.write_text(yaml.safe_dump(data))
+    with pytest.raises(ValueError):
+        contracts.registry(tmp_path)
+
+
+@pytest.mark.parametrize('fault', ['missing_header', 'wrong_target', 'missing_consumer'])
+def test_common_delivery_requires_public_api_and_consumers(tmp_path, fault):
+    source = ROOT / 'common'
+    shutil.copytree(source, tmp_path / 'common')
+    path = tmp_path / 'common/common.yaml'
+    data = yaml.safe_load(path.read_text())
+    for consumer in data['consumers']:
+        (tmp_path / consumer).mkdir(parents=True, exist_ok=True)
+    if fault == 'missing_header':
+        (tmp_path / 'common' / data['headers'][0]).unlink()
+    elif fault == 'wrong_target':
+        data['build']['target'] = 'aix::esl::imaginary'
+    else:
+        data['consumers'].append('models/missing')
+    path.write_text(yaml.safe_dump(data))
+    with pytest.raises(ValueError):
+        contracts.validate_common(path)

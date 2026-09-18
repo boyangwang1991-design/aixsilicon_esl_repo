@@ -1,0 +1,2184 @@
+{
+  "train": {
+    "concurrent": {
+      "kind": "closed_loop_dag",
+      "seed": 0,
+      "profile": "concurrent",
+      "local_buffer_bytes_per_tile": 65536,
+      "compute_model": "serial PE waves: ceil(M/16)*ceil(N/16)*(K+30)",
+      "shape": [
+        256,
+        128,
+        128
+      ],
+      "tile": [
+        64,
+        64,
+        64
+      ],
+      "leading_dimension": 512,
+      "loop": "output_tile_then_K",
+      "local_footprint_bytes": 49152,
+      "reuse": "C stationary across K; ping-pong A/B; no inter-output-tile B cache",
+      "external_source": "64 B/cycle per load DMA, first W +100 cycles",
+      "tasks": 3090,
+      "read_bytes": 393216,
+      "write_bytes": 524288,
+      "allocated_shared_bytes": 524288,
+      "tensors": [
+        {
+          "name": "A",
+          "shape": [
+            256,
+            128
+          ],
+          "element_bytes": 2,
+          "base": 0,
+          "bytes": 262144,
+          "row_stride_bytes": 1024
+        },
+        {
+          "name": "B",
+          "shape": [
+            128,
+            128
+          ],
+          "element_bytes": 2,
+          "base": 262144,
+          "bytes": 131072,
+          "row_stride_bytes": 1024
+        },
+        {
+          "name": "C",
+          "shape": [
+            256,
+            128
+          ],
+          "element_bytes": 4,
+          "base": 393216,
+          "bytes": 131072,
+          "row_stride_bytes": 512
+        }
+      ],
+      "compute_cycles": 24064
+    },
+    "convolution": {
+      "kind": "closed_loop_dag",
+      "seed": 0,
+      "profile": "convolution",
+      "local_buffer_bytes_per_tile": 65536,
+      "compute_model": "serial PE waves: ceil(M/16)*ceil(N/16)*(K+30)",
+      "shape": [
+        1,
+        16,
+        16,
+        32,
+        32
+      ],
+      "kernel": [
+        3,
+        3
+      ],
+      "algorithm": "direct NHWC, halo loads once per tile; zero padding omitted",
+      "local_footprint_bytes": 39424,
+      "tasks": 76,
+      "read_bytes": 94464,
+      "write_bytes": 32768,
+      "allocated_shared_bytes": 69632,
+      "tensors": [
+        {
+          "name": "input",
+          "shape": [
+            16,
+            16,
+            32
+          ],
+          "element_bytes": 2,
+          "base": 0,
+          "bytes": 16384,
+          "row_stride_bytes": 64
+        },
+        {
+          "name": "weights",
+          "shape": [
+            3,
+            3,
+            32,
+            32
+          ],
+          "element_bytes": 2,
+          "base": 16384,
+          "bytes": 18432,
+          "row_stride_bytes": 64
+        },
+        {
+          "name": "output",
+          "shape": [
+            16,
+            16,
+            32
+          ],
+          "element_bytes": 4,
+          "base": 36864,
+          "bytes": 32768,
+          "row_stride_bytes": 128
+        }
+      ],
+      "compute_cycles": 9336
+    },
+    "decode": {
+      "kind": "closed_loop_dag",
+      "seed": 0,
+      "profile": "decode",
+      "local_buffer_bytes_per_tile": 65536,
+      "compute_model": "serial PE waves: ceil(M/16)*ceil(N/16)*(K+30)",
+      "sequence": 256,
+      "heads": 4,
+      "head_dim": 64,
+      "local_footprint_bytes": 24704,
+      "attention": "online tiled, no materialized full score matrix",
+      "layout": "head_token_dim",
+      "vector_model": "16 elements/cycle reduction/scale; 4 exp/cycle; serial stages",
+      "tasks": 2216,
+      "read_bytes": 262656,
+      "write_bytes": 1536,
+      "allocated_shared_bytes": 274944,
+      "tensors": [
+        {
+          "name": "Q",
+          "shape": [
+            4,
+            1,
+            64
+          ],
+          "element_bytes": 2,
+          "base": 0,
+          "bytes": 512,
+          "row_stride_bytes": 128
+        },
+        {
+          "name": "K",
+          "shape": [
+            4,
+            257,
+            64
+          ],
+          "element_bytes": 2,
+          "base": 4096,
+          "bytes": 131584,
+          "row_stride_bytes": 128
+        },
+        {
+          "name": "V",
+          "shape": [
+            4,
+            257,
+            64
+          ],
+          "element_bytes": 2,
+          "base": 139264,
+          "bytes": 131584,
+          "row_stride_bytes": 128
+        },
+        {
+          "name": "O",
+          "shape": [
+            4,
+            1,
+            64
+          ],
+          "element_bytes": 2,
+          "base": 274432,
+          "bytes": 512,
+          "row_stride_bytes": 128
+        }
+      ],
+      "compute_cycles": 15040
+    },
+    "embedding_11": {
+      "kind": "closed_loop_dag",
+      "seed": 11,
+      "profile": "embedding_11",
+      "local_buffer_bytes_per_tile": 65536,
+      "compute_model": "serial PE waves: ceil(M/16)*ceil(N/16)*(K+30)",
+      "indices": [
+        14,
+        6,
+        15,
+        1525,
+        9,
+        1,
+        3245,
+        1290,
+        517,
+        6,
+        246,
+        2672,
+        6,
+        2409,
+        2,
+        8,
+        2,
+        2582,
+        2367,
+        3,
+        9,
+        0,
+        4,
+        1,
+        12,
+        6,
+        2210,
+        9,
+        13,
+        966,
+        3,
+        14,
+        1455,
+        1543,
+        6,
+        1072,
+        12,
+        13,
+        3,
+        9,
+        160,
+        12,
+        821,
+        4,
+        8,
+        10,
+        3163,
+        2,
+        7,
+        11,
+        14,
+        15,
+        1111,
+        1497,
+        2546,
+        2043,
+        1298,
+        1610,
+        3180,
+        643,
+        3,
+        8,
+        12,
+        15
+      ],
+      "index_semantics": "trace materializes index values; dependency waits for index read",
+      "distribution": "mixture uniform table / uniform hot set; no dedup",
+      "local_footprint_bytes": 512,
+      "tasks": 192,
+      "read_bytes": 16896,
+      "write_bytes": 16384,
+      "allocated_shared_bytes": 1069056,
+      "tensors": [
+        {
+          "name": "table",
+          "shape": [
+            4096,
+            128
+          ],
+          "element_bytes": 2,
+          "base": 0,
+          "bytes": 1048576,
+          "row_stride_bytes": 256
+        },
+        {
+          "name": "indices",
+          "shape": [
+            64,
+            4
+          ],
+          "element_bytes": 2,
+          "base": 1048576,
+          "bytes": 512,
+          "row_stride_bytes": 8
+        },
+        {
+          "name": "gather_output",
+          "shape": [
+            64,
+            128
+          ],
+          "element_bytes": 2,
+          "base": 1052672,
+          "bytes": 16384,
+          "row_stride_bytes": 256
+        }
+      ],
+      "compute_cycles": 0
+    },
+    "embedding_23": {
+      "kind": "closed_loop_dag",
+      "seed": 23,
+      "profile": "embedding_23",
+      "local_buffer_bytes_per_tile": 65536,
+      "compute_model": "serial PE waves: ceil(M/16)*ceil(N/16)*(K+30)",
+      "indices": [
+        2374,
+        684,
+        9,
+        11,
+        6,
+        0,
+        14,
+        867,
+        15,
+        13,
+        1,
+        1,
+        1408,
+        2971,
+        3020,
+        2304,
+        2575,
+        3883,
+        15,
+        3665,
+        1340,
+        5,
+        1602,
+        674,
+        1,
+        2298,
+        2709,
+        9,
+        3725,
+        2116,
+        3,
+        4038,
+        4,
+        822,
+        1370,
+        1,
+        13,
+        5,
+        104,
+        465,
+        3646,
+        2835,
+        12,
+        1,
+        14,
+        3760,
+        1769,
+        5,
+        1954,
+        13,
+        0,
+        10,
+        3395,
+        3380,
+        7,
+        3482,
+        1,
+        888,
+        4,
+        13,
+        2,
+        3,
+        15,
+        2229
+      ],
+      "index_semantics": "trace materializes index values; dependency waits for index read",
+      "distribution": "mixture uniform table / uniform hot set; no dedup",
+      "local_footprint_bytes": 512,
+      "tasks": 192,
+      "read_bytes": 16896,
+      "write_bytes": 16384,
+      "allocated_shared_bytes": 1069056,
+      "tensors": [
+        {
+          "name": "table",
+          "shape": [
+            4096,
+            128
+          ],
+          "element_bytes": 2,
+          "base": 0,
+          "bytes": 1048576,
+          "row_stride_bytes": 256
+        },
+        {
+          "name": "indices",
+          "shape": [
+            64,
+            4
+          ],
+          "element_bytes": 2,
+          "base": 1048576,
+          "bytes": 512,
+          "row_stride_bytes": 8
+        },
+        {
+          "name": "gather_output",
+          "shape": [
+            64,
+            128
+          ],
+          "element_bytes": 2,
+          "base": 1052672,
+          "bytes": 16384,
+          "row_stride_bytes": 256
+        }
+      ],
+      "compute_cycles": 0
+    },
+    "embedding_37": {
+      "kind": "closed_loop_dag",
+      "seed": 37,
+      "profile": "embedding_37",
+      "local_buffer_bytes_per_tile": 65536,
+      "compute_model": "serial PE waves: ceil(M/16)*ceil(N/16)*(K+30)",
+      "indices": [
+        750,
+        290,
+        3024,
+        3,
+        3742,
+        2309,
+        3467,
+        1,
+        2,
+        2958,
+        3541,
+        2999,
+        278,
+        1746,
+        516,
+        11,
+        7,
+        11,
+        177,
+        1785,
+        2552,
+        2471,
+        2316,
+        6,
+        6,
+        1,
+        3,
+        20,
+        7,
+        4,
+        0,
+        4,
+        5,
+        2007,
+        2363,
+        5,
+        2410,
+        3,
+        3514,
+        69,
+        2,
+        442,
+        5,
+        10,
+        2,
+        381,
+        7,
+        4071,
+        8,
+        334,
+        1612,
+        2454,
+        2191,
+        227,
+        14,
+        11,
+        2960,
+        3049,
+        2,
+        1363,
+        706,
+        10,
+        4,
+        2573
+      ],
+      "index_semantics": "trace materializes index values; dependency waits for index read",
+      "distribution": "mixture uniform table / uniform hot set; no dedup",
+      "local_footprint_bytes": 512,
+      "tasks": 192,
+      "read_bytes": 16896,
+      "write_bytes": 16384,
+      "allocated_shared_bytes": 1069056,
+      "tensors": [
+        {
+          "name": "table",
+          "shape": [
+            4096,
+            128
+          ],
+          "element_bytes": 2,
+          "base": 0,
+          "bytes": 1048576,
+          "row_stride_bytes": 256
+        },
+        {
+          "name": "indices",
+          "shape": [
+            64,
+            4
+          ],
+          "element_bytes": 2,
+          "base": 1048576,
+          "bytes": 512,
+          "row_stride_bytes": 8
+        },
+        {
+          "name": "gather_output",
+          "shape": [
+            64,
+            128
+          ],
+          "element_bytes": 2,
+          "base": 1052672,
+          "bytes": 16384,
+          "row_stride_bytes": 256
+        }
+      ],
+      "compute_cycles": 0
+    },
+    "embedding_53": {
+      "kind": "closed_loop_dag",
+      "seed": 53,
+      "profile": "embedding_53",
+      "local_buffer_bytes_per_tile": 65536,
+      "compute_model": "serial PE waves: ceil(M/16)*ceil(N/16)*(K+30)",
+      "indices": [
+        1769,
+        15,
+        2954,
+        255,
+        301,
+        2816,
+        2138,
+        459,
+        11,
+        6,
+        4,
+        10,
+        3303,
+        451,
+        4,
+        13,
+        7,
+        1271,
+        3665,
+        3932,
+        11,
+        1868,
+        650,
+        3,
+        423,
+        3247,
+        2105,
+        12,
+        5,
+        10,
+        1564,
+        15,
+        1421,
+        9,
+        13,
+        12,
+        4,
+        3275,
+        14,
+        2548,
+        15,
+        7,
+        6,
+        1096,
+        2292,
+        2636,
+        789,
+        94,
+        2,
+        3079,
+        6,
+        2107,
+        3872,
+        2736,
+        1295,
+        11,
+        12,
+        0,
+        3534,
+        3786,
+        12,
+        1785,
+        3012,
+        8
+      ],
+      "index_semantics": "trace materializes index values; dependency waits for index read",
+      "distribution": "mixture uniform table / uniform hot set; no dedup",
+      "local_footprint_bytes": 512,
+      "tasks": 192,
+      "read_bytes": 16896,
+      "write_bytes": 16384,
+      "allocated_shared_bytes": 1069056,
+      "tensors": [
+        {
+          "name": "table",
+          "shape": [
+            4096,
+            128
+          ],
+          "element_bytes": 2,
+          "base": 0,
+          "bytes": 1048576,
+          "row_stride_bytes": 256
+        },
+        {
+          "name": "indices",
+          "shape": [
+            64,
+            4
+          ],
+          "element_bytes": 2,
+          "base": 1048576,
+          "bytes": 512,
+          "row_stride_bytes": 8
+        },
+        {
+          "name": "gather_output",
+          "shape": [
+            64,
+            128
+          ],
+          "element_bytes": 2,
+          "base": 1052672,
+          "bytes": 16384,
+          "row_stride_bytes": 256
+        }
+      ],
+      "compute_cycles": 0
+    },
+    "embedding_71": {
+      "kind": "closed_loop_dag",
+      "seed": 71,
+      "profile": "embedding_71",
+      "local_buffer_bytes_per_tile": 65536,
+      "compute_model": "serial PE waves: ceil(M/16)*ceil(N/16)*(K+30)",
+      "indices": [
+        0,
+        4,
+        1632,
+        6,
+        1587,
+        2995,
+        3744,
+        2861,
+        302,
+        0,
+        6,
+        2632,
+        3580,
+        3,
+        171,
+        4,
+        11,
+        0,
+        6,
+        2,
+        3,
+        13,
+        11,
+        3,
+        6,
+        14,
+        10,
+        8,
+        201,
+        6,
+        10,
+        2517,
+        2211,
+        438,
+        14,
+        2,
+        14,
+        14,
+        8,
+        10,
+        4033,
+        13,
+        9,
+        2380,
+        411,
+        2,
+        10,
+        1242,
+        2820,
+        406,
+        3,
+        2327,
+        9,
+        180,
+        3089,
+        8,
+        3,
+        3847,
+        8,
+        15,
+        3579,
+        14,
+        3694,
+        4
+      ],
+      "index_semantics": "trace materializes index values; dependency waits for index read",
+      "distribution": "mixture uniform table / uniform hot set; no dedup",
+      "local_footprint_bytes": 512,
+      "tasks": 192,
+      "read_bytes": 16896,
+      "write_bytes": 16384,
+      "allocated_shared_bytes": 1069056,
+      "tensors": [
+        {
+          "name": "table",
+          "shape": [
+            4096,
+            128
+          ],
+          "element_bytes": 2,
+          "base": 0,
+          "bytes": 1048576,
+          "row_stride_bytes": 256
+        },
+        {
+          "name": "indices",
+          "shape": [
+            64,
+            4
+          ],
+          "element_bytes": 2,
+          "base": 1048576,
+          "bytes": 512,
+          "row_stride_bytes": 8
+        },
+        {
+          "name": "gather_output",
+          "shape": [
+            64,
+            128
+          ],
+          "element_bytes": 2,
+          "base": 1052672,
+          "bytes": 16384,
+          "row_stride_bytes": 256
+        }
+      ],
+      "compute_cycles": 0
+    },
+    "gemm": {
+      "kind": "closed_loop_dag",
+      "seed": 0,
+      "profile": "gemm",
+      "local_buffer_bytes_per_tile": 65536,
+      "compute_model": "serial PE waves: ceil(M/16)*ceil(N/16)*(K+30)",
+      "shape": [
+        256,
+        128,
+        128
+      ],
+      "tile": [
+        64,
+        64,
+        64
+      ],
+      "leading_dimension": 512,
+      "loop": "output_tile_then_K",
+      "local_footprint_bytes": 49152,
+      "reuse": "C stationary across K; ping-pong A/B; no inter-output-tile B cache",
+      "external_source": "preinitialized",
+      "tasks": 2576,
+      "read_bytes": 262144,
+      "write_bytes": 131072,
+      "allocated_shared_bytes": 524288,
+      "tensors": [
+        {
+          "name": "A",
+          "shape": [
+            256,
+            128
+          ],
+          "element_bytes": 2,
+          "base": 0,
+          "bytes": 262144,
+          "row_stride_bytes": 1024
+        },
+        {
+          "name": "B",
+          "shape": [
+            128,
+            128
+          ],
+          "element_bytes": 2,
+          "base": 262144,
+          "bytes": 131072,
+          "row_stride_bytes": 1024
+        },
+        {
+          "name": "C",
+          "shape": [
+            256,
+            128
+          ],
+          "element_bytes": 4,
+          "base": 393216,
+          "bytes": 131072,
+          "row_stride_bytes": 512
+        }
+      ],
+      "compute_cycles": 24064
+    },
+    "gemm_tail": {
+      "kind": "closed_loop_dag",
+      "seed": 0,
+      "profile": "gemm_tail",
+      "local_buffer_bytes_per_tile": 65536,
+      "compute_model": "serial PE waves: ceil(M/16)*ceil(N/16)*(K+30)",
+      "shape": [
+        16,
+        128,
+        256
+      ],
+      "tile": [
+        64,
+        64,
+        64
+      ],
+      "leading_dimension": 512,
+      "loop": "output_tile_then_K",
+      "local_footprint_bytes": 49152,
+      "reuse": "C stationary across K; ping-pong A/B; no inter-output-tile B cache",
+      "external_source": "preinitialized",
+      "tasks": 680,
+      "read_bytes": 81920,
+      "write_bytes": 8192,
+      "allocated_shared_bytes": 286720,
+      "tensors": [
+        {
+          "name": "A",
+          "shape": [
+            16,
+            256
+          ],
+          "element_bytes": 2,
+          "base": 0,
+          "bytes": 16384,
+          "row_stride_bytes": 1024
+        },
+        {
+          "name": "B",
+          "shape": [
+            256,
+            128
+          ],
+          "element_bytes": 2,
+          "base": 16384,
+          "bytes": 262144,
+          "row_stride_bytes": 1024
+        },
+        {
+          "name": "C",
+          "shape": [
+            16,
+            128
+          ],
+          "element_bytes": 4,
+          "base": 278528,
+          "bytes": 8192,
+          "row_stride_bytes": 512
+        }
+      ],
+      "compute_cycles": 3008
+    },
+    "prefill": {
+      "kind": "closed_loop_dag",
+      "seed": 0,
+      "profile": "prefill",
+      "local_buffer_bytes_per_tile": 65536,
+      "compute_model": "serial PE waves: ceil(M/16)*ceil(N/16)*(K+30)",
+      "sequence": 64,
+      "heads": 2,
+      "head_dim": 64,
+      "local_footprint_bytes": 24704,
+      "attention": "online tiled, no materialized full score matrix",
+      "layout": "head_token_dim",
+      "vector_model": "16 elements/cycle reduction/scale; 4 exp/cycle; serial stages",
+      "tasks": 1328,
+      "read_bytes": 147456,
+      "write_bytes": 16384,
+      "allocated_shared_bytes": 73728,
+      "tensors": [
+        {
+          "name": "Q",
+          "shape": [
+            2,
+            64,
+            64
+          ],
+          "element_bytes": 2,
+          "base": 0,
+          "bytes": 16384,
+          "row_stride_bytes": 128
+        },
+        {
+          "name": "K",
+          "shape": [
+            2,
+            65,
+            64
+          ],
+          "element_bytes": 2,
+          "base": 16384,
+          "bytes": 16640,
+          "row_stride_bytes": 128
+        },
+        {
+          "name": "V",
+          "shape": [
+            2,
+            65,
+            64
+          ],
+          "element_bytes": 2,
+          "base": 36864,
+          "bytes": 16640,
+          "row_stride_bytes": 128
+        },
+        {
+          "name": "O",
+          "shape": [
+            2,
+            64,
+            64
+          ],
+          "element_bytes": 2,
+          "base": 57344,
+          "bytes": 16384,
+          "row_stride_bytes": 128
+        }
+      ],
+      "compute_cycles": 11840
+    },
+    "transpose": {
+      "kind": "closed_loop_dag",
+      "seed": 0,
+      "profile": "transpose",
+      "local_buffer_bytes_per_tile": 65536,
+      "compute_model": "serial PE waves: ceil(M/16)*ceil(N/16)*(K+30)",
+      "tile": [
+        32,
+        32
+      ],
+      "local_footprint_bytes": 4096,
+      "tasks": 520,
+      "read_bytes": 16384,
+      "write_bytes": 16384,
+      "allocated_shared_bytes": 32768,
+      "tensors": [
+        {
+          "name": "source",
+          "shape": [
+            64,
+            128
+          ],
+          "element_bytes": 2,
+          "base": 0,
+          "bytes": 16384,
+          "row_stride_bytes": 256
+        },
+        {
+          "name": "destination",
+          "shape": [
+            128,
+            64
+          ],
+          "element_bytes": 2,
+          "base": 16384,
+          "bytes": 16384,
+          "row_stride_bytes": 128
+        }
+      ],
+      "compute_cycles": 512
+    }
+  },
+  "holdout": {
+    "concurrent": {
+      "kind": "closed_loop_dag",
+      "seed": 0,
+      "profile": "concurrent",
+      "local_buffer_bytes_per_tile": 65536,
+      "compute_model": "serial PE waves: ceil(M/16)*ceil(N/16)*(K+30)",
+      "shape": [
+        192,
+        192,
+        128
+      ],
+      "tile": [
+        64,
+        64,
+        64
+      ],
+      "leading_dimension": 520,
+      "loop": "output_tile_then_K",
+      "local_footprint_bytes": 49152,
+      "reuse": "C stationary across K; ping-pong A/B; no inter-output-tile B cache",
+      "external_source": "64 B/cycle per load DMA, first W +100 cycles",
+      "tasks": 3476,
+      "read_bytes": 442368,
+      "write_bytes": 480256,
+      "allocated_shared_bytes": 483328,
+      "tensors": [
+        {
+          "name": "A",
+          "shape": [
+            192,
+            128
+          ],
+          "element_bytes": 2,
+          "base": 0,
+          "bytes": 199680,
+          "row_stride_bytes": 1040
+        },
+        {
+          "name": "B",
+          "shape": [
+            128,
+            192
+          ],
+          "element_bytes": 2,
+          "base": 200704,
+          "bytes": 133120,
+          "row_stride_bytes": 1040
+        },
+        {
+          "name": "C",
+          "shape": [
+            192,
+            192
+          ],
+          "element_bytes": 4,
+          "base": 335872,
+          "bytes": 147456,
+          "row_stride_bytes": 768
+        }
+      ],
+      "compute_cycles": 27072
+    },
+    "convolution": {
+      "kind": "closed_loop_dag",
+      "seed": 0,
+      "profile": "convolution",
+      "local_buffer_bytes_per_tile": 65536,
+      "compute_model": "serial PE waves: ceil(M/16)*ceil(N/16)*(K+30)",
+      "shape": [
+        1,
+        24,
+        24,
+        32,
+        32
+      ],
+      "kernel": [
+        3,
+        3
+      ],
+      "algorithm": "direct NHWC, halo loads once per tile; zero padding omitted",
+      "local_footprint_bytes": 39424,
+      "tasks": 174,
+      "read_bytes": 216064,
+      "write_bytes": 73728,
+      "allocated_shared_bytes": 131072,
+      "tensors": [
+        {
+          "name": "input",
+          "shape": [
+            24,
+            24,
+            32
+          ],
+          "element_bytes": 2,
+          "base": 0,
+          "bytes": 36864,
+          "row_stride_bytes": 64
+        },
+        {
+          "name": "weights",
+          "shape": [
+            3,
+            3,
+            32,
+            32
+          ],
+          "element_bytes": 2,
+          "base": 36864,
+          "bytes": 18432,
+          "row_stride_bytes": 64
+        },
+        {
+          "name": "output",
+          "shape": [
+            24,
+            24,
+            32
+          ],
+          "element_bytes": 4,
+          "base": 57344,
+          "bytes": 73728,
+          "row_stride_bytes": 128
+        }
+      ],
+      "compute_cycles": 21006
+    },
+    "decode": {
+      "kind": "closed_loop_dag",
+      "seed": 0,
+      "profile": "decode",
+      "local_buffer_bytes_per_tile": 65536,
+      "compute_model": "serial PE waves: ceil(M/16)*ceil(N/16)*(K+30)",
+      "sequence": 384,
+      "heads": 4,
+      "head_dim": 128,
+      "local_footprint_bytes": 47232,
+      "attention": "online tiled, no materialized full score matrix",
+      "layout": "head_token_dim",
+      "vector_model": "16 elements/cycle reduction/scale; 4 exp/cycle; serial stages",
+      "tasks": 3352,
+      "read_bytes": 787456,
+      "write_bytes": 3072,
+      "allocated_shared_bytes": 799744,
+      "tensors": [
+        {
+          "name": "Q",
+          "shape": [
+            4,
+            1,
+            128
+          ],
+          "element_bytes": 2,
+          "base": 0,
+          "bytes": 1024,
+          "row_stride_bytes": 256
+        },
+        {
+          "name": "K",
+          "shape": [
+            4,
+            385,
+            128
+          ],
+          "element_bytes": 2,
+          "base": 4096,
+          "bytes": 394240,
+          "row_stride_bytes": 256
+        },
+        {
+          "name": "V",
+          "shape": [
+            4,
+            385,
+            128
+          ],
+          "element_bytes": 2,
+          "base": 401408,
+          "bytes": 394240,
+          "row_stride_bytes": 256
+        },
+        {
+          "name": "O",
+          "shape": [
+            4,
+            1,
+            128
+          ],
+          "element_bytes": 2,
+          "base": 798720,
+          "bytes": 1024,
+          "row_stride_bytes": 256
+        }
+      ],
+      "compute_cycles": 40800
+    },
+    "embedding_101": {
+      "kind": "closed_loop_dag",
+      "seed": 101,
+      "profile": "embedding_101",
+      "local_buffer_bytes_per_tile": 65536,
+      "compute_model": "serial PE waves: ceil(M/16)*ceil(N/16)*(K+30)",
+      "indices": [
+        6,
+        2938,
+        6,
+        9,
+        6,
+        14,
+        6,
+        14,
+        3002,
+        10,
+        12,
+        2,
+        9,
+        10,
+        8,
+        12,
+        2,
+        13,
+        14,
+        3,
+        0,
+        11,
+        4,
+        3537,
+        2,
+        3315,
+        11,
+        3892,
+        9,
+        1484,
+        0,
+        540,
+        11,
+        14,
+        973,
+        14,
+        1149,
+        6,
+        3657,
+        1142,
+        4,
+        2765,
+        1,
+        11,
+        6,
+        10,
+        4,
+        6,
+        10,
+        8,
+        5,
+        12,
+        3758,
+        1,
+        1953,
+        3860,
+        10,
+        4,
+        11,
+        3283,
+        7,
+        6,
+        3,
+        3,
+        14,
+        1658,
+        11,
+        6,
+        10,
+        9,
+        1971,
+        1667,
+        9,
+        2015,
+        10,
+        3594,
+        1,
+        6,
+        3810,
+        477,
+        14,
+        4,
+        1,
+        8,
+        3,
+        14,
+        2,
+        13,
+        0,
+        6,
+        3,
+        1575,
+        5,
+        1572,
+        1,
+        1857
+      ],
+      "index_semantics": "trace materializes index values; dependency waits for index read",
+      "distribution": "mixture uniform table / uniform hot set; no dedup",
+      "local_footprint_bytes": 512,
+      "tasks": 288,
+      "read_bytes": 25344,
+      "write_bytes": 24576,
+      "allocated_shared_bytes": 1077248,
+      "tensors": [
+        {
+          "name": "table",
+          "shape": [
+            4096,
+            128
+          ],
+          "element_bytes": 2,
+          "base": 0,
+          "bytes": 1048576,
+          "row_stride_bytes": 256
+        },
+        {
+          "name": "indices",
+          "shape": [
+            96,
+            4
+          ],
+          "element_bytes": 2,
+          "base": 1048576,
+          "bytes": 768,
+          "row_stride_bytes": 8
+        },
+        {
+          "name": "gather_output",
+          "shape": [
+            96,
+            128
+          ],
+          "element_bytes": 2,
+          "base": 1052672,
+          "bytes": 24576,
+          "row_stride_bytes": 256
+        }
+      ],
+      "compute_cycles": 0
+    },
+    "embedding_127": {
+      "kind": "closed_loop_dag",
+      "seed": 127,
+      "profile": "embedding_127",
+      "local_buffer_bytes_per_tile": 65536,
+      "compute_model": "serial PE waves: ceil(M/16)*ceil(N/16)*(K+30)",
+      "indices": [
+        3,
+        8,
+        3343,
+        9,
+        1,
+        3,
+        3097,
+        2,
+        3033,
+        177,
+        5,
+        3052,
+        2317,
+        3,
+        3,
+        1,
+        6,
+        13,
+        1,
+        2068,
+        7,
+        3613,
+        4,
+        3653,
+        1805,
+        6,
+        13,
+        12,
+        3824,
+        7,
+        13,
+        6,
+        12,
+        4,
+        2415,
+        3115,
+        9,
+        11,
+        14,
+        1,
+        7,
+        0,
+        10,
+        325,
+        10,
+        8,
+        6,
+        12,
+        230,
+        10,
+        7,
+        14,
+        14,
+        7,
+        0,
+        3584,
+        10,
+        8,
+        2203,
+        2712,
+        4,
+        3521,
+        1088,
+        105,
+        13,
+        3688,
+        13,
+        3,
+        6,
+        10,
+        1,
+        13,
+        9,
+        0,
+        13,
+        8,
+        6,
+        2735,
+        11,
+        14,
+        3,
+        14,
+        10,
+        1,
+        503,
+        3150,
+        6,
+        3919,
+        8,
+        14,
+        704,
+        1,
+        15,
+        11,
+        3,
+        8
+      ],
+      "index_semantics": "trace materializes index values; dependency waits for index read",
+      "distribution": "mixture uniform table / uniform hot set; no dedup",
+      "local_footprint_bytes": 512,
+      "tasks": 288,
+      "read_bytes": 25344,
+      "write_bytes": 24576,
+      "allocated_shared_bytes": 1077248,
+      "tensors": [
+        {
+          "name": "table",
+          "shape": [
+            4096,
+            128
+          ],
+          "element_bytes": 2,
+          "base": 0,
+          "bytes": 1048576,
+          "row_stride_bytes": 256
+        },
+        {
+          "name": "indices",
+          "shape": [
+            96,
+            4
+          ],
+          "element_bytes": 2,
+          "base": 1048576,
+          "bytes": 768,
+          "row_stride_bytes": 8
+        },
+        {
+          "name": "gather_output",
+          "shape": [
+            96,
+            128
+          ],
+          "element_bytes": 2,
+          "base": 1052672,
+          "bytes": 24576,
+          "row_stride_bytes": 256
+        }
+      ],
+      "compute_cycles": 0
+    },
+    "embedding_149": {
+      "kind": "closed_loop_dag",
+      "seed": 149,
+      "profile": "embedding_149",
+      "local_buffer_bytes_per_tile": 65536,
+      "compute_model": "serial PE waves: ceil(M/16)*ceil(N/16)*(K+30)",
+      "indices": [
+        8,
+        4,
+        5,
+        12,
+        9,
+        1539,
+        2,
+        5,
+        10,
+        8,
+        15,
+        9,
+        15,
+        6,
+        8,
+        5,
+        11,
+        13,
+        1280,
+        3,
+        8,
+        7,
+        1,
+        14,
+        12,
+        7,
+        296,
+        8,
+        15,
+        1568,
+        1,
+        278,
+        0,
+        9,
+        15,
+        2113,
+        10,
+        7,
+        3138,
+        1,
+        2333,
+        3668,
+        10,
+        163,
+        5,
+        9,
+        8,
+        9,
+        240,
+        10,
+        1658,
+        14,
+        1620,
+        10,
+        4,
+        7,
+        4,
+        14,
+        1440,
+        5,
+        12,
+        2673,
+        4052,
+        13,
+        5,
+        11,
+        11,
+        9,
+        7,
+        2363,
+        2485,
+        11,
+        2047,
+        10,
+        1260,
+        9,
+        7,
+        9,
+        9,
+        15,
+        4,
+        5,
+        9,
+        3,
+        3056,
+        9,
+        2945,
+        2358,
+        5,
+        9,
+        12,
+        8,
+        3834,
+        10,
+        2,
+        9
+      ],
+      "index_semantics": "trace materializes index values; dependency waits for index read",
+      "distribution": "mixture uniform table / uniform hot set; no dedup",
+      "local_footprint_bytes": 512,
+      "tasks": 288,
+      "read_bytes": 25344,
+      "write_bytes": 24576,
+      "allocated_shared_bytes": 1077248,
+      "tensors": [
+        {
+          "name": "table",
+          "shape": [
+            4096,
+            128
+          ],
+          "element_bytes": 2,
+          "base": 0,
+          "bytes": 1048576,
+          "row_stride_bytes": 256
+        },
+        {
+          "name": "indices",
+          "shape": [
+            96,
+            4
+          ],
+          "element_bytes": 2,
+          "base": 1048576,
+          "bytes": 768,
+          "row_stride_bytes": 8
+        },
+        {
+          "name": "gather_output",
+          "shape": [
+            96,
+            128
+          ],
+          "element_bytes": 2,
+          "base": 1052672,
+          "bytes": 24576,
+          "row_stride_bytes": 256
+        }
+      ],
+      "compute_cycles": 0
+    },
+    "embedding_173": {
+      "kind": "closed_loop_dag",
+      "seed": 173,
+      "profile": "embedding_173",
+      "local_buffer_bytes_per_tile": 65536,
+      "compute_model": "serial PE waves: ceil(M/16)*ceil(N/16)*(K+30)",
+      "indices": [
+        11,
+        2005,
+        0,
+        0,
+        14,
+        3719,
+        1812,
+        623,
+        0,
+        4,
+        3,
+        1591,
+        8,
+        0,
+        5,
+        2,
+        14,
+        6,
+        8,
+        11,
+        2229,
+        635,
+        3748,
+        15,
+        11,
+        964,
+        13,
+        2417,
+        5,
+        2100,
+        3581,
+        9,
+        9,
+        10,
+        2442,
+        1414,
+        8,
+        9,
+        3,
+        2,
+        3830,
+        9,
+        10,
+        1786,
+        13,
+        6,
+        3469,
+        3,
+        3529,
+        9,
+        0,
+        1884,
+        2137,
+        14,
+        12,
+        15,
+        1751,
+        3,
+        817,
+        14,
+        8,
+        3,
+        8,
+        3,
+        14,
+        11,
+        3978,
+        5,
+        0,
+        10,
+        13,
+        2,
+        12,
+        6,
+        357,
+        7,
+        5,
+        2917,
+        8,
+        10,
+        2029,
+        3,
+        7,
+        11,
+        144,
+        12,
+        1371,
+        3,
+        0,
+        7,
+        10,
+        3263,
+        12,
+        5,
+        2244,
+        12
+      ],
+      "index_semantics": "trace materializes index values; dependency waits for index read",
+      "distribution": "mixture uniform table / uniform hot set; no dedup",
+      "local_footprint_bytes": 512,
+      "tasks": 288,
+      "read_bytes": 25344,
+      "write_bytes": 24576,
+      "allocated_shared_bytes": 1077248,
+      "tensors": [
+        {
+          "name": "table",
+          "shape": [
+            4096,
+            128
+          ],
+          "element_bytes": 2,
+          "base": 0,
+          "bytes": 1048576,
+          "row_stride_bytes": 256
+        },
+        {
+          "name": "indices",
+          "shape": [
+            96,
+            4
+          ],
+          "element_bytes": 2,
+          "base": 1048576,
+          "bytes": 768,
+          "row_stride_bytes": 8
+        },
+        {
+          "name": "gather_output",
+          "shape": [
+            96,
+            128
+          ],
+          "element_bytes": 2,
+          "base": 1052672,
+          "bytes": 24576,
+          "row_stride_bytes": 256
+        }
+      ],
+      "compute_cycles": 0
+    },
+    "embedding_199": {
+      "kind": "closed_loop_dag",
+      "seed": 199,
+      "profile": "embedding_199",
+      "local_buffer_bytes_per_tile": 65536,
+      "compute_model": "serial PE waves: ceil(M/16)*ceil(N/16)*(K+30)",
+      "indices": [
+        12,
+        2530,
+        11,
+        10,
+        3090,
+        12,
+        7,
+        1187,
+        10,
+        2600,
+        0,
+        6,
+        8,
+        1,
+        1035,
+        3505,
+        3,
+        15,
+        2,
+        109,
+        2570,
+        2,
+        3280,
+        3,
+        12,
+        12,
+        15,
+        1,
+        3643,
+        8,
+        2434,
+        10,
+        2960,
+        6,
+        9,
+        13,
+        0,
+        4,
+        2502,
+        7,
+        14,
+        310,
+        3433,
+        11,
+        5,
+        6,
+        6,
+        0,
+        2716,
+        4,
+        1341,
+        15,
+        0,
+        2363,
+        4,
+        7,
+        3529,
+        13,
+        10,
+        12,
+        1,
+        2,
+        4,
+        12,
+        8,
+        11,
+        1258,
+        3,
+        12,
+        1,
+        2053,
+        15,
+        0,
+        6,
+        6,
+        6,
+        12,
+        3853,
+        2737,
+        10,
+        6,
+        560,
+        13,
+        1608,
+        9,
+        0,
+        582,
+        4,
+        823,
+        1891,
+        104,
+        1656,
+        11,
+        11,
+        4,
+        747
+      ],
+      "index_semantics": "trace materializes index values; dependency waits for index read",
+      "distribution": "mixture uniform table / uniform hot set; no dedup",
+      "local_footprint_bytes": 512,
+      "tasks": 288,
+      "read_bytes": 25344,
+      "write_bytes": 24576,
+      "allocated_shared_bytes": 1077248,
+      "tensors": [
+        {
+          "name": "table",
+          "shape": [
+            4096,
+            128
+          ],
+          "element_bytes": 2,
+          "base": 0,
+          "bytes": 1048576,
+          "row_stride_bytes": 256
+        },
+        {
+          "name": "indices",
+          "shape": [
+            96,
+            4
+          ],
+          "element_bytes": 2,
+          "base": 1048576,
+          "bytes": 768,
+          "row_stride_bytes": 8
+        },
+        {
+          "name": "gather_output",
+          "shape": [
+            96,
+            128
+          ],
+          "element_bytes": 2,
+          "base": 1052672,
+          "bytes": 24576,
+          "row_stride_bytes": 256
+        }
+      ],
+      "compute_cycles": 0
+    },
+    "gemm": {
+      "kind": "closed_loop_dag",
+      "seed": 0,
+      "profile": "gemm",
+      "local_buffer_bytes_per_tile": 65536,
+      "compute_model": "serial PE waves: ceil(M/16)*ceil(N/16)*(K+30)",
+      "shape": [
+        192,
+        192,
+        128
+      ],
+      "tile": [
+        64,
+        64,
+        64
+      ],
+      "leading_dimension": 520,
+      "loop": "output_tile_then_K",
+      "local_footprint_bytes": 49152,
+      "reuse": "C stationary across K; ping-pong A/B; no inter-output-tile B cache",
+      "external_source": "preinitialized",
+      "tasks": 2898,
+      "read_bytes": 294912,
+      "write_bytes": 147456,
+      "allocated_shared_bytes": 483328,
+      "tensors": [
+        {
+          "name": "A",
+          "shape": [
+            192,
+            128
+          ],
+          "element_bytes": 2,
+          "base": 0,
+          "bytes": 199680,
+          "row_stride_bytes": 1040
+        },
+        {
+          "name": "B",
+          "shape": [
+            128,
+            192
+          ],
+          "element_bytes": 2,
+          "base": 200704,
+          "bytes": 133120,
+          "row_stride_bytes": 1040
+        },
+        {
+          "name": "C",
+          "shape": [
+            192,
+            192
+          ],
+          "element_bytes": 4,
+          "base": 335872,
+          "bytes": 147456,
+          "row_stride_bytes": 768
+        }
+      ],
+      "compute_cycles": 27072
+    },
+    "gemm_tail": {
+      "kind": "closed_loop_dag",
+      "seed": 0,
+      "profile": "gemm_tail",
+      "local_buffer_bytes_per_tile": 65536,
+      "compute_model": "serial PE waves: ceil(M/16)*ceil(N/16)*(K+30)",
+      "shape": [
+        16,
+        128,
+        192
+      ],
+      "tile": [
+        64,
+        64,
+        64
+      ],
+      "leading_dimension": 520,
+      "loop": "output_tile_then_K",
+      "local_footprint_bytes": 49152,
+      "reuse": "C stationary across K; ping-pong A/B; no inter-output-tile B cache",
+      "external_source": "preinitialized",
+      "tasks": 518,
+      "read_bytes": 61440,
+      "write_bytes": 8192,
+      "allocated_shared_bytes": 229376,
+      "tensors": [
+        {
+          "name": "A",
+          "shape": [
+            16,
+            192
+          ],
+          "element_bytes": 2,
+          "base": 0,
+          "bytes": 16640,
+          "row_stride_bytes": 1040
+        },
+        {
+          "name": "B",
+          "shape": [
+            192,
+            128
+          ],
+          "element_bytes": 2,
+          "base": 20480,
+          "bytes": 199680,
+          "row_stride_bytes": 1040
+        },
+        {
+          "name": "C",
+          "shape": [
+            16,
+            128
+          ],
+          "element_bytes": 4,
+          "base": 221184,
+          "bytes": 8192,
+          "row_stride_bytes": 512
+        }
+      ],
+      "compute_cycles": 2256
+    },
+    "prefill": {
+      "kind": "closed_loop_dag",
+      "seed": 0,
+      "profile": "prefill",
+      "local_buffer_bytes_per_tile": 65536,
+      "compute_model": "serial PE waves: ceil(M/16)*ceil(N/16)*(K+30)",
+      "sequence": 96,
+      "heads": 4,
+      "head_dim": 64,
+      "local_footprint_bytes": 24704,
+      "attention": "online tiled, no materialized full score matrix",
+      "layout": "head_token_dim",
+      "vector_model": "16 elements/cycle reduction/scale; 4 exp/cycle; serial stages",
+      "tasks": 5592,
+      "read_bytes": 638976,
+      "write_bytes": 49152,
+      "allocated_shared_bytes": 204800,
+      "tensors": [
+        {
+          "name": "Q",
+          "shape": [
+            4,
+            96,
+            64
+          ],
+          "element_bytes": 2,
+          "base": 0,
+          "bytes": 49152,
+          "row_stride_bytes": 128
+        },
+        {
+          "name": "K",
+          "shape": [
+            4,
+            97,
+            64
+          ],
+          "element_bytes": 2,
+          "base": 49152,
+          "bytes": 49664,
+          "row_stride_bytes": 128
+        },
+        {
+          "name": "V",
+          "shape": [
+            4,
+            97,
+            64
+          ],
+          "element_bytes": 2,
+          "base": 102400,
+          "bytes": 49664,
+          "row_stride_bytes": 128
+        },
+        {
+          "name": "O",
+          "shape": [
+            4,
+            96,
+            64
+          ],
+          "element_bytes": 2,
+          "base": 155648,
+          "bytes": 49152,
+          "row_stride_bytes": 128
+        }
+      ],
+      "compute_cycles": 53280
+    },
+    "transpose": {
+      "kind": "closed_loop_dag",
+      "seed": 0,
+      "profile": "transpose",
+      "local_buffer_bytes_per_tile": 65536,
+      "compute_model": "serial PE waves: ceil(M/16)*ceil(N/16)*(K+30)",
+      "tile": [
+        32,
+        32
+      ],
+      "local_footprint_bytes": 4096,
+      "tasks": 780,
+      "read_bytes": 24576,
+      "write_bytes": 24576,
+      "allocated_shared_bytes": 49152,
+      "tensors": [
+        {
+          "name": "source",
+          "shape": [
+            96,
+            128
+          ],
+          "element_bytes": 2,
+          "base": 0,
+          "bytes": 24576,
+          "row_stride_bytes": 256
+        },
+        {
+          "name": "destination",
+          "shape": [
+            128,
+            96
+          ],
+          "element_bytes": 2,
+          "base": 24576,
+          "bytes": 24576,
+          "row_stride_bytes": 192
+        }
+      ],
+      "compute_cycles": 768
+    }
+  }
+}

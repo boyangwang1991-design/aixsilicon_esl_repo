@@ -46,7 +46,7 @@ runs/                      被忽略的运行日志、构建与 hash 证据
 
 历史 Python 模板与 compute_cpp 保留为迁移参考但不可生成。CLI 仅允许已登记 available 的模板；标准库模板提供独立输出目录、公开 API 与完整消费者。
 
-定时器/中断控制器已完成源码、模型文档与独立验证，纳入默认 SystemC 构建；UART/GPIO 等其余模型仍 planned。
+定时器/中断控制器与 UART/GPIO 已完成源码、模型文档与独立消费者验证，纳入默认 SystemC 构建；命令式 DMA 与 dma_system 也已交付，Compute/BMU/banked_sram 仍 planned。
 
 ## 迁移验收
 

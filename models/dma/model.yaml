@@ -1,0 +1,49 @@
+schema_version: 1
+id: aixsilicon:esl:dma:0.1.0
+factory: aix::esl::dma::Model
+model_kinds: [behavioral]
+profiles:
+  command:
+    timing_model: annotated
+    data_modes: [full_data]
+    interface_mode: command
+    transport: LT
+    capabilities: [memory_copy, bounded_commands, completion_records, reset_cancel, drain]
+ports:
+  memory:
+    direction: initiator
+    type: tlm_generic_payload
+    transport: LT
+    bus_width: 32
+    binding: exactly_one
+parameters:
+  capacity:
+    type: integer
+    default: 4
+    min: 1
+    max: 65535
+  burst_bytes:
+    type: integer
+    default: 64
+    min: 1
+    max: 4294967295
+  max_transfer_bytes:
+    type: integer
+    default: 1048576
+    min: 1
+    max: 4294967295
+assumptions:
+- burst_bytes_not_greater_than_max_transfer_bytes
+- nonoverlapping_positive_length_copy
+- capacity_includes_unconsumed_completions
+- chunk_visible_not_atomic_command
+- reset_waits_for_issued_transaction
+- no_implicit_retry
+- no_mmio_irq_sg_stride
+- no_at_dmi_debug
+build:
+  backend: cmake
+  package: AixEslDma
+  target: aix::esl::dma
+  cxx_standard: 17
+  entry: CMakeLists.txt

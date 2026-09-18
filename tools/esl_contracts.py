@@ -149,6 +149,35 @@ def validate_model(path):
     return model
 
 
+def validate_common(path):
+    path = Path(path)
+    data = load(path)
+    fields(data, {'schema_version', 'id', 'build', 'headers', 'consumers'},
+           {'schema_version', 'id', 'build', 'headers', 'consumers'})
+    if data['schema_version'] != 1 or data['id'] != 'aixsilicon:esl:common:0.1.0':
+        raise ValueError('unsupported common package schema/id')
+    expected = {'backend': 'cmake', 'package': 'AixEslCommon', 'target': 'aix::esl::common',
+                'cxx_standard': 17, 'entry': 'CMakeLists.txt'}
+    if data['build'] != expected:
+        raise ValueError('invalid common package build contract')
+    headers = data['headers']
+    if not isinstance(headers, list) or not headers or len(set(headers)) != len(headers):
+        raise ValueError('common headers must be a nonempty unique list')
+    if any(not isinstance(h, str) or not h.startswith('systemc/include/aix/esl/') or not h.endswith('.hpp')
+           for h in headers):
+        raise ValueError('invalid common public header path')
+    for relative in [*headers, 'CMakeLists.txt', 'README.md', 'docs/design.md',
+                     'docs/integration.md', 'docs/verification.md']:
+        if not inside(path.parent, relative).is_file():
+            raise ValueError(f'missing common delivery file: {relative}')
+    if not isinstance(data['consumers'], list) or len(set(data['consumers'])) < 2:
+        raise ValueError('common package requires multiple actual consumers')
+    for relative in data['consumers']:
+        if not inside(path.parent.parent, relative).is_dir():
+            raise ValueError(f'missing common consumer: {relative}')
+    return data
+
+
 def registry(root):
     data = load(root / 'registry.yaml')
     fields(data, {'schema_version', 'assets'}, {'schema_version', 'assets'})
@@ -156,12 +185,17 @@ def registry(root):
         raise ValueError('unsupported registry schema')
     ids = set()
     for asset in data['assets']:
-        fields(asset, {'id', 'kind', 'path', 'status', 'description', 'evidence'}, {'id', 'kind', 'path', 'status'})
+        fields(asset, {'id', 'kind', 'path', 'status', 'description', 'evidence', 'aliases'}, {'id', 'kind', 'path', 'status'})
         if asset['kind'] not in {'common', 'model', 'example', 'template'}:
             raise ValueError('unknown asset kind')
-        if asset['id'] in ids or asset['status'] not in {'planned', 'available'}:
+        aliases = asset.get('aliases', [])
+        if not isinstance(aliases, list) or any(not isinstance(a, str) or not re.fullmatch(
+                r'aixsilicon:esl:[a-z][a-z0-9_]*:[a-z][a-z0-9_]*:\d+\.\d+\.\d+', a) for a in aliases):
+            raise ValueError('aliases must be legacy five-part ESL IDs')
+        names = [asset['id'], *aliases]
+        if len(set(names)) != len(names) or ids.intersection(names) or asset['status'] not in {'planned', 'available'}:
             raise ValueError('duplicate id or invalid registry status')
-        ids.add(asset['id'])
+        ids.update(names)
         path = inside(root, asset['path'])
         if not path.is_dir():
             raise ValueError(f'missing registered directory: {path}')
@@ -171,6 +205,8 @@ def registry(root):
             raise ValueError('available assets require four-part IDs')
         if asset['kind'] == 'model' and validate_model(path / 'model.yaml')['id'] != asset['id']:
             raise ValueError('registry/manifest id mismatch')
+        if asset['kind'] == 'common' and validate_common(path / 'common.yaml')['id'] != asset['id']:
+            raise ValueError('registry/common manifest id mismatch')
         if asset['kind'] == 'example' and not all((path / f).is_file() for f in ['README.md', 'CMakeLists.txt']):
             raise ValueError('available example lacks README or CMake entry')
         if asset['kind'] == 'template':

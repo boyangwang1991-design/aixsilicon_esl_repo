@@ -1,0 +1,4 @@
+# C-ECC: four 64-bit codewords per Bank per cycle, separate encode/decode.
+ecc_bytes: 8
+ecc_lanes: 4
+ecc_ii: 1

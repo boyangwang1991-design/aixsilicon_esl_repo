@@ -1,0 +1,74 @@
+schema_version: 1
+id: aixsilicon:esl:uart:0.1.0
+factory: aix::esl::uart::Model
+model_kinds:
+- behavioral
+- software_visible
+profiles:
+  register:
+    timing_model: annotated
+    data_modes:
+    - full_data
+    interface_mode: register
+    transport: LT
+    capabilities:
+    - mmio32
+    - level_irq
+    - reset_cancel
+    - drain
+    - byte_fifo
+ports:
+  registers:
+    direction: target
+    type: tlm_generic_payload
+    transport: LT
+    bus_width: 32
+    binding: one_or_more
+  reset:
+    direction: input
+    type: sc_in<bool>
+    binding: required
+    active: high
+  irq:
+    direction: output
+    type: sc_out<bool>
+    binding: required
+    active: high
+  tx:
+    direction: output
+    type: sc_fifo_out<unsigned char>
+    binding: required
+parameters:
+  access_latency:
+    type: time
+    default: 1 ns
+  frame_time:
+    type: time
+    default: 10 ns
+    constraint: positive
+  tx_depth:
+    type: integer
+    default: 4
+    min: 1
+    max: 65535
+  rx_depth:
+    type: integer
+    default: 4
+    min: 1
+    max: 65535
+assumptions:
+- exploratory_abi
+- one_outstanding
+- no_at
+- no_dmi
+- no_debug
+- full_word_access_only
+- byte_level_not_16550
+- tx_depth_includes_active
+- external_sink_progress_required_for_drain
+build:
+  backend: cmake
+  package: AixEslUart
+  target: aix::esl::uart
+  cxx_standard: 17
+  entry: CMakeLists.txt

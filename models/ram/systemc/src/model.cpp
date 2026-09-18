@@ -135,11 +135,11 @@ void Model::transport(int, tlm::tlm_generic_payload& tx, sc_core::sc_time& delay
         const auto ticks = p.config.setup_ticks + beats;
         if (!wait_interval(sc_core::sc_time::from_value(ticks * p.config.tick.value()))) return;
     }
-    for (unsigned i = 0; i < length; ++i) {
-        if (enables && enables[i % enable_length] == 0) continue;
-        if (tx.is_write()) p.store[address + i] = tx.get_data_ptr()[i];
-        else tx.get_data_ptr()[i] = p.store[address + i];
-    }
+    const auto n_enables = enables ? enable_length : 0;
+    const bool moved = tx.is_write()
+        ? p.store.write(address, tx.get_data_ptr(), length, enables, n_enables)
+        : p.store.read(address, tx.get_data_ptr(), length, enables, n_enables);
+    if (!moved) throw std::logic_error("RAM prevalidated ByteStore transfer failed");
     tx.set_response_status(tlm::TLM_OK_RESPONSE);
     if (p.counts.enabled) {
         ++p.counts.completed;

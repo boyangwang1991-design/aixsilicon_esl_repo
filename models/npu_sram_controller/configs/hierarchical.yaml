@@ -1,0 +1,5 @@
+topology: hierarchical
+groups: 4
+remote_bytes: 128
+mapping: xor
+stripe_bytes: 32
