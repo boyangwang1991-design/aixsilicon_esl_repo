@@ -1,0 +1,11 @@
+# command_engine 模板（R29）：薄骨架，复用 Queue/ServiceResource/Event
+id: aixsilicon:esl:template:command_engine:0.1.0
+target: models/{name}/
+files:
+  - model.yaml
+  - model.py
+  - tests/test_template.py
+description: 命令引擎薄骨架：accept/execute/complete；复用 BoundedQueue/ServiceResource。
+requires:
+  - aixsilicon:esl:queue:bounded:0.1.0
+  - aixsilicon:esl:resource:service:0.1.0

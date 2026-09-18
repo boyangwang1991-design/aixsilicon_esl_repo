@@ -64,40 +64,72 @@ def cmd_inspect(args):
     })
 
 
+def _render_template(template: str, name: str, kind: str) -> Path:
+    """从 templates/<template>/ 渲染生成新资产（替换 {{name}} 占位符）。
+
+    模板 = 薄骨架；只写业务 hook，不复制 common 实现（边界 references/boundaries.md）。
+    返回生成的目标目录。
+    """
+    tpl_dir = REPO_ROOT / "templates" / template
+    if not (tpl_dir / "template.yaml").exists():
+        raise FileNotFoundError(f"模板 {template!r} 不存在（可用: compute/command_engine/buffer_manager/memory_target）")
+    meta = yaml.safe_load((tpl_dir / "template.yaml").read_text(encoding="utf-8"))
+    target_rel = meta.get("target", f"models/{{name}}/").replace("{name}", name)
+    target = REPO_ROOT / target_rel
+    if target.exists():
+        raise FileExistsError(f"{target} 已存在，不覆盖")
+    target.mkdir(parents=True, exist_ok=True)
+    # 渲染 template.yaml 声明的文件（相对 tpl_dir）
+    # files 声明的是【模板内实际文件名】；目标名映射规则固定：
+    #   model.py / model.cpp → <name>.py / <name>.cpp
+    #   test_template.py / test_template.cpp → tests/test_<name>.py / .cpp
+    #   其他文件           → 同名
+    for rel in meta.get("files", []):
+        src = tpl_dir / rel
+        if not src.exists():
+            continue
+        if rel in ("model.py", "model.cpp"):
+            ext = rel.rsplit(".", 1)[1]
+            dst_rel = f"{name}.{ext}"
+        elif rel.endswith("test_template.py"):
+            dst_rel = f"tests/test_{name}.py"
+        elif rel.endswith("test_template.cpp"):
+            dst_rel = f"tests/test_{name}.cpp"
+        else:
+            dst_rel = rel
+        dst = target / dst_rel
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        text = src.read_text(encoding="utf-8")
+        text = text.replace("{{name}}", name)
+        # CMakeLists 里对源文件名的引用：model.cpp → <name>.cpp
+        if rel == "CMakeLists.txt":
+            text = text.replace("model.cpp", f"{name}.cpp")
+        dst.write_text(text, encoding="utf-8")
+    # 生成目录为合法 Python 包
+    init = target / "__init__.py"
+    if not init.exists():
+        init.write_text(f'"""esl 模型 {name}（由模板生成）。"""\n', encoding="utf-8")
+    # 生成 README（模板无 README 文件时）
+    if not (target / "README.md").exists():
+        (target / "README.md").write_text(
+            f"# {name}\n\n从模板 `{template}` 生成的薄骨架（边界：不复制 common 实现）。\n",
+            encoding="utf-8")
+    return target
+
+
 def cmd_new(args):
-    """从模板生成新资产骨架（薄骨架 + 配置示例，不复制 common 实现）。"""
+    """esl new：从模板生成新模型/系统薄骨架（R29/R30）。"""
     kind = args.kind
     name = args.name
     template = args.template
-    target = REPO_ROOT / ("models" if kind == "model" else "examples") / name
-    if target.exists():
-        return _out({"command": "new", "status": "FAIL", "error": f"{target} 已存在，不覆盖"})
-    target.mkdir(parents=True, exist_ok=True)
-    # 生成 model.yaml 示例（VLNV 一律 aixsilicon:*）
-    if kind == "model":
-        model = {
-            "schema_version": 1,
-            "id": f"aixsilicon:esl:{name}:0.1.0",
-            "factory": name,
-            "model_kinds": ["behavioral"],
-            "profiles": {"functional": {"timing_model": "untimed",
-                                        "data_modes": ["full_data"],
-                                        "interface_mode": "command",
-                                        "transport": "direct",
-                                        "capabilities": []}},
-            "ports": {}, "parameters": {},
-            "assumptions": [],
-        }
-        (target / "model.yaml").write_text(
-            yaml.safe_dump(model, allow_unicode=True, sort_keys=False), encoding="utf-8")
-    else:
-        system = {"instances": {}, "connections": []}
-        (target / "system.yaml").write_text(
-            yaml.safe_dump(system, allow_unicode=True, sort_keys=False), encoding="utf-8")
-    (target / "README.md").write_text(f"# {name}\n\n从模板 `{template}` 生成的骨架（R31）。\n",
-                                      encoding="utf-8")
-    return _out({"command": "new", "status": "OK", "path": str(target.relative_to(REPO_ROOT)),
-                 "note": "骨架已生成；模板不得复制 common 实现"})
+    try:
+        target = _render_template(template, name, kind)
+    except (FileNotFoundError, FileExistsError) as exc:
+        return _out({"command": "new", "status": "FAIL", "error": str(exc)})
+    return _out({"command": "new", "status": "OK",
+                 "template": template,
+                 "path": str(target.relative_to(REPO_ROOT)),
+                 "note": "薄骨架已生成；运行 tests 前确认功能 hook 已实现；模板不得复制 common 实现"})
 
 
 def _build_mini_pipeline(**params):

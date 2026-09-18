@@ -1,0 +1,10 @@
+# memory_target 模板（R29）：薄骨架，复用 ByteStore/MemoryPort
+id: aixsilicon:esl:template:memory_target:0.1.0
+target: models/{name}/
+files:
+  - model.yaml
+  - model.py
+  - tests/test_template.py
+description: 内存目标薄骨架：地址/容量配置、响应 hook；复用 ByteStore/MemoryPort。
+requires:
+  - aixsilicon:esl:memory:byte_store:0.1.0

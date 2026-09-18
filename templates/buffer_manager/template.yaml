@@ -1,0 +1,10 @@
+# buffer_manager 模板（R29）：薄骨架，复用 BufferPool
+id: aixsilicon:esl:template:buffer_manager:0.1.0
+target: models/{name}/
+files:
+  - model.yaml
+  - model.py
+  - tests/test_template.py
+description: buffer 管理薄骨架：分配/释放策略；复用 BufferPool/Event。
+requires:
+  - aixsilicon:esl:buffer:pool:0.1.0

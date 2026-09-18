@@ -1,0 +1,15 @@
+# {{name}} model.yaml（memory_target 模板生成）
+schema_version: 1
+id: aixsilicon:esl:{{name}}:0.1.0
+factory: {{name}}
+model_kinds: [behavioral]
+profiles:
+  functional:
+    timing_model: untimed
+    data_modes: [full_data]
+    interface_mode: command
+    transport: direct
+    capabilities: [byte_store]
+ports: {memory: memory.target}
+parameters: {}
+assumptions: []

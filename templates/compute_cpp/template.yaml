@@ -1,0 +1,15 @@
+# compute_cpp 模板（R29 C++/SystemC 变体）：薄骨架，SystemC 目标模型
+# 边界：SystemC/CMake 是性能/并发/事件/目标时间的核心载体（repo-plan §2）；
+# Python 仅作 oracle/参考。生成物须能 cmake 构建并运行。
+id: aixsilicon:esl:template:compute_cpp:0.1.0
+target: models/{name}/
+files:
+  - model.yaml
+  - model.cpp
+  - CMakeLists.txt
+  - tests/test_template.cpp
+description: SystemC 计算模型薄骨架：sc_module + 功能 hook；复用 CMake 构建，不复制 common。
+requires:
+  - systemc (env)
+  - cmake (env)
+lang: cpp

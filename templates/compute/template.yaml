@@ -1,0 +1,10 @@
+# compute 模板（R29）：薄骨架，复用 ComputeShell
+id: aixsilicon:esl:template:compute:0.1.0
+target: models/{name}/
+files:
+  - model.yaml
+  - model.py
+  - tests/test_template.py
+description: 计算模型薄骨架：功能函数、类型、时间参数；复用 ComputeShell 与独立 oracle。
+requires:
+  - aixsilicon:esl:compute:0.1.0

@@ -1,0 +1,21 @@
+# {{name}} model.yaml（command_engine 模板生成）
+schema_version: 1
+id: aixsilicon:esl:{{name}}:0.1.0
+factory: {{name}}
+model_kinds: [behavioral, performance]
+profiles:
+  functional:
+    timing_model: untimed
+    data_modes: [full_data]
+    interface_mode: command
+    transport: direct
+    capabilities: [command_engine]
+  resource:
+    timing_model: resource_contention
+    data_modes: [full_data]
+    interface_mode: command
+    transport: direct
+    capabilities: [command_engine, finite_service]
+ports: {command: command.consumer, done: event.producer}
+parameters: {}
+assumptions: []
