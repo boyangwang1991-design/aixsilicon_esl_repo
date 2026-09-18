@@ -79,13 +79,13 @@ B-C0/B-C1 无依赖的项可同批开展；其他批次不能绕过输入合同�
 |---|---|---|---|
 | PW01 / P0 | 合成流量：顺序、随机、stride、热点、突发、读写混合、端口相位 | PI01/PI02/PI06；Bank/互连/DMA/存储 | 实现中：TrafficSource 顺序/stride/随机/热点/读写混合已测；多 Bank 组合实际有限 outstanding 反馈。突发与端口相位配置待扩展。 |
 | PW02 / P1 | 标准 trace reader/writer、录制/回放 | PI01、PA00、PI06 | planned；版本/时间单位/依赖/source/截断标记，真实流量和仅观测 trace 区分；回放保持语义，不将缺依赖 trace 当可重放 |
-| PW03 / P0 | 闭环 DAG 引擎、有限 buffer、完成反馈、load/compute/store 重叠 | PC01/PC03/PC08 基础依赖、PI07 | 实现中：TaskGraph 已有确定性就绪、有限并发/output buffer、末消费者释放、失败传播/环拒绝/容量停滞 fixture；SystemC 任务执行组合待补。 |
-| PW04 / P0 | 计算资源占位：计算量/吞吐、latency/II、有限并发、完成事件 | PC03、PW03 | planned；计算占位与算法数值模型区分；人工可推导首完成/稳态吞吐，对 DMA/NPU 两类组合可复用 |
-| PW05 / P0 | scoreboard：数据、mask、映射、ID 顺序、最终状态 | PI01、PC02/PC05、PW01 | 实现中：多 Bank fixture 有独立地址/最终数据 oracle；通用 scoreboard 类与 mask/顺序的组合待补。 |
-| PW06 / P0 | 协议/资源检查器：非法请求、重复完成、容量/带宽、事务/字节守恒 | PI01、PA00、PC01/PC03 | 实现中：公共接口拒绝重复/未知/提前完成与超容量，CSV 分析检查事务守恒；可复用协议监视器待补。 |
+| PW03 / P0 | 闭环 DAG 引擎、有限 buffer、完成反馈、load/compute/store 重叠 | PC01/PC03/PC08 基础依赖、PI07 | 实现中：TaskGraph 已有确定性就绪、有限并发/output buffer、末消费者释放、失败传播/环拒绝/容量停滞 fixture；新增两个有限 load/compute/store SystemC 组合，解析完成时间 13 ns 与失败隔离通过。 |
+| PW04 / P0 | 计算资源占位：计算量/吞吐、latency/II、有限并发、完成事件 | PC03、PW03 | 实现中：task_pipeline 组合采用 ResourceTiming 计算占位，latency=8 ns/II=1 ns/并发2，解析时序通过；计算量→时序配置换算接口待补。 |
+| PW05 / P0 | scoreboard：数据、mask、映射、ID 顺序、最终状态 | PI01、PC02/PC05、PW01 | 实现中：多 Bank fixture 有独立地址/最终数据 oracle；MemoryScoreboard 已实现独立 mask oracle，并接入组合的最终数据检查。 |
+| PW06 / P0 | 协议/资源检查器：非法请求、重复完成、容量/带宽、事务/字节守恒 | PI01、PA00、PC01/PC03 | 实现中：公共接口拒绝重复/未知/提前完成与超容量，CSV 分析检查事务守恒；ConservationChecker/BandwidthChecker 已实现，独立负向注入和组合守恒通过；完整协议监视器待扩展。 |
 | PW07 / P1 | NPU 访存：shape/layout/tiling/GEMM/Attention/转置 | PC05、PW01/PW03 | planned；作为独立 workload，不绑定单一 SRAM；地址/字节量/依赖/结束条件自检，支持 stride/padding 对照 |
-| PW08 / P0 | 可重放背压、错误、bank 暂停、延迟扰动、带宽下降 | PI06、PI07、PC03、PW06 | planned；明确注入时刻/对象/阶段，恢复后无丢失/重复/资源泄漏；随机扰动记录 seed |
-| PW09 / P0 | 解析微基准与独立公共 fixture | 每项公共组件、PA00 | 实现中：examples/common_primitives 已扩为 34 个 SystemC 场景，含资源/仲裁/映射/ECC/DAG/链路与组合。 |
+| PW08 / P0 | 可重放背压、错误、bank 暂停、延迟扰动、带宽下降 | PI06、PI07、PC03、PW06 | 实现中：FaultSchedule 明确目标/半开时间窗，暂停/错误/延迟/带宽效果分离；组合实际应用 Bank 暂停恢复和 DAG 分支错误。随机窗口与其他效果接入待扩展。 |
+| PW09 / P0 | 解析微基准与独立公共 fixture | 每项公共组件、PA00 | 实现中：examples/common_primitives 已扩为 39 个 SystemC 场景，含资源/仲裁/映射/ECC/DAG/链路与组合。 |
 | PW10 / P1 | RTL/测量 trace 校准、误差计算、训练/验证分离 | PI10、PW02、PA10 | planned；真实参考到位后定义误差指标/适用范围，不能用自身模型拟合自身或预设无依据误差门限 |
 
 ### 4. 统计、可视化与架构探索
