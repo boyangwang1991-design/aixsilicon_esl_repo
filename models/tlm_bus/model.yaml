@@ -1,0 +1,50 @@
+schema_version: 1
+id: aixsilicon:esl:tlm_bus:0.1.0
+factory: aix::esl::tlm_bus::Model
+model_kinds:
+- behavioral
+- performance
+profiles:
+  resource:
+    timing_model: resource_contention
+    data_modes:
+    - full_data
+    interface_mode: memory
+    transport: LT
+    capabilities:
+    - drain
+    - finite_outstanding
+ports:
+  targets:
+    direction: target
+    type: tlm_generic_payload
+    transport: LT
+    bus_width: 32
+    binding: one_or_more
+  initiators:
+    direction: initiator
+    type: tlm_generic_payload
+    transport: LT
+    bus_width: 32
+    binding: one_or_more
+parameters:
+  max_outstanding:
+    type: integer
+    default: 4
+    min: 1
+  regions:
+    type: region_array
+    required: true
+  route_latency:
+    type: time
+    default: 1 ns
+assumptions:
+- no_at
+- no_dmi
+- no_debug
+build:
+  backend: cmake
+  package: AixEslTlmBus
+  target: aix::esl::tlm_bus
+  cxx_standard: 17
+  entry: CMakeLists.txt

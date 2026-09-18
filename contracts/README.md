@@ -4,7 +4,7 @@
 [`docs/esl_repo_plan.md`](../docs/esl_repo_plan.md) §2.2/§4.1）；Skill 只引用，
 不另存副本。
 
-## 基础接口（§4.1 最小合同）
+## 历史 Python 原型接口（§4.1 最小合同）
 
 - **请求/事件字段**：所有异步操作至少携带 `request_id / task_id / epoch` 中适用
   的字段。请求有 accepted、started、completed/failed/cancelled 三类关键边界。
@@ -32,5 +32,6 @@
 
 只声明已实现的组合；选择不支持的 profile/前端/数据模式必须拒绝。
 
-> 本目录当前为 P01 骨架；完整 schema（model/system/experiment）随 R03/R04 实现
-> 加入（见 [`docs/esl_todo.md`](../docs/esl_todo.md)）。
+当前 manifest、registry 与参考后端配置的可执行校验见 [工具合同](tool_contracts.md)。通用 SystemC 系统配置装配仍待实现，不能把历史 Python 接口视为所有 SystemC 模型的统一接口。各模型 manifest 和接口文档规定其实际数据可见性与生命周期。
+
+基础 SystemC timer/IRQ 的实际软件可见接口见 [MMIO32 合同](mmio32.md)；它与历史 Python MemoryRequest 合同分开，不代表通用 schema 已全部实现。

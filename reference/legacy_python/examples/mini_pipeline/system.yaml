@@ -1,0 +1,25 @@
+schema_version: 1
+id: aixsilicon:esl:system:mini_pipeline:0.1.0
+instances:
+  dma:
+    model: aixsilicon:esl:dma:0.1.0
+    params:
+      dma_queue_depth: 4
+  bmu:
+    model: aixsilicon:esl:bmu:0.1.0
+    params:
+      num_slots: 1
+  compute:
+    model: aixsilicon:esl:compute:0.1.0
+    params: {}
+connections:
+- from: dma
+  to: ext_mem
+  kind: memory
+- from: dma
+  to: sram
+  kind: memory
+- from: compute
+  to: sram
+  kind: memory
+backend: legacy-python-mini-pipeline

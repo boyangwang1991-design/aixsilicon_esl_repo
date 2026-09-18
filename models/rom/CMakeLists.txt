@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 3.19)
+project(AixEslRom VERSION 0.1.0 LANGUAGES CXX)
+include("${CMAKE_CURRENT_LIST_DIR}/../../cmake/ESLModel.cmake")
+if(NOT TARGET aix::esl::ram)
+    add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/../ram" ram-dependency)
+endif()
+esl_model(rom AixEslRom LIBRARIES aix::esl::ram PACKAGES AixEslRam)

@@ -1,278 +1,247 @@
-"""esl 统一 CLI 入口（R31：doctor / inspect / new / run / sweep / compare）。
-
-确定性执行门禁：Skill 与用户都应通过本入口调用 Repo 能力，不手写一次性脚本。
-- doctor：环境检查
-- inspect：能力发现（只返回 available 资产）
-- new：从模板生成 model/system 骨架
-- run：运行 system.yaml（含 oracle/checks/summary 输出）
-- sweep：参数扫描（保留全部点含失败）
-- compare：比较两 run 结果
-
-运行：uv run python tools/esl_cli.py <command> [args]
-"""
+"""Asset discovery, validated generation and explicit legacy-reference execution."""
 from __future__ import annotations
 
 import argparse
+import itertools
 import json
+import math
+import struct
 import sys
+import tempfile
+import uuid
 from pathlib import Path
 
-try:
-    import yaml
-except ImportError:  # pragma: no cover
-    yaml = None
+import yaml
 
-REPO_ROOT = Path(__file__).resolve().parent.parent
-REGISTRY = REPO_ROOT / "registry.yaml"
+# Also supports importlib-loaded test/host callers without requiring PYTHONPATH.
+TOOLS = Path(__file__).resolve().parent
+if str(TOOLS) not in sys.path:
+    sys.path.insert(0, str(TOOLS))
+import esl_contracts as contracts  # noqa: E402
 
-
-def _load_registry():
-    if yaml is None:
-        raise RuntimeError("需要 PyYAML（workflow 根环境已含；uv run 即可）")
-    data = yaml.safe_load(REGISTRY.read_text(encoding="utf-8"))
-    return data.get("assets", [])
+REPO_ROOT = TOOLS.parent
+LEGACY_ROOT = REPO_ROOT / 'reference/legacy_python'
 
 
-def _out(obj) -> int:
+def _out(obj):
     print(json.dumps(obj, ensure_ascii=False, indent=2))
-    return 0
+    return 0 if obj.get('status') in {'PASS', 'OK'} else 1
 
 
-def cmd_doctor(_args):
-    import esl_doctor  # 同目录模块
-    return esl_doctor.main()
+def _use_legacy():
+    if str(LEGACY_ROOT) not in sys.path:
+        sys.path.insert(0, str(LEGACY_ROOT))
 
 
 def cmd_inspect(args):
-    """只返回 available（可运行候选）；planned 不返回。"""
-    assets = _load_registry()
-    kind = getattr(args, "kind", None)
+    assets = contracts.registry(REPO_ROOT)
+    selected = [a for a in assets if not args.kind or a['kind'] == args.kind]
     available = []
-    planned_count = 0
-    for a in assets:
-        if kind and a.get("kind") != kind:
+    for asset in selected:
+        if asset['status'] != 'available':
             continue
-        if a.get("status", "planned") == "available":
-            available.append({"id": a["id"], "path": a["path"],
-                              "description": a.get("description", "")})
-        else:
-            planned_count += 1
-    return _out({
-        "command": "inspect", "kind": kind or "all",
-        "available": available, "planned_count": planned_count,
-        "message": "仅 available 资产可运行；planned 资产需先实现（见 docs/esl_todo.md）",
-    })
+        item = dict(asset)
+        item['evidence_status'] = contracts.evidence_status(REPO_ROOT, asset)
+        if asset['kind'] == 'model':
+            item['manifest'] = contracts.validate_model(REPO_ROOT / asset['path'] / 'model.yaml')
+        available.append(item)
+    return _out({'command': 'inspect', 'status': 'PASS', 'available': available,
+                 'planned_count': sum(a['status'] == 'planned' for a in selected)})
 
 
-def _render_template(template: str, name: str, kind: str) -> Path:
-    """从 templates/<template>/ 渲染生成新资产（替换 {{name}} 占位符）。
-
-    模板 = 薄骨架；只写业务 hook，不复制 common 实现（边界 references/boundaries.md）。
-    返回生成的目标目录。
-    """
-    tpl_dir = REPO_ROOT / "templates" / template
-    if not (tpl_dir / "template.yaml").exists():
-        raise FileNotFoundError(f"模板 {template!r} 不存在（可用: compute/command_engine/buffer_manager/memory_target）")
-    meta = yaml.safe_load((tpl_dir / "template.yaml").read_text(encoding="utf-8"))
-    target_rel = meta.get("target", f"models/{{name}}/").replace("{name}", name)
-    target = REPO_ROOT / target_rel
+def _render_template(template, name, kind, output=None):
+    if not contracts.NAME.fullmatch(name) or not contracts.NAME.fullmatch(template):
+        raise ValueError('name and template must be lowercase identifiers, not paths')
+    entries = [a for a in contracts.registry(REPO_ROOT)
+               if a['kind'] == 'template' and Path(a['path']).name == template]
+    if len(entries) != 1 or entries[0]['status'] != 'available':
+        raise ValueError(f'template {template!r} is missing or planned; generation refused')
+    source = contracts.inside(REPO_ROOT, entries[0]['path'])
+    meta = contracts.load(source / 'template.yaml')
+    contracts.fields(meta, {'id', 'kind', 'files', 'support_files'}, {'id', 'kind', 'files', 'support_files'})
+    if meta['id'] != entries[0]['id'] or meta['kind'] != kind:
+        raise ValueError('template id/kind mismatch')
+    target = (Path(output) if output else REPO_ROOT / 'models' / name).resolve()
     if target.exists():
-        raise FileExistsError(f"{target} 已存在，不覆盖")
-    target.mkdir(parents=True, exist_ok=True)
-    # 渲染 template.yaml 声明的文件（相对 tpl_dir）
-    # files 声明的是【模板内实际文件名】；目标名映射规则固定：
-    #   model.py / model.cpp → <name>.py / <name>.cpp
-    #   test_template.py / test_template.cpp → tests/test_<name>.py / .cpp
-    #   其他文件           → 同名
-    for rel in meta.get("files", []):
-        src = tpl_dir / rel
-        if not src.exists():
-            continue
-        if rel in ("model.py", "model.cpp"):
-            ext = rel.rsplit(".", 1)[1]
-            dst_rel = f"{name}.{ext}"
-        elif rel.endswith("test_template.py"):
-            dst_rel = f"tests/test_{name}.py"
-        elif rel.endswith("test_template.cpp"):
-            dst_rel = f"tests/test_{name}.cpp"
-        else:
-            dst_rel = rel
-        dst = target / dst_rel
-        dst.parent.mkdir(parents=True, exist_ok=True)
-        text = src.read_text(encoding="utf-8")
-        text = text.replace("{{name}}", name)
-        # CMakeLists 里对源文件名的引用：model.cpp → <name>.cpp
-        if rel == "CMakeLists.txt":
-            text = text.replace("model.cpp", f"{name}.cpp")
-        dst.write_text(text, encoding="utf-8")
-    # 生成目录为合法 Python 包
-    init = target / "__init__.py"
-    if not init.exists():
-        init.write_text(f'"""esl 模型 {name}（由模板生成）。"""\n', encoding="utf-8")
-    # 生成 README（模板无 README 文件时）
-    if not (target / "README.md").exists():
-        (target / "README.md").write_text(
-            f"# {name}\n\n从模板 `{template}` 生成的薄骨架（边界：不复制 common 实现）。\n",
-            encoding="utf-8")
+        raise FileExistsError(f'{target} exists; refusing overwrite')
+    replacements = {'{{name}}': name, '{{package}}': 'AixEsl' + ''.join(x.capitalize() for x in name.split('_'))}
+    staged = {}
+    for relative in meta['files']:
+        src = contracts.inside(source, relative)
+        text = src.read_text(encoding='utf-8')  # Missing files fail before creating a directory.
+        dest = relative
+        for token, value in replacements.items():
+            dest, text = dest.replace(token, value), text.replace(token, value)
+        contracts.inside(target, dest)
+        if '{{' in text or '{{' in dest or dest in staged:
+            raise ValueError(f'unresolved placeholder or duplicate destination: {relative}')
+        staged[dest] = text
+    for dest, relative in meta['support_files'].items():
+        contracts.inside(target, dest)
+        if dest in staged:
+            raise ValueError('duplicate template support file')
+        staged[dest] = contracts.inside(REPO_ROOT, relative).read_text(encoding='utf-8')
+    target.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix='.esl-new-', dir=target.parent) as temp:
+        stage = Path(temp) / name
+        stage.mkdir()
+        for relative, text in staged.items():
+            dst = stage / relative
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            dst.write_text(text, encoding='utf-8')
+        contracts.validate_model(stage / 'model.yaml')
+        stage.rename(target)
     return target
 
 
 def cmd_new(args):
-    """esl new：从模板生成新模型/系统薄骨架（R29/R30）。"""
-    kind = args.kind
-    name = args.name
-    template = args.template
-    try:
-        target = _render_template(template, name, kind)
-    except (FileNotFoundError, FileExistsError) as exc:
-        return _out({"command": "new", "status": "FAIL", "error": str(exc)})
-    return _out({"command": "new", "status": "OK",
-                 "template": template,
-                 "path": str(target.relative_to(REPO_ROOT)),
-                 "note": "薄骨架已生成；运行 tests 前确认功能 hook 已实现；模板不得复制 common 实现"})
+    target = _render_template(args.template, args.name, args.kind, args.output)
+    return _out({'command': 'new', 'status': 'OK', 'path': str(target),
+                 'asset_status': 'unregistered', 'note': 'generated model needs its own validation before registration'})
 
 
 def _build_mini_pipeline(**params):
-    """构造 mini_pipeline 系统实例（R31 run 用）。"""
+    _use_legacy()
     from examples.mini_pipeline.system import MiniPipeline
     return MiniPipeline(**params)
 
 
-def cmd_run(args):
-    """esl run：运行 system（mini_pipeline）→ ticks + 数据校验 + checks。
-
-    运行记录输出到 runs/<run_id>/（run.json/metrics/checks/summary）。
-    """
-    import time as _time
-    from common.base.config import validate_system
-    from common.testing.reporting import one_page_summary, write_run_outputs
-
-    system_path = Path(args.system)
-    if not system_path.exists():
-        return _out({"command": "run", "status": "BLOCKED", "error": f"{system_path} 不存在"})
-    if yaml is None:
-        return _out({"command": "run", "status": "BLOCKED", "error": "缺 PyYAML"})
-    system = yaml.safe_load(system_path.read_text(encoding="utf-8"))
-    # 从 system.yaml 读取实例参数（slot 数等）
-    params = {}
-    instances = system.get("instances", {})
-    for name, spec in instances.items():
-        if isinstance(spec, dict) and "params" in spec:
-            params.update(spec["params"])
-    validate_system(system)
-
-    run_id = f"run-{int(_time.time())}"
+def _execute_reference(system, backend):
+    params = contracts.validate_reference(system, backend)
     mp = _build_mini_pipeline(**params)
     ticks = mp.run()
-    data_ok = mp.check_output()
-    execution_status = "OK"
-    overall_status = "PASS" if data_ok else "FAIL"
-    checks = [
-        {"name": "config_valid", "status": "PASS", "detail": "system.yaml 校验通过"},
-        {"name": "data_oracle", "status": "PASS" if data_ok else "FAIL",
-         "detail": "独立 oracle 逐元素比对"},
-        {"name": "performance_sanity", "status": "PASS",
-         "detail": f"total_ticks={ticks}（解析预期由实验配置决定）"},
-    ]
-    metrics = {"total_ticks": ticks, "n_elements": mp.n_elements,
-               "num_chunks": mp.num_chunks, "data_ok": data_ok}
-    summary = one_page_summary(work_type="run", assets="mini_pipeline",
-                               profile="pipeline_analytic",
-                               inputs=f"slots={params.get('num_slots', 1)}",
-                               execution=f"真实运行 {ticks} ticks",
-                               checks_status=overall_status,
-                               evidence_path=f"runs/{run_id}/",
-                               limitations="未建模 bank/descriptor/RTL；tick 为资源模型内结果")
-    run_dir = write_run_outputs(
-        REPO_ROOT / "runs", run_id, config=system, metrics=metrics, checks=checks,
-        summary_text=summary, execution_status=execution_status,
-        overall_status=overall_status)
-    return _out({"command": "run", "status": overall_status, "run_id": run_id,
-                 "ticks": ticks, "data_ok": data_ok,
-                 "output_dir": str(run_dir.relative_to(REPO_ROOT))})
+    # Independent arithmetic oracle: does not call ComputeShell/vector_affine.
+    expected = b''.join(struct.pack('<h', max(-32768, min(32767, 2 * (((17 * i + 5) % 65536) - 32768) + 3)))
+                        for i in range(params['n_elements']))
+    data_ok = mp.ext_mem.read(0x10000, len(expected)) == expected
+    chunks = params['n_elements'] // 256
+    dma = 4 + (512 + params['dma_bytes_per_tick'] - 1) // params['dma_bytes_per_tick']
+    compute = 4 + (256 + params['compute_elements_per_tick'] - 1) // params['compute_elements_per_tick']
+    lower, upper = max(2 * chunks * dma, chunks * compute), chunks * (2 * dma + compute)
+    timing_ok = type(ticks) is int and lower <= ticks <= upper
+    return {'status': 'PASS' if data_ok and timing_ok else 'FAIL', 'backend': contracts.BACKEND,
+            'scope': 'legacy_reference', 'target_validation': 'NOT_RUN', 'profile': 'pipeline_analytic',
+            'time_unit': 'reference_tick', 'config': params, 'total_ticks': ticks, 'data_ok': data_ok,
+            'checks': [{'name': 'config_valid', 'status': 'PASS'},
+                       {'name': 'independent_data_oracle', 'status': 'PASS' if data_ok else 'FAIL'},
+                       {'name': 'service_time_bounds', 'status': 'PASS' if timing_ok else 'FAIL',
+                        'lower': lower, 'upper': upper, 'actual': ticks}]}
+
+
+def cmd_run(args):
+    system = contracts.load(args.system)
+    result = _execute_reference(system, args.backend)
+    run = REPO_ROOT / 'runs' / f'reference-{uuid.uuid4().hex}'
+    run.mkdir(parents=True)
+    result.update(command='run', output_dir=str(run))
+    (run / 'result.json').write_text(json.dumps(result, ensure_ascii=False, indent=2) + '\n')
+    (run / 'system.yaml').write_text(yaml.safe_dump(system, sort_keys=False))
+    return _out(result)
 
 
 def cmd_sweep(args):
-    """esl sweep：参数扫描（保留全部点含失败/非法）。"""
-    import time as _time
-    from common.testing.sweep import SweepRunner
-
-    if yaml is None:
-        return _out({"command": "sweep", "status": "BLOCKED", "error": "缺 PyYAML"})
-    exp_path = Path(args.experiment)
-    if not exp_path.exists():
-        return _out({"command": "sweep", "status": "BLOCKED", "error": f"{exp_path} 不存在"})
-    exp = yaml.safe_load(exp_path.read_text(encoding="utf-8"))
-    sweep_map = exp.get("sweep", {})
-    keys = list(sweep_map)
-    values = list(sweep_map.values())
-    if not keys:
-        return _out({"command": "sweep", "status": "FAIL", "error": "sweep 为空"})
+    exp = contracts.load(args.experiment)
+    contracts.fields(exp, {'schema_version', 'system', 'backend', 'baseline', 'sweep', 'metrics', 'mode'},
+                     {'schema_version', 'system', 'sweep'})
+    if exp['schema_version'] != 1:
+        raise ValueError('unsupported experiment schema')
+    system = contracts.load(Path(args.experiment).resolve().parent / exp['system'])
+    backend = args.backend or exp.get('backend') or system.get('backend')
+    if exp.get('backend', backend) != backend:
+        raise ValueError('conflicting experiment backend')
+    if not isinstance(exp.get('metrics', []), list) or not set(exp.get('metrics', [])) <= {'total_ticks', 'data_ok'}:
+        raise ValueError('unsupported reference metric')
+    contracts.validate_reference(system, backend)
+    sweep, baseline = exp['sweep'], exp.get('baseline', {})
+    contracts.fields(sweep, contracts.DEFAULTS)
+    contracts.fields(baseline, contracts.DEFAULTS)
+    if not sweep or any(not isinstance(v, list) or not v for v in sweep.values()):
+        raise ValueError('sweep must contain nonempty parameter lists')
+    keys, values = list(sweep), list(sweep.values())
+    mode = exp.get('mode', 'cartesian')
+    if mode == 'zip':
+        if len({len(v) for v in values}) != 1:
+            raise ValueError('zip sweep lengths must match; points cannot be truncated')
+        combos = zip(*values, strict=True)
+    elif mode == 'cartesian':
+        combos = itertools.product(*values)
+    else:
+        raise ValueError('mode must be cartesian or zip')
     points = []
-    for combo in zip(*[v if isinstance(v, list) else [v] for v in values]):
-        points.append(dict(zip(keys, combo)))
-
-    def run_fn(params):
-        mp = _build_mini_pipeline(**params)
-        ticks = mp.run()
-        ok = mp.check_output()
-        return {"ticks": ticks, "data_ok": ok, "config": dict(params),
-                "status": "PASS" if ok else "FAIL"}
-
-    runner = SweepRunner()
-    runner.run(points, run_fn)
-    return _out({"command": "sweep", "experiment": str(exp_path),
-                 "summary": runner.summary(), "points": runner.points})
+    for combo in combos:
+        changes = {**baseline, **dict(zip(keys, combo, strict=True))}
+        candidate = json.loads(json.dumps(system))
+        for owner, names in contracts.OWNERS.items():
+            candidate['instances'][owner].setdefault('params', {}).update({k: v for k, v in changes.items() if k in names})
+        try:
+            point = _execute_reference(candidate, backend)
+        except Exception as exc:
+            # A failed simulation must not discard other sweep points; interrupts still propagate.
+            point = {'status': 'FAIL', 'error': str(exc)}
+        points.append({'index': len(points), 'requested': changes, **point})
+    return _out({'command': 'sweep', 'status': 'PASS' if all(p['status'] == 'PASS' for p in points) else 'FAIL',
+                 'mode': mode, 'points': points, 'total': len(points)})
 
 
 def cmd_compare(args):
-    """esl compare：比较两 run 的结果 dict（同口径指标）。"""
-    from common.testing.sweep import RunComparator
-
-    try:
-        a = json.loads(Path(args.run_a).read_text(encoding="utf-8"))
-        b = json.loads(Path(args.run_b).read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError) as exc:
-        return _out({"command": "compare", "status": "FAIL", "error": str(exc)})
-    cmp = RunComparator()
-    report = cmp.compare(a, b)
-    return _out({"command": "compare", "status": "OK", "report": report})
+    a, b = (json.loads(Path(p).read_text()) for p in [args.run_a, args.run_b])
+    for key in ['backend', 'scope', 'profile', 'time_unit']:
+        if not a.get(key) or a.get(key) != b.get(key):
+            raise ValueError(f'incomparable runs: {key}')
+    for result in [a, b]:
+        if result.get('status') != 'PASS' or result.get('data_ok') is not True:
+            raise ValueError('comparison requires successful validated runs')
+        value = result.get('total_ticks')
+        if type(value) not in {int, float} or not math.isfinite(value) or value <= 0:
+            raise ValueError('missing/invalid total_ticks')
+    if a['config']['n_elements'] != b['config']['n_elements']:
+        raise ValueError('different workloads cannot be compared as equal work')
+    return _out({'command': 'compare', 'status': 'PASS', 'time_unit': a['time_unit'],
+                 'delta_ticks': b['total_ticks'] - a['total_ticks'], 'ratio': b['total_ticks'] / a['total_ticks']})
 
 
 def main(argv=None):
-    parser = argparse.ArgumentParser(prog="esl", description="esl_repo 统一 CLI")
-    sub = parser.add_subparsers(dest="command", required=True)
-
-    p_doc = sub.add_parser("doctor", help="环境检查")
-    p_doc.set_defaults(func=cmd_doctor)
-
-    p_insp = sub.add_parser("inspect", help="能力发现")
-    p_insp.add_argument("--kind", choices=["common", "model", "example", "template"],
-                        default=None, help="按类别过滤")
-    p_insp.set_defaults(func=cmd_inspect)
-
-    p_new = sub.add_parser("new", help="从模板生成骨架")
-    p_new.add_argument("kind", choices=["model", "system"], help="生成类型")
-    p_new.add_argument("name", help="资产名")
-    p_new.add_argument("--template", default="thin", help="模板名")
-    p_new.set_defaults(func=cmd_new)
-
-    p_run = sub.add_parser("run", help="运行 system（mini_pipeline）")
-    p_run.add_argument("system", help="system.yaml 路径")
-    p_run.set_defaults(func=cmd_run)
-
-    p_sweep = sub.add_parser("sweep", help="参数扫描")
-    p_sweep.add_argument("experiment", help="experiment.yaml 路径")
-    p_sweep.set_defaults(func=cmd_sweep)
-
-    p_cmp = sub.add_parser("compare", help="比较两 run")
-    p_cmp.add_argument("run_a", help="run A（json 文件）")
-    p_cmp.add_argument("run_b", help="run B（json 文件）")
-    p_cmp.set_defaults(func=cmd_compare)
-
+    parser = argparse.ArgumentParser(prog='esl')
+    sub = parser.add_subparsers(dest='command', required=True)
+    sub.add_parser('doctor')
+    inspect = sub.add_parser('inspect')
+    inspect.add_argument('--kind', choices=['common', 'model', 'example', 'template'])
+    validate = sub.add_parser('validate')
+    validate.add_argument('--model', type=Path, help='model.yaml; otherwise validate available registry assets')
+    validate.add_argument('--evidence', action='store_true', help='require current hashes for available assets')
+    new = sub.add_parser('new')
+    new.add_argument('kind', choices=['model', 'system'])
+    new.add_argument('name')
+    new.add_argument('--template', default='register_target')
+    new.add_argument('--output', type=Path, help='new directory; never overwrite')
+    for command, file in [('run', 'system'), ('sweep', 'experiment')]:
+        p = sub.add_parser(command, help='explicit legacy reference backend only; SystemC uses CMake')
+        p.add_argument(file)
+        p.add_argument('--backend', help=f'currently supported: {contracts.BACKEND}')
+    compare = sub.add_parser('compare')
+    compare.add_argument('run_a')
+    compare.add_argument('run_b')
     args = parser.parse_args(argv)
-    return args.func(args)
+    try:
+        if args.command == 'doctor':
+            import esl_doctor
+            return esl_doctor.main()
+        if args.command == 'validate':
+            if args.model:
+                contracts.validate_model(args.model)
+            else:
+                assets = contracts.registry(REPO_ROOT)
+                if args.evidence:
+                    failures = {a['id']: contracts.evidence_status(REPO_ROOT, a)
+                                for a in assets if a['status'] == 'available'
+                                and contracts.evidence_status(REPO_ROOT, a) != 'CURRENT'}
+                    if failures:
+                        raise ValueError(f'evidence unavailable or stale: {failures}')
+            return _out({'command': 'validate', 'status': 'PASS'})
+        return globals()['cmd_' + args.command](args)
+    except (OSError, ValueError, TypeError, KeyError, RuntimeError, yaml.YAMLError) as exc:
+        return _out({'command': args.command, 'status': 'FAIL', 'error': str(exc)})
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     sys.exit(main())

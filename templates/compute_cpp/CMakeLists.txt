@@ -1,19 +1,7 @@
-# {{name}}：SystemC 薄骨架构建（compute_cpp 模板）
-# 用法：cmake -DSYSTEMC_HOME=$SYSTEMC_HOME -S . -B build && cmake --build build
-cmake_minimum_required(VERSION 3.16)
+# Existing executable template; reusable model-library packaging is tracked in SC01/SC03.
+cmake_minimum_required(VERSION 3.19)
 project({{name}} LANGUAGES CXX)
-set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-if(NOT DEFINED SYSTEMC_HOME AND DEFINED ENV{SYSTEMC_HOME})
-    set(SYSTEMC_HOME "$ENV{SYSTEMC_HOME}")
-endif()
-if(SYSTEMC_HOME)
-    set(CMAKE_PREFIX_PATH "${SYSTEMC_HOME};${CMAKE_PREFIX_PATH}")
-endif()
-find_library(SYSTEMC_LIB NAMES systemc HINTS ${SYSTEMC_HOME}/lib-linux64 REQUIRED)
-find_path(SYSTEMC_INCLUDE systemc.h HINTS ${SYSTEMC_HOME}/include REQUIRED)
-
+include("${CMAKE_CURRENT_LIST_DIR}/../../cmake/ESLSystemC.cmake")
 add_executable({{name}} model.cpp)
-target_include_directories({{name}} PRIVATE ${SYSTEMC_INCLUDE})
-target_link_libraries({{name}} PRIVATE ${SYSTEMC_LIB})
+target_compile_features({{name}} PRIVATE cxx_std_${ESL_CXX_STANDARD})
+target_link_libraries({{name}} PRIVATE SystemC::systemc)

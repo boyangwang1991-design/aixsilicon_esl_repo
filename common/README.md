@@ -1,32 +1,7 @@
-# 公共组件（common/）
+# SystemC 公共实现
 
-可编译/可复用的公共实现。**只此一份**；模型/示例不得复制（边界：见 skill
-references/boundaries.md）。
+目标模型内部共用组件位于 systemc/include/aix/esl：ByteStore、BlockingGate/BlockingLease。Mmio32 是经 timer/IRQ 系统回归的私有 helper，访问规则见 [合同](../contracts/mmio32.md)。模型通过私有 include 复用，不要求消费者访问这些实现头文件。
 
-## 目录
+公开模型 API 不暴露内部组件类型。公共接口如需对外发布，应另有版本化 target、安装与消费验证，不能把当前内部 header 视作已发布 ABI。
 
-| 子目录 | 组件 | 用途 |
-|---|---|---|
-| `base/` | TickClock、IdAllocator、Epoch、错误类型、EventChannel、TaskGraph、config 校验/Factory | 时间/ID/生命周期/配置基础 |
-| `transport/` | MemoryRequest、Command、Completion | 请求/命令/完成合同 |
-| `resources/` | BoundedQueue、ServiceResource、Arbiter | 有限队列/非流水服务/仲裁 |
-| `memory/` | ByteStore、BufferPool、MemoryPort | 真实字节存储/固定 slot/异步端口 |
-| `observability/` | Observer、MetricRegistry、Aggregator、TraceRecorder、instrument | 埋点/聚合/trace/导出/自动埋点 |
-| `testing/` | Oracle、ScenarioRunner、FaultInjector、SanityChecker、SweepRunner、RunComparator、reporting | oracle/场景/故障/自洽/扫描/比较/报告 |
-
-## 运行/测试
-
-```bash
-# 组件冒烟（R06–R12）
-PYTHONPATH=<esl_repo> uv run --project . python \
-  <esl_repo>/common/base/tests/test_config_contracts.py
-# 观察器（A06–A10）
-PYTHONPATH=<esl_repo> uv run --project . python \
-  <esl_repo>/common/observability/tests/test_observability.py
-```
-
-## 修改纪律
-
-- 修一次公共组件让所有模型受益；改 Queue/Memory/Observe 需跑对应公共测试与
-  小系统回归。
-- 公共组件自带标准埋点（busy/queue 积分/字节计数），模型只补业务事实。
+历史 Python 公共组件唯一位于 [reference/legacy_python/common](../reference/legacy_python/common)，与 SystemC 目标状态分开。构建和回归见 [基础系统](../examples/basic_system/README.md)。

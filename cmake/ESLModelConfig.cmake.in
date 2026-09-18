@@ -1,0 +1,6 @@
+@PACKAGE_INIT@
+include(CMakeFindDependencyMacro)
+include("${CMAKE_CURRENT_LIST_DIR}/cmake/ESLSystemC.cmake")
+@ESL_DEPENDENCIES@
+include("${CMAKE_CURRENT_LIST_DIR}/@ESL_PACKAGE@Targets.cmake")
+check_required_components(@ESL_PACKAGE@)

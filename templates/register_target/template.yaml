@@ -1,0 +1,19 @@
+id: aixsilicon:esl:register_target:0.1.0
+kind: model
+files:
+- CMakeLists.txt
+- systemc/include/{{name}}/config.hpp
+- systemc/include/{{name}}/model.hpp
+- systemc/src/model.cpp
+- examples/integration/CMakeLists.txt
+- examples/integration/main.cpp
+- README.md
+- docs/design.md
+- docs/integration.md
+- docs/verification.md
+- model.yaml
+support_files:
+  cmake/ESLModel.cmake: cmake/ESLModel.cmake
+  cmake/ESLSystemC.cmake: cmake/ESLSystemC.cmake
+  cmake/ESLModelConfig.cmake.in: cmake/ESLModelConfig.cmake.in
+  contracts/environment.json: contracts/environment.json

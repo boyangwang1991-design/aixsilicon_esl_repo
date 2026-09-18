@@ -4,15 +4,15 @@ name: esl_repo
 document_version: 1.3.0
 status: proposed
 date: 2026-09-17
-companion: esl-development-suite-plan.md
-example: esl-testcase.md
+method_owner: esl-development-suite
+example: esl_testcase.md
 ---
 
 # esl_repo：面向架构探索的模型与公共组件库
 
 本文替代上一版规划。核心调整：**公共组件做扎实，单次探索流程做轻；先能组合、能运行、能观察，再按问题增加精度。** 不要求每个模型建立完整需求文档、RTM、多级 Gate 或 RTL 校准。
 
-本文是待实施方案。组件名、API、命令和数值示例均是拟开发合同，不表示已有可运行实现。配套文件：[esl-development-suite-plan.md](esl-development-suite-plan.md)、[esl-testcase.md](esl-testcase.md)。
+本文是待实施方案。组件名、API、命令和数值示例均是拟开发合同，不表示已有可运行实现。配套文件：本仓 [测试案例](esl_testcase.md) 和 [资产进度](esl_todo.md)；开发方法唯一归 esl-development-suite。
 
 ## 1. 最小目标与开发边界
 
@@ -23,14 +23,14 @@ example: esl-testcase.md
 | 默认需要 | 按需增加 | 本次不作为基础设施目标 |
 |---|---|---|
 | 有限队列/资源、数据与事件语义、最小 oracle、性能观测、可重跑配置 | 寄存器兼容、真实 descriptor ABI、AT 精细握手、RTL/ISS、校准 | 全套 CPU/DDR/NoC 自研、数据库、云调度、复杂权限平台 |
-| 一份 model.yaml、一份 README、源码与少量测试 | 完整需求文档、RTM、兼容矩阵、发布审批 | 为每个模型重复写多份规格或强制走多级 Gate |
+| model.yaml、SystemC 库、设计/集成/验证文档与消费者用例 | 完整需求文档、RTM、兼容矩阵、发布审批 | 为每个模型重复写多份规格或强制走多级 Gate |
 
 探索结论可以基于假设。报告列明假设即可；缺少 RTL 不能阻止架构探索，但不应声称预测准确到某个百分比。
 
 ## 2. 技术分工与模型精度
 
-- Python：功能 oracle、工作负载、配置、sweep、结果分析。
-- C++ / SystemC：系统并发、事件、资源竞争和目标仿真时间。
+- Python：可选算法行为参考/oracle；也可用于工程配置、测试驱动和结果分析，不能替代 SystemC 目标模型。
+- C++ / SystemC：ESL 模型主体，包括行为、系统并发、事件、资源竞争和目标仿真时间。
 - TLM：内存访问的互操作接口；命令、事件和 buffer 服务使用简单有类型接口。
 - RTL/ISS：有具体需求时通过适配器加入，不是跑通基础示例的前提。
 
@@ -47,7 +47,7 @@ Linux 作为统一构建/运行环境；Windows 用户可连接 Linux 环境。�
 | software_visible | 软件可见 Software-Visible | 寄存器、descriptor、IRQ、软件可见副作用 | 具备完整CPU/OS或精确硬件性能 |
 | microarchitecture | 微架构详细 Microarchitecture-Detailed | 指定内部资源、流水、路由/流控 | 整个模型逐周期等价RTL |
 
-功能参考是 behavioral 的一种用途，不单独增加一种模型类别。多个类别可属于同一资产；复用行为核心，组合时间策略与前端，避免复制四份完整模型。纯性能模型允许没有真实数据路径；纯Python功能参考也允许不依赖SystemC。
+功能参考是 behavioral 的一种用途，不单独增加一种模型类别。多个类别可属于同一资产；复用行为核心，组合时间策略与前端，避免复制四份完整模型。纯性能模型允许没有真实数据路径；可选 Python 算法参考不依赖 SystemC，但其通过不代表目标模型交付。
 
 ### 2.2 profile：一组已经实现且经过声明的配置
 
@@ -80,49 +80,11 @@ Linux 作为统一构建/运行环境；Windows 用户可连接 Linux 环境。�
 
 ## 3. 仓库结构与职责
 
-```text
-esl_repo/
-  README.md
-  registry.yaml
-  contracts/                 # 少量 schema 和公共接口说明
-  common/
-    base/                    # 时间、ID、配置、错误、生命周期
-    transport/               # 内存/命令/事件接口、TLM 适配
-    resources/               # queue、server、arbiter、credit
-    memory/                  # byte store、bank service
-    registers/               # regbank、访问语义、IRQ helper
-    observability/           # counters、trace、collector、export
-    testing/                 # oracle、scenario、fault、microbench
-  models/                    # DMA/BMU/Scheduler/Compute 等组合模型
-  templates/                 # 模型、系统、实验的可运行起点
-  examples/mini_pipeline/    # 基础行为/性能组合案例
-  examples/multiport_sram_perf/ # 多AXI端口SRAM性能专项案例
-  tools/                     # ESL 生成、构建、运行、分析等确定性工具资产
-  docs/
-  CMakeLists.txt
-  pyproject.toml
-```
+实际目录唯一见 [仓库布局与迁移索引](repository_layout.md)。未来能力按 registry/TODO 推进，不在这里重复维护第二份目录树。
 
 `common` 存可编译组件，`templates` 存少量薄骨架，`models` 存可实例化模型，`examples` 存具体组合。模板不得复制 common 的实现；修一次公共组件应让所有模型受益。
 
 Skill 本体放既有 Skill 仓库，仅承载方法。ESL 专用生成器、构建/运行入口、观测器、测试工具及模板作为工程资产放本 Repo；可以调用既有 tool-repo 的通用能力，但不要求为 ESL 再拆一个工具仓库。
-
-### 3.1 Repo 放资产，Skill 放方法
-
-| 内容 | 唯一归属 | 另一方如何使用 |
-|---|---|---|
-| 模型源码、公共组件、runtime、接口/schema | esl_repo | Skill 读取规范、选择并调用 |
-| 模型/系统/报告模板、generator、环境配方 | esl_repo | Skill 选择 template ID 与参数 |
-| 性能观察器、测试 harness、oracle、测试数据 | esl_repo | Skill 决定测什么、运行什么、解释结果 |
-| 示例系统、实验配置、模型使用文档 | esl_repo | Skill 用作现成资产与练习题 |
-| 建模深度选择、复用原则、流程、诊断策略 | Skill | Repo 不另存一套工作流方法 |
-| 工具调用说明、失败处置、报告解读方法 | Skill | 指向 Repo 的真实接口与资产 |
-
-Repo 中的 API 说明和模型 README 是资产使用说明；Skill 中的“何时选择哪个模型、如何比较架构”是方法。声明某模板存在的是 Repo 注册表，决定本任务是否使用它的是 Skill。二者通过版本化资产 ID、参数与工具结果衔接，不复制实现。
-
-一个简单判据：**不用 AI/Skill 也应能运行 Repo 的示例；换一套 Repo，Skill 的通用方法仍应大体成立。**
-
-单模型默认只要求 `model.yaml / README.md / src/ / tests/` 与匹配语言的构建/运行入口；C++用CMake，纯Python参考无需CMake或SystemC。README 合并行为、参数、限制、用法；复杂后再拆 architecture、interfaces 等文档。
 
 ## 4. 公共组件：必须先讲清楚的能力
 
@@ -381,20 +343,20 @@ registry只维护ID、路径、类别与可用状态；详细能力读取model.y
 
 ## 9. 默认使用方式与轻量检查
 
-拟开发接口：
+当前可用入口（实际参数和范围以 [工具合同](../contracts/tool_contracts.md) 为准）：
 
 ```bash
-esl inspect --kind performance
-esl new model vector_affine --template compute
-esl new system demo --template pipeline_system
-esl run examples/mini_pipeline/system.yaml
-esl sweep examples/mini_pipeline/experiment.yaml
-esl compare runs/baseline runs/double_buffer
+esl inspect --kind model
+esl validate --evidence
+esl new model sample_register --template register_target
+esl run reference/legacy_python/examples/mini_pipeline/system.yaml
+esl sweep reference/legacy_python/examples/mini_pipeline/experiment.yaml
+esl compare runs/baseline/result.json runs/double_buffer/result.json
 ```
 
 `inspect`是轻量能力发现，返回模型/模板/profile、支持的参数、capabilities与可用状态，供CLI和Skill共同使用；不需要数据库。
 
-`run` 自动完成参数校验、必要构建、仿真、oracle、指标与摘要；不要求用户手动执行十几条命令。
+当前 `run` 只接受显式 legacy-python-mini-pipeline 后端，校验配置、独立数值 oracle 和服务时间界限；SystemC 模型通过 CMake 消费者构建与验证。通用 SystemC 配置装配是后续目标。
 
 | 检查 | 何时执行 | 失败怎么处理 |
 |---|---|---|
@@ -408,25 +370,9 @@ esl compare runs/baseline runs/double_buffer
 
 校准、寄存器兼容、RTL 差分在相应任务才加入；不保留两套 G/R 编号。资源耗尽/异常测试重点覆盖公共组件和本次变更，不为修改 README 重跑全系统。
 
-## 10. 实施顺序与收敛建议
-
-先开发 Queue、ServiceResource、ByteStore、BufferPool 与计数器/trace；随后完成 DMA、Compute、简单 Scheduler，再跑配套 mini_pipeline。这个例子同时验证公共组件是否真能复用，而不只是目录齐全。
-
-第二步补 BankedMemory 微基准、RegBank/IRQ、真实 descriptor 模板，接到同一个示例中。第二步同时以配套示例文档第14节的multiport_sram_perf验证交织、Router/HOL、仲裁和响应背压；它是独立性能专项，不替代Mini Pipeline。第三步才按实际架构问题扩展详细NoC/DRAM、复杂BMU、RTL/ISS。
-
-暂不建设独立性能数据库、Web 仿真平台、自定义时间内核和通用插件加载框架。先把一条命令运行、一个报告解释、几组参数比较做好。
-
-本仓库的完成标准：**新模块的主要代码是它自己的行为；新系统的主要工作是组合配置；性能问题能由同一套观察工具解释。**
-
-## 11. 文档分工与开发前先固定的选择
-
-本文件拥有分类、Schema、公共接口和资产归属；Skill文档拥有方法；mini_pipeline文档拥有该示例参数/调度/解析预期；TODO文档拥有任务与验收清单。冲突时先按此owner修正引用，不维护四份独立契约。
-
-开发前只需确定：profile字段、请求/完成语义、仲裁owner、时间责任、窗口与状态口径。其余内部类名/文件组织可由实现自主选择。此轮仍是规划，没有Schema/模型实现或验收通过声明。
-
 ## 12. 支撑不同工作类型的资产组合
 
-工作类型 W01–W14 及路由以 Skill 规划第13节为准。本节只规定工程资产，不在 Repo 重写 subskill 方法。所有新增能力仍为规划；模板可先以已有薄骨架组合，不能在 inspect 中提前标 available。
+工作类型 W01–W14 及路由由 esl-development-suite 的 references/routing.md 定义。本节只规定工程资产，不在 Repo 重写 subskill 方法。所有新增能力仍为规划；模板可先以已有薄骨架组合，不能在 inspect 中提前标 available。
 
 | 工作类型 | Repo 应提供的资产 | 用户项目通常只需补充 |
 |---|---|---|

@@ -1,0 +1,38 @@
+schema_version: 1
+id: aixsilicon:esl:host_master:0.1.0
+factory: aix::esl::host_master::Model
+model_kinds:
+- behavioral
+- performance
+profiles:
+  resource:
+    timing_model: untimed
+    data_modes:
+    - full_data
+    interface_mode: memory
+    transport: LT
+    capabilities:
+    - drain
+    - finite_outstanding
+ports:
+  memory:
+    direction: initiator
+    type: tlm_generic_payload
+    transport: LT
+    bus_width: 32
+    binding: exactly_one
+parameters:
+  max_outstanding:
+    type: integer
+    default: 4
+    min: 1
+assumptions:
+- no_at
+- no_dmi
+- no_debug
+build:
+  backend: cmake
+  package: AixEslHostMaster
+  target: aix::esl::host_master
+  cxx_standard: 17
+  entry: CMakeLists.txt

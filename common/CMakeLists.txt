@@ -1,2 +1,2 @@
-# 公共组件（common/）构建入口（P02+ 逐个加入可编译组件）。
-# 骨架阶段无 C++ 目标；实现后在此 add_subdirectory 或 add_library。
+# 内部 header-only 组件由 cmake/ESLModel.cmake 作为 PRIVATE include 使用。
+# 当前没有独立发布的 common target。

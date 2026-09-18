@@ -1,68 +1,127 @@
-# esl_repo 资产注册表（唯一登记源）
-# 约定：只维护 ID、路径、类别与可用状态；详细能力读取各 model.yaml。
-# status: planned = 已规划未实现（不可运行）；available = 已实现且检查通过（可运行）。
-# 实现前一律保持 planned，不得提前标 available。
+# ESL 资产唯一注册表；available 仅限 manifest/README 已验证能力。
 schema_version: aixsilicon.esl-registry/v1
-
 assets:
-  - id: aixsilicon:esl:queue:bounded:0.1.0
-    kind: common
-    path: common/resources
-    status: planned
-    description: 有限队列（depth 只计等待项、拒绝不丢请求）
-
-  - id: aixsilicon:esl:resource:service:0.1.0
-    kind: common
-    path: common/resources
-    status: planned
-    description: 非流水服务资源（有限容量、排队、起止与释放）
-
-  - id: aixsilicon:esl:memory:byte_store:0.1.0
-    kind: common
-    path: common/memory
-    status: planned
-    description: 真实字节存储（初始化、边界、byte enable、唯一 owner）
-
-  - id: aixsilicon:esl:buffer:pool:0.1.0
-    kind: common
-    path: common/memory
-    status: planned
-    description: 固定块/slot 分配（原子分配、generation、防提前释放）
-
-  - id: aixsilicon:esl:observe:core:0.1.0
-    kind: common
-    path: common/observability
-    status: planned
-    description: Counter/Gauge/Span/Event 埋点与收集
-
-  - id: aixsilicon:esl:dma:command:0.1.0
-    kind: model
-    path: models/dma
-    status: planned
-    description: 命令式 DMA（真实 copy、共享 load/store 资源）
-
-  - id: aixsilicon:esl:compute:vector_affine:0.1.0
-    kind: model
-    path: models/compute
-    status: planned
-    description: ComputeShell + vector_affine（int32 中间、int16 饱和）
-
-  - id: aixsilicon:esl:system:mini_pipeline:0.1.0
-    kind: example
-    path: examples/mini_pipeline
-    status: planned
-    description: 外存→DMA→Compute→DMA 小系统（单/双缓冲比较）
-
-  - id: aixsilicon:esl:template:compute:0.1.0
-    kind: template
-    path: templates
-    status: planned
-    description: compute 薄骨架模板
-
-  - id: aixsilicon:esl:template:pipeline_system:0.1.0
-    kind: template
-    path: templates
-    status: planned
-    description: pipeline_system 薄骨架模板（system.yaml + oracle + README）
-
-# 实施状态由 TODO（docs/esl_todo.md）跟踪；本文件不另设 Gate。
+- id: aixsilicon:esl:queue:bounded:0.1.0
+  kind: common
+  path: common/systemc
+  status: planned
+  description: 有限队列（depth 只计等待项、拒绝不丢请求）
+- id: aixsilicon:esl:resource:service:0.1.0
+  kind: common
+  path: common/systemc
+  status: planned
+  description: 非流水服务资源（有限容量、排队、起止与释放）
+- id: aixsilicon:esl:memory:byte_store:0.1.0
+  kind: common
+  path: common/systemc
+  status: planned
+  description: 真实字节存储（初始化、边界、byte enable、唯一 owner）
+- id: aixsilicon:esl:buffer:pool:0.1.0
+  kind: common
+  path: common/systemc
+  status: planned
+  description: 固定块/slot 分配（原子分配、generation、防提前释放）
+- id: aixsilicon:esl:observe:core:0.1.0
+  kind: common
+  path: common/systemc
+  status: planned
+  description: Counter/Gauge/Span/Event 埋点与收集
+- id: aixsilicon:esl:dma:command:0.1.0
+  kind: model
+  path: models/dma
+  status: planned
+  description: 命令式 DMA（真实 copy、共享 load/store 资源）
+- id: aixsilicon:esl:compute:vector_affine:0.1.0
+  kind: model
+  path: models/compute
+  status: planned
+  description: ComputeShell + vector_affine（int32 中间、int16 饱和）
+- id: aixsilicon:esl:system:mini_pipeline:0.1.0
+  kind: example
+  path: reference/legacy_python/examples/mini_pipeline
+  status: planned
+  description: 外存→DMA→Compute→DMA 小系统（单/双缓冲比较）
+- id: aixsilicon:esl:template:compute:0.1.0
+  kind: template
+  path: reference/legacy_python/templates/compute
+  status: planned
+  description: compute 薄骨架模板
+- id: aixsilicon:esl:template:pipeline_system:0.1.0
+  kind: template
+  path: reference/legacy_python/templates/pipeline_system
+  status: planned
+  description: pipeline_system 薄骨架模板（system.yaml + oracle + README）
+- id: aixsilicon:esl:host_master:0.1.0
+  kind: model
+  path: models/host_master
+  status: available
+  evidence: runs/review-fixes-integration-final/checks.json
+  description: 可编程事务主设备/测试主机
+- id: aixsilicon:esl:tlm_bus:0.1.0
+  kind: model
+  path: models/tlm_bus
+  status: available
+  evidence: runs/review-fixes-integration-final/checks.json
+  description: 基础地址译码互连
+- id: aixsilicon:esl:ram:0.1.0
+  kind: model
+  path: models/ram
+  status: available
+  evidence: runs/review-fixes-integration-final/checks.json
+  description: 可读写片上/外部抽象存储
+- id: aixsilicon:esl:rom:0.1.0
+  kind: model
+  path: models/rom
+  status: available
+  evidence: runs/review-fixes-integration-final/checks.json
+  description: 只读映像存储
+- id: aixsilicon:esl:bmu:0.1.0
+  kind: model
+  path: models/bmu
+  status: planned
+  description: buffer/slot 管理器
+- id: aixsilicon:esl:timer:0.1.0
+  kind: model
+  path: models/timer
+  status: available
+  evidence: runs/review-fixes-integration-final/checks.json
+  description: 基础可编程定时器
+- id: aixsilicon:esl:irq_controller:0.1.0
+  kind: model
+  path: models/irq_controller
+  status: available
+  evidence: runs/review-fixes-integration-final/checks.json
+  description: 基础中断汇聚控制器
+- id: aixsilicon:esl:uart:0.1.0
+  kind: model
+  path: models/uart
+  status: planned
+  description: 基础串口外设
+- id: aixsilicon:esl:gpio:0.1.0
+  kind: model
+  path: models/gpio
+  status: planned
+  description: 基础 GPIO 外设
+- id: aixsilicon:esl:banked_sram:0.1.0
+  kind: model
+  path: models/banked_sram
+  status: planned
+  description: 后续性能参考：多 bank SRAM
+- id: aixsilicon:esl:basic_system:0.1.0
+  kind: example
+  path: examples/basic_system
+  status: available
+  evidence: runs/review-fixes-integration-final/checks.json
+  description: B0 SystemC 双主机/译码总线/RAM/ROM；B1 外设及后续阶段仍 planned
+- id: aixsilicon:esl:interrupt_system:0.1.0
+  kind: example
+  path: examples/interrupt_system
+  status: available
+  evidence: runs/review-fixes-integration-final/checks.json
+  description: B1 timer/IRQ 子集：双定时器、屏蔽/清除/复位；UART/GPIO 仍 planned
+- id: aixsilicon:esl:register_target:0.1.0
+  kind: template
+  path: templates/register_target
+  status: available
+  evidence: runs/review-fixes-template-validated/checks.json
+  description: SystemC 寄存器库模板；源码、安装与搬迁消费者已验证

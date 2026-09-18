@@ -1,0 +1,42 @@
+schema_version: 1
+id: aixsilicon:esl:{{name}}:0.1.0
+factory: aix::esl::{{name}}::Model
+model_kinds:
+- behavioral
+profiles:
+  register:
+    timing_model: annotated
+    data_modes:
+    - full_data
+    interface_mode: register
+    transport: LT
+    capabilities:
+    - read_write
+    - drain
+ports:
+  registers:
+    direction: target
+    type: tlm_generic_payload
+    transport: LT
+    bus_width: 32
+    binding: exactly_one
+parameters:
+  initial_value:
+    type: integer
+    default: 0
+    min: 0
+    max: 4294967295
+  access_latency:
+    type: time
+    default: 1 ns
+assumptions:
+- call_time_effects
+- no_outstanding
+- no_dmi
+- no_at
+build:
+  backend: cmake
+  package: '{{package}}'
+  target: aix::esl::{{name}}
+  cxx_standard: 17
+  entry: CMakeLists.txt

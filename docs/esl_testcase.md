@@ -3,8 +3,8 @@ document_type: system-test-project-plan
 name: esl-mini-pipeline
 document_version: 1.2.0
 status: proposed
-repo_plan: esl-repo-plan.md
-skill_plan: esl-development-suite-plan.md
+repo_plan: esl_repo_plan.md
+method_owner: esl-development-suite
 ---
 
 # ESL测试系统规划：Mini Pipeline基础案例与多AXI端口SRAM性能案例
@@ -14,6 +14,8 @@ skill_plan: esl-development-suite-plan.md
 选用“外存输入 → DMA 搬入 → 向量计算 → DMA 回写”的小系统。算法刻意简单，让开发注意力落在组件复用、数据流、资源竞争、buffer 生命周期和性能解释。
 
 本文第1–13节保留Mini Pipeline基础案例；第14节为独立的多AXI端口SRAM Controller性能验收案例；第15节用不同工作入口检验subskill路由。后者属于明确的performance用途，不要求先完成RTL或信号级AXI VIP。
+
+当前 Python 实现位于 reference/legacy_python/examples/mini_pipeline；下文未来 SystemC mini_pipeline 是独立待办，不能以旧实现代替目标交付。
 
 ## 1. 这个项目要回答什么
 
@@ -300,7 +302,7 @@ IRQ 为 `(DONE & en_done) | (ERROR & en_error)`，清状态后重新计算电平
 
 ## 13. 可直接交给未来 Skill 的测试任务
 
-> 请基于 esl_repo 已有模型与公共组件，按照 [esl-testcase.md](esl-testcase.md)（Mini Pipeline 系统测试示例）实现 examples/mini_pipeline。先完成 pipeline_analytic 的命令模式、真实 int16 数据、单/双 slot 和公共性能观察，复用 DMA、BufferPool、TaskGraph、ComputeShell 与观察器。运行 T01–T12 中适用的基础测试和 E0–E6，对比数据正确性、周期、资源利用率、buffer 占用与时间线。缺失的通用能力补到 Repo，Skill 只负责方法与编排。不要实现 CPU/OS/完整 DDR/NoC；寄存器、descriptor 与 bank 扩展暂不作为基础完成条件。所有结果区分解析预期和实际测量，报告已运行、失败与未覆盖项。
+> 请基于 esl_repo 已有模型与公共组件，按照 [esl_testcase.md](esl_testcase.md)（Mini Pipeline 系统测试示例）实现 examples/mini_pipeline。先完成 pipeline_analytic 的命令模式、真实 int16 数据、单/双 slot 和公共性能观察，复用 DMA、BufferPool、TaskGraph、ComputeShell 与观察器。运行 T01–T12 中适用的基础测试和 E0–E6，对比数据正确性、周期、资源利用率、buffer 占用与时间线。缺失的通用能力补到 Repo，Skill 只负责方法与编排。不要实现 CPU/OS/完整 DDR/NoC；寄存器、descriptor 与 bank 扩展暂不作为基础完成条件。所有结果区分解析预期和实际测量，报告已运行、失败与未覆盖项。
 
 这段是后续开发时使用的任务说明；本次交付仅为规划 Markdown，没有执行其中的 ESL 开发任务。
 
@@ -398,7 +400,7 @@ traffic_only可作为此案例扩展模式，要求地址/长度/读写/依赖�
 
 ## 15. 按工作类型测试：同一资产，不同起点
 
-以下是未来交给 Skill 的测试任务，不是本轮执行请求。W编号引用Skill规划第13节；验收编号统一在TODO中。各任务使用隔离分支/项目目录或仅暴露指定资产的fixture，不删除真实仓库已有模型来制造缺失，避免“从零开发”覆盖已有模型；基础/专项数值以本文前述合同为准。
+以下是未来交给 Skill 的测试任务，不是本轮执行请求。W 路由与方法判据由 esl-development-suite 管理；工程验收编号见本仓 esl_todo.md。各任务使用隔离分支/项目目录或仅暴露指定资产的fixture，不删除真实仓库已有模型来制造缺失，避免“从零开发”覆盖已有模型；基础/专项数值以本文前述合同为准。
 
 | 题号 | 起点与请求 | 预期路由/关键行为 | 检查证据 |
 |---|---|---|---|

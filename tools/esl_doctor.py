@@ -1,17 +1,47 @@
 """esl doctor：环境检查（R02）。
 
 检查编译器、CMake、Python 与 SystemC 版本组合，报告具体缺项。
-退出码：0=可运行基础（Python 资产）；2=缺关键依赖。
+退出码：0=目标环境静态检查满足；2=缺关键依赖/版本不符。
+静态检查不代替实际 SystemC 编译链接与运行。
 
 运行：uv run python tools/esl_doctor.py
 """
 from __future__ import annotations
 
+import json
 import os
+import re
 import shutil
 import subprocess
 import sys
 from pathlib import Path
+
+ENVIRONMENT = json.loads((Path(__file__).resolve().parents[1] / "contracts/environment.json").read_text())
+
+
+def check_systemc(prefix):
+    """Check the selected installation, including version and CMake consumption."""
+    prefix = Path(prefix)
+    header = prefix / "include/sysc/kernel/sc_ver.h"
+    if not header.is_file():
+        return False, f"缺版本头文件: {header}"
+    text = header.read_text(encoding="utf-8")
+    components = [re.search(rf"^#define\s+SC_VERSION_{part}\s+(\d+)\b", text, re.M)
+                  for part in ("MAJOR", "MINOR", "PATCH")]
+    if not all(components):
+        return False, f"无法解析 SystemC 版本: {header}"
+    version = ".".join(item.group(1) for item in components)
+    expected = ENVIRONMENT["systemc_version"]
+    if version != expected:
+        return False, f"{prefix}: 实际 {version}，目标 {expected}"
+    libraries = [p for pattern in ("lib*/libsystemc.a", "lib*/libsystemc.so*",
+                                   "lib/*/libsystemc.so*") for p in prefix.glob(pattern)]
+    if not any(p.is_file() for p in libraries):
+        return False, f"{prefix}: {version} 头文件存在，但缺库文件"
+    packages = list(prefix.rglob("SystemCLanguageConfig.cmake"))
+    if not packages:
+        return False, f"{prefix}: 缺 SystemCLanguage CMake package"
+    return True, f"{prefix}: {version}，头文件/库/package 完整（仍需实际构建运行验证）"
 
 
 def _which(name):
@@ -48,6 +78,7 @@ def main():
         print(f"[OK] C++ compiler: {gxx} {_version([gxx, '--version'])}")
     else:
         print("[BLOCKED] C++ compiler: 未找到 g++/clang++（纯 Python 资产不受影响）")
+        ok = False
 
     cmake = _which("cmake")
     home = str(Path.home())
@@ -63,21 +94,17 @@ def main():
         print(f"[OK] cmake: {cmake} {_version([cmake, '--version'])}")
     else:
         print("[BLOCKED] cmake: 未找到（SystemC 模型构建需要；见 esl_env_setup.py）")
+        ok = False
 
     # SystemC（核心目标时间载体；检查 ~/.local/systemc 与 PATH）
     systemc_home = os.environ.get("SYSTEMC_HOME", f"{home}/.local/systemc")
-    sysc_header = Path(systemc_home) / "include" / "systemc.h"
-    sysc_lib = Path(systemc_home) / "lib-linux64" / "libsystemc.a"
-    if sysc_header.exists() and sysc_lib.exists():
-        print(f"[OK] SystemC: {systemc_home} (libsystemc.a)")
-    elif _which("systemc-config"):
-        print(f"[OK] SystemC: {_which('systemc-config')}")
-    else:
-        print("[BLOCKED] SystemC: 未找到（核心并发/事件/资源模型需要；见 esl_env_setup.py）")
+    systemc_ok, detail = check_systemc(systemc_home)
+    print(f"[{'OK' if systemc_ok else 'BLOCKED'}] SystemC: {detail}")
+    ok = ok and systemc_ok
 
     print()
     if ok:
-        print("[esl doctor] 结果: 基础环境就绪（Python 资产可运行）")
+        print("[esl doctor] 结果: 目标环境静态检查满足；模型须另行构建/运行验证")
         return 0
     print("[esl doctor] 结果: 缺关键依赖（见上 FAIL 项）")
     return 2

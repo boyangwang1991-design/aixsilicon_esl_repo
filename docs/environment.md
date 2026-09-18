@@ -1,55 +1,33 @@
-# ESL 核心环境配方（docs/environment.md）
+# ESL 目标环境配方
 
-本机（Rocky Linux 8.10）已验证的核心环境：**Python + g++ + CMake + SystemC**。
-SystemC/CMake 是并发/事件/资源竞争/目标仿真时间的核心载体（repo-plan §2）；
-Python 只做 oracle/参考。
+版本唯一配置在 [contracts/environment.json](../contracts/environment.json)：当前锁定 **SystemC 3.0.2、C++17**，包含 TLM。2026-09-18 核对 [Accellera 官方下载页](https://www.accellera.org/downloads/standards/systemc)，它是最新的 3.0 系列正式版本。升级时修改唯一配置并重新验收，不追踪浮动 main。
 
-## 已验证版本组合
+[官方 3.0.2 安装说明](https://github.com/accellera-official/systemc/blob/3.0.2/INSTALL.md) 推荐 CMake，列出 GCC >=9.3 或 Clang >=13，C++17 基线。本仓消费者使用 CMake >=3.19，统一通过 SystemCLanguage package 和 SystemC::systemc target 连接。编译器/标准库/编译选项必须与库一致。
 
-| 组件 | 版本 | 位置/来源 |
-|---|---|---|
-| Python | 3.12.13 | workflow 根 uv venv |
-| g++ | 8.5.0 | 系统 |
-| CMake | 4.4.3 | `/tmp/esl_cmake_venv`（PyPI wheel，`uv pip install cmake`） |
-| SystemC | 2.3.4 | `~/.local/systemc`（源码编译，见下） |
+## 当前证据
 
-## 安装步骤（用户级，无 root）
+2026-09-18 已安装至 `~/.local/systemc-3.0.2`，保留原 `~/.local/systemc`（2.3.4）。`.bashrc` 的 ESL 块已切换到新目录并备份。新 shell 的 doctor、SystemC 时钟计数与 TLM 读写/越界/目标时间检查通过；ldd 确認运行时加载新库。证据见 [本次检查](../runs/systemc-3.0.2-install/checks.json)。
 
-```bash
-# 1. CMake（PyPI 预编译 wheel，~1s）
-uv venv /tmp/esl_cmake_venv && uv pip install --python /tmp/esl_cmake_venv/bin/python cmake
+实测组合为 GCC 8.5.0、C++17、CMake 4.4.3。官方建议 GCC >=9.3；当前组合已完成本机源码编译及上述冒烟验证，但不是全模型或全部编译器特性的兼容性认证。模型和标准集成 I01–I07 仍需各自验收。
 
-# 2. SystemC 2.3.4（GitHub tag tarball 经 ghproxy 镜像下载，网络直连慢时用）
-#    GitHub: https://github.com/accellera-official/systemc/archive/refs/tags/2.3.4.tar.gz
-#    镜像:   https://ghproxy.net/https://github.com/accellera-official/systemc/archive/refs/tags/2.3.4.tar.gz
-tar xzf systemc-2.3.4.tar.gz -C ~/.local/systemc-src
-cd ~/.local/systemc-src/systemc-2.3.4
-autoreconf -i                # 系统有 autoconf/automake 时生成 configure
-./configure --prefix=$HOME/.local/systemc
-make -j$(nproc) && make install
-# 产物: ~/.local/systemc/{include/systemc.h, lib-linux64/libsystemc.a, lib-linux64/libsystemc-2.3.4.so}
+CMake package 实际版本为 `3.0.2.20251031`，末尾是发布日期。Repo 构建入口检查前三段发行版本，避免 `EXACT 3.0.2` 错拒官方包，同时拒绝其他补丁版本。
 
-# 3. 环境变量（已写入 ~/.bashrc）
-export PATH="/tmp/esl_cmake_venv/bin:$PATH"
-export SYSTEMC_HOME="$HOME/.local/systemc"
-export LD_LIBRARY_PATH="$HOME/.local/systemc/lib-linux64:$LD_LIBRARY_PATH"
-```
+## 安装与验证入口
 
-## 验证
+从 workflow 根复用现有 uv 环境；不创建第二个 venv。准备官方源包并核实来源，使用独立安装前缀，不覆盖旧环境。安装脚本从唯一配置读取默认版本，使用 CMake 构建；执行安装须属于用户当前任务范围。
 
 ```bash
-# 环境检查
-PYTHONPATH=<esl_repo> uv run --project . python <esl_repo>/tools/esl_cli.py doctor
-# 期望全部 [OK]：python / g++ / cmake / SystemC
-
-# 最小 SystemC 用例（CMake 全链路）
-cmake -DSYSTEMC_HOME=$SYSTEMC_HOME -S examples/min_systemc -B build && cmake --build build
-LD_LIBRARY_PATH=$SYSTEMC_HOME/lib-linux64 ./build/min_sc   # SystemC OK
+uv run --no-sync python repos/aixsilicon_esl_repo/tools/esl_env_setup.py install --only systemc --prefix cache/esl-env-3.0.2 --install-prefix "$HOME/.local/systemc-3.0.2"
 ```
 
-## 注意事项
+该入口需要可用的 CMake、兼容编译器与网络/缓存；显式 install-prefix 作为 CMAKE_PREFIX_PATH（未指定时为 prefix/systemc）。源码包及工具版本、来源和实际 hash 留在构建证据；不要把缓存存在当作下载来源已验证。
 
-- **ABI 匹配**：SystemC 库按 C++14 编译（符号 `cxx201402`）；用户用例须
-  `-std=c++14` 匹配，否则链接报 version symbol 错误。
-- 运行时需 `LD_LIBRARY_PATH` 指向 `lib-linux64`（SystemC 装的是共享库）。
-- CMake 用临时 venv（不污染子仓/不动系统）；SystemC 装 `~/.local`，两者均可复现。
+```bash
+cmake -S repos/aixsilicon_esl_repo/tests/environment/systemc -B build/esl-min-systemc3 -DCMAKE_PREFIX_PATH="$HOME/.local/systemc-3.0.2"
+cmake --build build/esl-min-systemc3
+ctest --test-dir build/esl-min-systemc3 --output-on-failure
+```
+
+SystemC 3 的 CMake 安装可能使用 lib/lib64；通过 package 解析依赖，不硬编码旧 lib-linux64。仅有头文件或找到旧 systemc-config 不算 3.0.2 就绪。真实目标库缺失时 SystemC 构建应失败；Python 算法参考可独立运行，但不是目标交付完成。
+
+当前 shell 可用 `source ~/.bashrc` 载入新配置；新 shell 自动读取。CMake 沿用机器已有安装路径，未另建 Python 环境。

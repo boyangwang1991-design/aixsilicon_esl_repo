@@ -1,0 +1,5 @@
+{
+  "systemc_version": "3.0.2",
+  "cxx_standard": 17,
+  "source_url": "https://github.com/accellera-official/systemc/archive/refs/tags/3.0.2.tar.gz"
+}

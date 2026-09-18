@@ -1,0 +1,78 @@
+schema_version: 1
+id: aixsilicon:esl:ram:0.1.0
+factory: aix::esl::ram::Model
+model_kinds:
+- behavioral
+- performance
+profiles:
+  functional:
+    timing_model: untimed
+    data_modes:
+    - full_data
+    interface_mode: memory
+    transport: LT
+    capabilities:
+    - read_write
+    - byte_enable
+    - shared_storage
+    - reset_drain
+  resource:
+    timing_model: resource_contention
+    data_modes:
+    - full_data
+    interface_mode: memory
+    transport: LT
+    capabilities:
+    - read_write
+    - byte_enable
+    - shared_storage
+    - reset_drain
+    - finite_single_server
+ports:
+  memory:
+    direction: target
+    type: tlm_generic_payload
+    transport: LT
+    bus_width: 32
+    binding: one_or_more
+parameters:
+  capacity_bytes:
+    type: integer
+    default: 4096
+    min: 1
+  max_outstanding:
+    type: integer
+    default: 4
+    min: 1
+  setup_ticks:
+    type: integer
+    default: 1
+    min: 0
+  bytes_per_tick:
+    type: integer
+    default: 8
+    min: 1
+  tick:
+    type: time
+    default: 1 ns
+  enable_counters:
+    type: boolean
+    default: true
+  read_only:
+    type: boolean
+    default: false
+  initial_data:
+    type: byte_array
+    default: []
+assumptions:
+- single_service_resource
+- no_dmi
+- no_debug
+- no_at
+- no_bank_or_ddr_timing
+build:
+  backend: cmake
+  package: AixEslRam
+  target: aix::esl::ram
+  cxx_standard: 17
+  entry: CMakeLists.txt

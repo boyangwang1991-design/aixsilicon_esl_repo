@@ -1,0 +1,61 @@
+schema_version: 1
+id: aixsilicon:esl:timer:0.1.0
+factory: aix::esl::timer::Model
+model_kinds:
+- behavioral
+- software_visible
+profiles:
+  register:
+    timing_model: annotated
+    data_modes:
+    - full_data
+    interface_mode: register
+    transport: LT
+    capabilities:
+    - mmio32
+    - level_irq
+    - reset_cancel
+    - drain
+ports:
+  registers:
+    direction: target
+    type: tlm_generic_payload
+    transport: LT
+    bus_width: 32
+    binding: one_or_more
+  reset:
+    direction: input
+    type: sc_in<bool>
+    binding: required
+    active: high
+  irq:
+    direction: output
+    type: sc_out<bool>
+    binding: required
+    active: high
+parameters:
+  access_latency:
+    type: time
+    default: 1 ns
+  tick:
+    type: time
+    default: 1 ns
+    constraint: positive
+  reset_reload:
+    type: integer
+    default: 10
+    min: 1
+    max: 4294967295
+assumptions:
+- exploratory_abi
+- one_outstanding
+- no_at
+- no_dmi
+- no_debug
+- full_word_access_only
+build:
+  backend: cmake
+  package: AixEslTimer
+  target: aix::esl::timer
+  cxx_standard: 17
+  entry: CMakeLists.txt

@@ -1,25 +1,28 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.19)
 project(aixsilicon_esl_repo LANGUAGES CXX)
 
 # esl_repo 基础构建入口（P01）。
-# - 基础阶段以纯 Python 行为参考为主，SystemC 为按需扩展（P10+）。
-# - 本文件保持可配置：未安装 SystemC 时 SKIP，不阻塞 Python 资产运行。
+# - SystemC 是目标模型主体；OFF 仅供检查历史参考资产，不代表目标验证通过。
+# - OFF 不查找 SystemC；ON 必须满足环境合同，否则配置失败。
 
 set(ESL_ENABLE_SYSTEMC OFF CACHE BOOL "Enable SystemC/TLM models (requires SystemC)")
 set(ESL_SYSTEMC_PREFIX "" CACHE PATH "SystemC installation prefix")
 
 if(ESL_ENABLE_SYSTEMC)
-    if(NOT ESL_SYSTEMC_PREFIX)
-        message(FATAL_ERROR "ESL_ENABLE_SYSTEMC=ON 需要 ESL_SYSTEMC_PREFIX 指向 SystemC 安装目录")
+    if(ESL_SYSTEMC_PREFIX)
+        list(PREPEND CMAKE_PREFIX_PATH "${ESL_SYSTEMC_PREFIX}")
     endif()
-    find_package(SystemCLanguage QUIET PATHS ${ESL_SYSTEMC_PREFIX})
-    if(NOT SystemC_FOUND)
-        message(FATAL_ERROR "未找到 SystemC；请先配置环境（esl doctor 可检查）")
-    endif()
+    include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/ESLSystemC.cmake")
 endif()
 
-# 公共组件子目录（P02+ 逐个加入；目前骨架阶段为空占位）
+# 目标模型内部共用的 header-only 组件。
 add_subdirectory(common)
 
-# 基础 Python 资产无需 CMake；C++ 资产在实现后于此处登记。
+# 基础 Python 参考资产无需 CMake；SystemC 模型按需构建。
 message(STATUS "aixsilicon_esl_repo: Python assets run via pyproject/uv; SystemC=${ESL_ENABLE_SYSTEMC}")
+
+if(ESL_ENABLE_SYSTEMC)
+    foreach(model ram rom host_master tlm_bus timer irq_controller)
+        add_subdirectory(models/${model})
+    endforeach()
+endif()
