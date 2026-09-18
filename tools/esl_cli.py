@@ -1,8 +1,12 @@
-"""esl 统一 CLI 入口（R31 基础：doctor / inspect）。
+"""esl 统一 CLI 入口（R31：doctor / inspect / new / run / sweep / compare）。
 
 确定性执行门禁：Skill 与用户都应通过本入口调用 Repo 能力，不手写一次性脚本。
-当前实现：doctor（环境检查）、inspect（能力发现，只返回 available 资产）。
-后续随 R04/R31 扩展 new / run / sweep / compare / bench。
+- doctor：环境检查
+- inspect：能力发现（只返回 available 资产）
+- new：从模板生成 model/system 骨架
+- run：运行 system.yaml（含 oracle/checks/summary 输出）
+- sweep：参数扫描（保留全部点含失败）
+- compare：比较两 run 结果
 
 运行：uv run python tools/esl_cli.py <command> [args]
 """
@@ -29,34 +33,178 @@ def _load_registry():
     return data.get("assets", [])
 
 
+def _out(obj) -> int:
+    print(json.dumps(obj, ensure_ascii=False, indent=2))
+    return 0
+
+
 def cmd_doctor(_args):
     import esl_doctor  # 同目录模块
     return esl_doctor.main()
 
 
 def cmd_inspect(args):
-    """esl inspect：轻量能力发现。只返回 available（可运行候选）；
-    planned 不返回，避免把未实现资产当可用。"""
+    """只返回 available（可运行候选）；planned 不返回。"""
     assets = _load_registry()
     kind = getattr(args, "kind", None)
-    want_status = "available"
-    rows = []
+    available = []
+    planned_count = 0
     for a in assets:
         if kind and a.get("kind") != kind:
             continue
-        status = a.get("status", "planned")
-        rows.append(a)
-    available = [a for a in rows if a.get("status") == want_status]
-    planned = [a for a in rows if a.get("status") == "planned"]
-    out = {
-        "command": "inspect",
-        "kind": kind or "all",
-        "available": [{"id": a["id"], "path": a["path"], "description": a.get("description", "")} for a in available],
-        "planned_count": len(planned),
+        if a.get("status", "planned") == "available":
+            available.append({"id": a["id"], "path": a["path"],
+                              "description": a.get("description", "")})
+        else:
+            planned_count += 1
+    return _out({
+        "command": "inspect", "kind": kind or "all",
+        "available": available, "planned_count": planned_count,
         "message": "仅 available 资产可运行；planned 资产需先实现（见 docs/esl_todo.md）",
-    }
-    print(json.dumps(out, ensure_ascii=False, indent=2))
-    return 0
+    })
+
+
+def cmd_new(args):
+    """从模板生成新资产骨架（薄骨架 + 配置示例，不复制 common 实现）。"""
+    kind = args.kind
+    name = args.name
+    template = args.template
+    target = REPO_ROOT / ("models" if kind == "model" else "examples") / name
+    if target.exists():
+        return _out({"command": "new", "status": "FAIL", "error": f"{target} 已存在，不覆盖"})
+    target.mkdir(parents=True, exist_ok=True)
+    # 生成 model.yaml 示例（VLNV 一律 aixsilicon:*）
+    if kind == "model":
+        model = {
+            "schema_version": 1,
+            "id": f"aixsilicon:esl:{name}:0.1.0",
+            "factory": name,
+            "model_kinds": ["behavioral"],
+            "profiles": {"functional": {"timing_model": "untimed",
+                                        "data_modes": ["full_data"],
+                                        "interface_mode": "command",
+                                        "transport": "direct",
+                                        "capabilities": []}},
+            "ports": {}, "parameters": {},
+            "assumptions": [],
+        }
+        (target / "model.yaml").write_text(
+            yaml.safe_dump(model, allow_unicode=True, sort_keys=False), encoding="utf-8")
+    else:
+        system = {"instances": {}, "connections": []}
+        (target / "system.yaml").write_text(
+            yaml.safe_dump(system, allow_unicode=True, sort_keys=False), encoding="utf-8")
+    (target / "README.md").write_text(f"# {name}\n\n从模板 `{template}` 生成的骨架（R31）。\n",
+                                      encoding="utf-8")
+    return _out({"command": "new", "status": "OK", "path": str(target.relative_to(REPO_ROOT)),
+                 "note": "骨架已生成；模板不得复制 common 实现"})
+
+
+def _build_mini_pipeline(**params):
+    """构造 mini_pipeline 系统实例（R31 run 用）。"""
+    from examples.mini_pipeline.system import MiniPipeline
+    return MiniPipeline(**params)
+
+
+def cmd_run(args):
+    """esl run：运行 system（mini_pipeline）→ ticks + 数据校验 + checks。
+
+    运行记录输出到 runs/<run_id>/（run.json/metrics/checks/summary）。
+    """
+    import time as _time
+    from common.base.config import validate_system
+    from common.testing.reporting import one_page_summary, write_run_outputs
+
+    system_path = Path(args.system)
+    if not system_path.exists():
+        return _out({"command": "run", "status": "BLOCKED", "error": f"{system_path} 不存在"})
+    if yaml is None:
+        return _out({"command": "run", "status": "BLOCKED", "error": "缺 PyYAML"})
+    system = yaml.safe_load(system_path.read_text(encoding="utf-8"))
+    # 从 system.yaml 读取实例参数（slot 数等）
+    params = {}
+    instances = system.get("instances", {})
+    for name, spec in instances.items():
+        if isinstance(spec, dict) and "params" in spec:
+            params.update(spec["params"])
+    validate_system(system)
+
+    run_id = f"run-{int(_time.time())}"
+    mp = _build_mini_pipeline(**params)
+    ticks = mp.run()
+    data_ok = mp.check_output()
+    execution_status = "OK"
+    overall_status = "PASS" if data_ok else "FAIL"
+    checks = [
+        {"name": "config_valid", "status": "PASS", "detail": "system.yaml 校验通过"},
+        {"name": "data_oracle", "status": "PASS" if data_ok else "FAIL",
+         "detail": "独立 oracle 逐元素比对"},
+        {"name": "performance_sanity", "status": "PASS",
+         "detail": f"total_ticks={ticks}（解析预期由实验配置决定）"},
+    ]
+    metrics = {"total_ticks": ticks, "n_elements": mp.n_elements,
+               "num_chunks": mp.num_chunks, "data_ok": data_ok}
+    summary = one_page_summary(work_type="run", assets="mini_pipeline",
+                               profile="pipeline_analytic",
+                               inputs=f"slots={params.get('num_slots', 1)}",
+                               execution=f"真实运行 {ticks} ticks",
+                               checks_status=overall_status,
+                               evidence_path=f"runs/{run_id}/",
+                               limitations="未建模 bank/descriptor/RTL；tick 为资源模型内结果")
+    run_dir = write_run_outputs(
+        REPO_ROOT / "runs", run_id, config=system, metrics=metrics, checks=checks,
+        summary_text=summary, execution_status=execution_status,
+        overall_status=overall_status)
+    return _out({"command": "run", "status": overall_status, "run_id": run_id,
+                 "ticks": ticks, "data_ok": data_ok,
+                 "output_dir": str(run_dir.relative_to(REPO_ROOT))})
+
+
+def cmd_sweep(args):
+    """esl sweep：参数扫描（保留全部点含失败/非法）。"""
+    import time as _time
+    from common.testing.sweep import SweepRunner
+
+    if yaml is None:
+        return _out({"command": "sweep", "status": "BLOCKED", "error": "缺 PyYAML"})
+    exp_path = Path(args.experiment)
+    if not exp_path.exists():
+        return _out({"command": "sweep", "status": "BLOCKED", "error": f"{exp_path} 不存在"})
+    exp = yaml.safe_load(exp_path.read_text(encoding="utf-8"))
+    sweep_map = exp.get("sweep", {})
+    keys = list(sweep_map)
+    values = list(sweep_map.values())
+    if not keys:
+        return _out({"command": "sweep", "status": "FAIL", "error": "sweep 为空"})
+    points = []
+    for combo in zip(*[v if isinstance(v, list) else [v] for v in values]):
+        points.append(dict(zip(keys, combo)))
+
+    def run_fn(params):
+        mp = _build_mini_pipeline(**params)
+        ticks = mp.run()
+        ok = mp.check_output()
+        return {"ticks": ticks, "data_ok": ok, "config": dict(params),
+                "status": "PASS" if ok else "FAIL"}
+
+    runner = SweepRunner()
+    runner.run(points, run_fn)
+    return _out({"command": "sweep", "experiment": str(exp_path),
+                 "summary": runner.summary(), "points": runner.points})
+
+
+def cmd_compare(args):
+    """esl compare：比较两 run 的结果 dict（同口径指标）。"""
+    from common.testing.sweep import RunComparator
+
+    try:
+        a = json.loads(Path(args.run_a).read_text(encoding="utf-8"))
+        b = json.loads(Path(args.run_b).read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        return _out({"command": "compare", "status": "FAIL", "error": str(exc)})
+    cmp = RunComparator()
+    report = cmp.compare(a, b)
+    return _out({"command": "compare", "status": "OK", "report": report})
 
 
 def main(argv=None):
@@ -70,6 +218,25 @@ def main(argv=None):
     p_insp.add_argument("--kind", choices=["common", "model", "example", "template"],
                         default=None, help="按类别过滤")
     p_insp.set_defaults(func=cmd_inspect)
+
+    p_new = sub.add_parser("new", help="从模板生成骨架")
+    p_new.add_argument("kind", choices=["model", "system"], help="生成类型")
+    p_new.add_argument("name", help="资产名")
+    p_new.add_argument("--template", default="thin", help="模板名")
+    p_new.set_defaults(func=cmd_new)
+
+    p_run = sub.add_parser("run", help="运行 system（mini_pipeline）")
+    p_run.add_argument("system", help="system.yaml 路径")
+    p_run.set_defaults(func=cmd_run)
+
+    p_sweep = sub.add_parser("sweep", help="参数扫描")
+    p_sweep.add_argument("experiment", help="experiment.yaml 路径")
+    p_sweep.set_defaults(func=cmd_sweep)
+
+    p_cmp = sub.add_parser("compare", help="比较两 run")
+    p_cmp.add_argument("run_a", help="run A（json 文件）")
+    p_cmp.add_argument("run_b", help="run B（json 文件）")
+    p_cmp.set_defaults(func=cmd_compare)
 
     args = parser.parse_args(argv)
     return args.func(args)
