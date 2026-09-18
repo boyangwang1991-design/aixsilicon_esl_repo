@@ -7,9 +7,11 @@
 """
 from __future__ import annotations
 
+import os
 import shutil
 import subprocess
 import sys
+from pathlib import Path
 
 
 def _which(name):
@@ -48,17 +50,30 @@ def main():
         print("[BLOCKED] C++ compiler: 未找到 g++/clang++（纯 Python 资产不受影响）")
 
     cmake = _which("cmake")
+    home = str(Path.home())
+    candidates = [f"{home}/.local/bin/cmake", "/tmp/esl_cmake_venv/bin/cmake"]
+    import glob as _glob
+    candidates += _glob.glob(f"{home}/.local/cmake-*/bin/cmake")
+    if cmake is None:
+        for c in candidates:
+            if Path(c).exists():
+                cmake = c
+                break
     if cmake:
-        print(f"[OK] cmake: {_version([cmake, '--version'])}")
+        print(f"[OK] cmake: {cmake} {_version([cmake, '--version'])}")
     else:
-        print("[BLOCKED] cmake: 未找到（纯 Python 资产不受影响）")
+        print("[BLOCKED] cmake: 未找到（SystemC 模型构建需要；见 esl_env_setup.py）")
 
-    # SystemC（按需扩展，基础阶段非必需）
-    systemc = _which("systemc-config") or _which("systemc")
-    if systemc:
-        print(f"[OK] SystemC: {systemc}")
+    # SystemC（核心目标时间载体；检查 ~/.local/systemc 与 PATH）
+    systemc_home = os.environ.get("SYSTEMC_HOME", f"{home}/.local/systemc")
+    sysc_header = Path(systemc_home) / "include" / "systemc.h"
+    sysc_lib = Path(systemc_home) / "lib-linux64" / "libsystemc.a"
+    if sysc_header.exists() and sysc_lib.exists():
+        print(f"[OK] SystemC: {systemc_home} (libsystemc.a)")
+    elif _which("systemc-config"):
+        print(f"[OK] SystemC: {_which('systemc-config')}")
     else:
-        print("[INFO] SystemC: 未找到（P10+ 扩展按需安装；基础 Python/行为资产可运行）")
+        print("[BLOCKED] SystemC: 未找到（核心并发/事件/资源模型需要；见 esl_env_setup.py）")
 
     print()
     if ok:
