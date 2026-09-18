@@ -32,13 +32,20 @@ private:
 };
 class InterruptState {
 public:
-    explicit InterruptState(unsigned threshold=1):threshold_(threshold){if(!threshold||threshold>32)throw std::invalid_argument("IRQ threshold");}
+    explicit InterruptState(unsigned threshold=1,uint32_t edge_mask=0):threshold_(threshold),edge_mask_(edge_mask){if(!threshold||threshold>32)throw std::invalid_argument("IRQ threshold");}
     void raise(uint32_t bits){pending_|=bits;}
     void clear(uint32_t bits){pending_&=~bits;}
     void mask(uint32_t enabled){enabled_=enabled;}
+    // One explicit sample boundary. edge_mask selects rising-edge detection;
+    // remaining inputs latch an active high level. New events dominate W1C.
+    void sample(uint32_t levels,uint32_t clear_bits=0){
+        const auto events=(levels&~edge_mask_)|(levels&~previous_&edge_mask_);
+        pending_=(pending_&~clear_bits)|events;
+        previous_=levels;
+    }
     bool asserted()const{auto bits=pending_&enabled_;unsigned n=0;while(bits){bits&=bits-1;++n;}return n>=threshold_;}
     uint32_t pending()const{return pending_;}
-    void reset(){pending_=0;enabled_=0;}
-private:uint32_t pending_=0,enabled_=0;unsigned threshold_;
+    void reset(){pending_=0;enabled_=0;previous_=0;}
+private:uint32_t pending_=0,enabled_=0;unsigned threshold_;uint32_t edge_mask_,previous_=0;
 };
 }

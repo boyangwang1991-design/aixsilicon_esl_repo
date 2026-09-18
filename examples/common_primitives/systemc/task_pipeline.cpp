@@ -1,5 +1,6 @@
 #include <aix/esl/task_graph.hpp>
 #include <aix/esl/resource_timing.hpp>
+#include <aix/esl/compute_timing.hpp>
 #include <aix/esl/simulation_lifecycle.hpp>
 #include <aix/esl/timed_channel.hpp>
 #include <aix/esl/event_recorder.hpp>
@@ -8,7 +9,7 @@
 using namespace aix::esl;using namespace sc_core;
 static void check(bool ok,const char* why){if(!ok)throw std::runtime_error(why);}
 struct Pipeline:sc_module{
-    TaskGraph graph;ResourceTiming compute{sc_time(8,SC_NS),sc_time(1,SC_NS),1,2};
+    TaskGraph graph;ResourceTiming compute=ComputeTiming{sc_time(1,SC_NS),4,0,1,1,2}.resource(32);
     TimedChannel<uint64_t> load{16,2,sc_time(1,SC_NS),sc_time(1,SC_NS)};
     TimedChannel<uint64_t> store{16,2,sc_time(1,SC_NS),sc_time(1,SC_NS)};
     SimulationLifecycle lifecycle;EventRecorder events;

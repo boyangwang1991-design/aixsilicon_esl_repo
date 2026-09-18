@@ -28,4 +28,4 @@ UV_CACHE_DIR=/tmp/aix-uv-cache uv run --no-sync python repos/aixsilicon_esl_repo
 
 所有性能结果是未校准资源模型中的相对比较，不是实际 SRAM macro 面积/频率或 NPU 芯片承诺。
 
-最终交付见 [中文结果分析](reports/20260918/report.md) 和 [离线图表](reports/20260918/index.html)。报告、图表、推荐配置与精简验证证据统一归档到本模型的 `reports/`，本次临时构建、原始 trace 和试跑目录在归档后清理。复跑时可把 `--output` 指向本模型 `reports/<new-run>`；该目录不参与模型源码哈希，避免构建产物递归纳入证据。
+最终交付见 [综合结论与三张支撑图表](reports/20260918/report.md)。生成的 JSON、YAML、HTML 不纳入报告交付，验证摘要仅保留在本地已忽略的 `runs/`。工具仍支持重新生成可视化；`reports/` 不参与模型源码哈希。

@@ -82,6 +82,7 @@ def source_hashes():
     ]
     paths += list((ROOT / "cmake").glob("*")) + [
         ROOT / "common/systemc/include/aix/esl/byte_store.hpp",
+        ROOT / "common/systemc/include/aix/esl/storage_access.hpp",
         ROOT / "contracts/environment.json",
     ]
     return {

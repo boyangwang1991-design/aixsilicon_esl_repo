@@ -1,4 +1,5 @@
 #pragma once
+#include <aix/esl/storage_access.hpp>
 #include <algorithm>
 #include <cstddef>
 #include <cstdint>
@@ -13,7 +14,7 @@ public:
         std::copy(initial.begin(), initial.end(), data_.begin());
     }
     bool contains(std::uint64_t address, std::size_t length) const noexcept {
-        return address <= data_.size() && length <= data_.size() - address;
+        return storage_contains(data_.size(), address, length);
     }
     bool read(std::uint64_t address, unsigned char* output, std::size_t length,
               const unsigned char* enables = nullptr, std::size_t enable_length = 0) const {
@@ -36,11 +37,7 @@ public:
 private:
     std::vector<unsigned char> data_;
     bool valid(std::uint64_t address, std::size_t length, const unsigned char* be, std::size_t n) const {
-        if (!length || !contains(address, length)) return false;
-        if (!be) return n == 0;
-        if (!n) return false;
-        for (std::size_t i = 0; i < n; ++i) if (be[i] != 0 && be[i] != 0xff) return false;
-        return true;
+        return storage_access_valid(data_.size(), address, length, be, n);
     }
 };
 }

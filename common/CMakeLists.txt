@@ -50,3 +50,7 @@ install(FILES systemc/include/aix/esl/timed_channel.hpp systemc/include/aix/esl/
     systemc/include/aix/esl/simulation_lifecycle.hpp DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/aix/esl")
 install(FILES systemc/include/aix/esl/verification.hpp systemc/include/aix/esl/fault_schedule.hpp
     DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/aix/esl")
+install(FILES systemc/include/aix/esl/storage_access.hpp systemc/include/aix/esl/ecc_memory.hpp
+    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/aix/esl")
+install(FILES systemc/include/aix/esl/compute_timing.hpp
+    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/aix/esl")

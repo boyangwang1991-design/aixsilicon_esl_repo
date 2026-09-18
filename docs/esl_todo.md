@@ -25,9 +25,9 @@
 
 ## 公共资产批次计划（当前执行主线）
 
-本轮优先公共资产，覆盖建模组件、仿真基础设施、工作负载/验证、分析工具四类。先完成公共合同和独立 SystemC 微基准，最后统一试用完整模型；暂停 DMA/UART 功能扩展及 B3 Compute/BMU 推进。已有消费者改动保留为开发中草稿，不据此提前宣称公共包发布完成。
+本轮优先公共资产，覆盖建模组件、仿真基础设施、工作负载/验证、分析工具四类。先完成公共合同和独立 SystemC 微基准，最后统一试用完整模型；暂停 DMA/UART 功能扩展及 B3 Compute/BMU 推进。已验证的公共包子集和消费者已登记，未实现的扩展不随包一并宣称完成。
 
-P0 是首批能力，不表示一个步骤内全部交付；P1 为首批稳定后扩展；P2 由实际精度/项目需求触发。`planned` 表示尚未交付；“实现中”表示已有代码或局部证据，仍不得作为 available 使用。验收必须有源码/配置 hash、实际命令和结果，公共包状态以 registry 为准。下面各任务行是公共资产唯一进度源；后文 R/X/A 的同类条目仅保留历史编号和判据，不再并行更新状态。
+P0 是首批能力，不表示一个步骤内全部交付；P1 为首批稳定后扩展；P2 由实际精度/项目需求触发。`planned` 表示尚未交付；“实现中”表示该任务完整范围尚未完成；公共包可仅将合同明确、已验收的子集登记 available，不能把包状态当作整项完成。验收必须有源码/配置 hash、实际命令和结果，公共包状态以 registry 为准。下面各任务行是公共资产唯一进度源；后文 R/X/A 的同类条目仅保留历史编号和判据，不再并行更新状态。
 
 ### 批次与先后依赖
 
@@ -41,12 +41,14 @@ P0 是首批能力，不表示一个步骤内全部交付；P1 为首批稳定�
 
 B-C0/B-C1 无依赖的项可同批开展；其他批次不能绕过输入合同。特别禁止将 `latency=8, II=1` 实现成每 8 拍接收一次：必须检查首完成延迟、稳态吞吐、在途容量和输出背压。
 
+本轮存储可靠性验收：公共/模型 [集成证据](../runs/common-reliability-final-20260918/checks.json)、[模板证据](../runs/common-reliability-template-20260918/checks.json)、[NPU 消费者证据](../runs/common-reliability-npu-20260918/checks.json)。PC02/PC10/PC11/PW04 按各行限定服务范围收敛，其他任务状态不继承。
+
 ### 1. 建模基础组件
 
 | ID / 优先级 | 公共能力与首版边界 | 复用对象 / 依赖 | 状态与完成判据 |
 |---|---|---|---|
 | PC01 / P0 | FIFO、有限容量、credit、watermark、占用与拒绝统计；存储项、在途项和未取完成项口径明确 | DMA 队列、SRAM 请求/返回队列、路由缓冲；PA00 | 实现中：BoundedQueue、Gate/Lease 和积分已有 13 项公共微基准，见 runs/common-batch-first-20260918/checks.json；credit 守恒与统一公开合同仍待收敛；满/空/异常/释放/背压无丢失或重复 |
-| PC02 / P0→P1 | 存储服务：字节存储、RAM/ROM、初始化、byte-enable、地址边界；稀疏后端 P1 | SRAM、外存、descriptor RAM；PI01 | 实现中：新增 SparseStore（40-bit 地址空间/按需分页 fixture）；ByteStore/RAM/ROM 已复用。稀疏/稠密统一 burst 接口待补。 |
+| PC02 / P0→P1 | 存储服务：字节存储、RAM/ROM、初始化、byte-enable、地址边界；稀疏后端 P1 | SRAM、外存、descriptor RAM；PI01 | 已完成当前存储服务范围：ByteStore/SparseStore 统一初始化、contains、burst、循环 byte-enable、clear；RAM/ROM 沿用存储与权限分层。跨页/禁用字节/非法请求与稀疏大地址经两后端同合同验证。证据见本轮存储可靠性验收。 |
 | PC03 / P0 | 参数化资源/流水线：latency、II、实例数、有限在途/输出容量、资源预留分开 | Bank、ECC 编解码、计算占位；PC01、PI01、PA00 | 实现中：ResourceTiming 已独立验证 latency=8/II=1、双实例、未消费结果保留 credit；组合比较 II=1/8。 |
 | PC04 / P0→P1 | RR、固定优先级首版；加权 RR、年龄保护及带宽份额 P1 | Bank、总线、任务调度；PI06、PC01 | 实现中：Arbiter 已实现 RR/WRR/固定优先级/年龄保护，解析份额和持续竞争 fixture 通过；权重按 grant 计，不宣称 byte 带宽公平。 |
 | PC05 / P0 | 分区、交织、XOR；bank/group/row/offset 正向映射与受支持配置的逆映射 | 多 Bank SRAM、分布式存储、映射可视化；PI02 | 实现中：AddressMapper 分区/交织/XOR、bank/group/local/stripe-row 与逆映射通过全地址双射和热点测试；区域表仍待公共化。 |
@@ -54,8 +56,8 @@ B-C0/B-C1 无依赖的项可同批开展；其他批次不能绕过输入合同�
 | PC07 / P1 | burst→beat→fragment、跨 bank/宽度拆分、mask、完成重组 | 多 AXI SRAM、宽窄转换；PC05、PI01、PC08 | 实现中：跨边界 split_transaction 与 CompletionAssembly 已测非整除、失败汇聚/重复完成；跨 Bank mask 重组组合待补。 |
 | PC08 / P1 | transaction ID、同 ID 顺序、ROB、依赖与完成屏障 | AXI 返回、多通道 DMA、任务调度；PC01、PI01 | 实现中：OrderedCompletion 有限 ROB、同 stream 退休/跨 stream 并发和屏障已有 fixture；reset epoch 组合待补。 |
 | PC09 / P1 | 带宽链路、pipeline、credit、请求/响应通道与可组合交换路径 | Crossbar、分层 Router、NoC；PC01、PC03–PC05 | 实现中：TimedChannel 独立序列化/流水延迟/消费后 credit 返回已验证；多跳路由与链路观测待组合。 |
-| PC10 / P1→P2 | ECC/错误服务：注错、纠错状态、RMW、scrub、编解码资源；具体码型按需求 | 可靠 SRAM、功能安全探索；PC02–PC03、PW08 | 实现中：Secded64 完成真实 64+8 编解码、72 个单错和 2556 个双错测试；RMW/scrub 策略仍待组合。 |
-| PC11 / P1 | 可组合 pending/mask/clear、事件合并、门限触发 | DMA 完成、外设中断、错误上报；PC06、PI01 | 实现中：InterruptState 提供 pending/enable/clear/popcount 门限；独立寄存器 fixture 已验证，边沿适配待补。 |
+| PC10 / P1→P2 | ECC/错误服务：注错、纠错状态、RMW、scrub、编解码资源；具体码型按需求 | 可靠 SRAM、功能安全探索；PC02–PC03、PW08 | 已完成 64+8 SECDED 服务范围：EccMemory 支持部分写 RMW、corrected/uncorrectable 传播、单字 scrub 修复/注错及实际读写/编解码计数；dense/sparse 共享 SystemC bank/codec 干扰与更新不丢失通过。周期、地址巡检与多 Bank 仲裁由 owner 组合，不声称物理可靠性验证。 |
+| PC11 / P1 | 可组合 pending/mask/clear、事件合并、门限触发 | DMA 完成、外设中断、错误上报；PC06、PI01 | 已完成当前中断状态服务：pending/mask/clear、popcount 门限、边沿/电平采样、同采样新事件优先于 W1C、reset 历史清空；独立 fixture 与原消费者回归通过，SystemC 信号驱动归 owner。 |
 | PC12 / P2 | 时钟比、跨域队列、同步可见延迟、复位清空策略 | 多时钟 SRAM/互连；PC01、PC03、PI07 | 实现中：ClockDomainQueue 明确目的时钟边沿与同步可见周期，reset 返回丢弃数；独立 fixture 已验证，不宣称物理 CDC 验证。 |
 
 ### 2. 仿真基础设施
@@ -80,12 +82,12 @@ B-C0/B-C1 无依赖的项可同批开展；其他批次不能绕过输入合同�
 | PW01 / P0 | 合成流量：顺序、随机、stride、热点、突发、读写混合、端口相位 | PI01/PI02/PI06；Bank/互连/DMA/存储 | 实现中：TrafficSource 顺序/stride/随机/热点/读写混合已测；多 Bank 组合实际有限 outstanding 反馈。突发与端口相位配置待扩展。 |
 | PW02 / P1 | 标准 trace reader/writer、录制/回放 | PI01、PA00、PI06 | planned；版本/时间单位/依赖/source/截断标记，真实流量和仅观测 trace 区分；回放保持语义，不将缺依赖 trace 当可重放 |
 | PW03 / P0 | 闭环 DAG 引擎、有限 buffer、完成反馈、load/compute/store 重叠 | PC01/PC03/PC08 基础依赖、PI07 | 实现中：TaskGraph 已有确定性就绪、有限并发/output buffer、末消费者释放、失败传播/环拒绝/容量停滞 fixture；新增两个有限 load/compute/store SystemC 组合，解析完成时间 13 ns 与失败隔离通过。 |
-| PW04 / P0 | 计算资源占位：计算量/吞吐、latency/II、有限并发、完成事件 | PC03、PW03 | 实现中：task_pipeline 组合采用 ResourceTiming 计算占位，latency=8 ns/II=1 ns/并发2，解析时序通过；计算量→时序配置换算接口待补。 |
+| PW04 / P0 | 计算资源占位：计算量/吞吐、latency/II、有限并发、完成事件 | PC03、PW03 | 已完成同尺寸任务计算占位：ComputeTiming 按工作量/吞吐向上取整并叠加流水级，独立配置 II/实例/容量，拒绝非法值/时间溢出；独立解析 fixture 与 task_pipeline 两种消费者通过。变长任务需 owner 调度，不修改活动资源延迟。 |
 | PW05 / P0 | scoreboard：数据、mask、映射、ID 顺序、最终状态 | PI01、PC02/PC05、PW01 | 实现中：多 Bank fixture 有独立地址/最终数据 oracle；MemoryScoreboard 已实现独立 mask oracle，并接入组合的最终数据检查。 |
 | PW06 / P0 | 协议/资源检查器：非法请求、重复完成、容量/带宽、事务/字节守恒 | PI01、PA00、PC01/PC03 | 实现中：公共接口拒绝重复/未知/提前完成与超容量，CSV 分析检查事务守恒；ConservationChecker/BandwidthChecker 已实现，独立负向注入和组合守恒通过；完整协议监视器待扩展。 |
 | PW07 / P1 | NPU 访存：shape/layout/tiling/GEMM/Attention/转置 | PC05、PW01/PW03 | planned；作为独立 workload，不绑定单一 SRAM；地址/字节量/依赖/结束条件自检，支持 stride/padding 对照 |
 | PW08 / P0 | 可重放背压、错误、bank 暂停、延迟扰动、带宽下降 | PI06、PI07、PC03、PW06 | 实现中：FaultSchedule 明确目标/半开时间窗，暂停/错误/延迟/带宽效果分离；组合实际应用 Bank 暂停恢复和 DAG 分支错误。随机窗口与其他效果接入待扩展。 |
-| PW09 / P0 | 解析微基准与独立公共 fixture | 每项公共组件、PA00 | 实现中：examples/common_primitives 已扩为 39 个 SystemC 场景，含资源/仲裁/映射/ECC/DAG/链路与组合。 |
+| PW09 / P0 | 解析微基准与独立公共 fixture | 每项公共组件、PA00 | 实现中：examples/common_primitives 已扩为 46 个 SystemC 场景，新增存储/ECC 时序与计算/中断策略；完整模型集成 113 个独立场景、323 次执行通过。后续公共能力继续新增解析 fixture。 |
 | PW10 / P1 | RTL/测量 trace 校准、误差计算、训练/验证分离 | PI10、PW02、PA10 | planned；真实参考到位后定义误差指标/适用范围，不能用自身模型拟合自身或预设无依据误差门限 |
 
 ### 4. 统计、可视化与架构探索
@@ -112,7 +114,7 @@ B-C0/B-C1 无依赖的项可同批开展；其他批次不能绕过输入合同�
 | ID / 优先级 | 工作 | 状态与退出条件 |
 |---|---|---|
 | PX01 / P0 | 公共目录分层、manifest、标准包与安装导出 | 实现中：AixEslCommon 草案与独立消费者；目标职责见下表。只随真实资产创建目录；迁移保留稳定公开 include/target，旧实现移除而非复制；源码/安装/搬迁三种消费验证 |
-| PX02 / P0 | 公共组件完成后统一试用，模型仅承担消费者角色 | 实现中：独立公共 fixture 后完成双端口四 Bank 试用；现有模型 source/install/relocated 全量回归执行中。 |
+| PX02 / P0 | 公共组件完成后统一试用，模型仅承担消费者角色 | 实现中：本轮存储可靠性独立验证与共享资源试用完成；公共/现有模型 source/install/relocated 回归 113 场景、323 次执行通过，证据 runs/common-reliability-final-20260918/checks.json。完整余项继续按 TODO 推进。 |
 
 | 目标目录职责 | 资产归属与迁移约束 |
 |---|---|

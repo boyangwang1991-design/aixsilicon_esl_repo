@@ -1,7 +1,0 @@
-{
-  "status": "PASS",
-  "metric": "full-window effective read B/cycle",
-  "target": 921.6,
-  "actual": 1019.02,
-  "run_dir": "runs/validation-C0-balanced_long-6ea6e3f288711177"
-}

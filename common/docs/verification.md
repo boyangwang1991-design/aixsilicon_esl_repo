@@ -22,6 +22,8 @@
 
 真实消费者回归包括 RAM/ROM、host/bus、timer/IRQ、UART/GPIO 和 DMA；它们证明公共实现替换没有改变原数据/时间/取消合同。I01/I02/I07 由独立 CMake/安装/搬迁和证据检查覆盖；I03/I04/I05/I06 由上表与消费者覆盖。组件没有模型端口/profile，未绑定/跨 profile 项不适用；OS 多线程并发、硬件校准和任意二进制 ABI 不在范围。
 
-扩展 fixture 另覆盖：流水 latency/II、并行实例、映射全地址双射与 stride/XOR 热点、RR/WRR/年龄保护、TLM 扩展所有权、非整齐分片与失败汇聚、同流退休、RNG 重放、寄存器 strobe/W1C、SECDED 所有单/双比特组合、DAG buffer/失败传播、链路序列化/credit 延迟、CDC 边沿、稀疏边界、测量/drain/停滞、事件截断、流量重放。加入多 Bank 暂停恢复、两个闭环任务场景和检查器负向注入后，共 39 个独立场景。
+扩展 fixture 另覆盖：流水 latency/II、并行实例、映射全地址双射与 stride/XOR 热点、RR/WRR/年龄保护、TLM 扩展所有权、非整齐分片与失败汇聚、同流退休、RNG 重放、寄存器 strobe/W1C、SECDED 所有单/双比特组合、DAG buffer/失败传播、链路序列化/credit 延迟、CDC 边沿、稀疏边界、测量/drain/停滞、事件截断、流量重放。加入多 Bank 暂停恢复、两个闭环任务场景和检查器负向注入后，共 46 个独立场景。
 
 组合 fixture 使用固定地址/数据 oracle，分别以不同映射/时序策略访问同一 ByteStore。common_explore 进一步对八组映射/latency/II 配置比较 off/trace 完成时间，保留失败，不把不同策略的速度差解释为功能差。分析脚本的单元测试只验证文件协议及离线统计，不替代 SystemC 模型测试。
+
+新增存储可靠性场景：`common_storage_dense/sparse` 对同一 burst/mask/跨页/非法请求合同和 ECC RMW/scrub 运行独立 oracle；`common_storage_timed_dense/timed_sparse/timed_baseline` 以实际 SystemC 共享 bank/codec 对照 12 ns/7 ns，检查资源排空和最终数据。新增策略场景 `common_policy_compute` 验证尾部工作量取整、溢出、latency 与 II 及完成 credit，`common_policy_interrupts` 验证边沿/电平、同采样 W1C 优先级、mask 和门限。task_pipeline 同时作为 ComputeTiming 的第二个消费者，解析完成时间保持 13 ns。

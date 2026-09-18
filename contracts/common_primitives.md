@@ -67,8 +67,12 @@ The installed `aix::esl::common` target also exports these independent facilitie
   byte enables, reset, hardware update and dump. Post-write callbacks see committed
   state; callback exceptions do not roll back the write. Descriptor generation from
   the cross-repository register SSOT is a separate integration task.
-- `InterruptState`: latched pending bits, enable mask, W1C and popcount threshold;
-  timing and SystemC signal driving belong to the composing model.
+- `InterruptState`: latched pending bits, enable mask, W1C and popcount threshold.
+  Constructor `edge_mask` selects rising-edge inputs; other inputs are sampled
+  active-high levels. `sample(levels, clear_bits)` gives new events priority over
+  same-sample W1C. A held edge does not retrigger; a held level relatches on the
+  next sample. Reset clears sampled history, so the next high edge input is new.
+  Timing and SystemC signal driving belong to the composing model.
 - `Secded64`: extended Hamming 64+8 functional SECDED, exhaustive one/two-bit fault
   fixture. Three-or-more-bit errors are outside the guarantee. ECC resource timing,
   RMW atomicity and scrub policy are separate composition responsibilities.
@@ -99,8 +103,13 @@ the discard count; the owner must terminate affected requests. Physical CDC and
 metastability are outside this transaction-level contract.
 
 `SparseStore` provides zero-filled, byte-addressed sparse storage with 4096-byte
-allocation pages and 64-bit capacity. Timing/ROM permission are owner policies;
-masked burst operations currently belong to ByteStore, not this minimal backend.
+allocation pages and 64-bit capacity. Its initialization, size/contains, burst
+read/write, cyclic byte-enable and clear API matches `ByteStore`; both use the
+same `storage_access_valid` contract. Disabled read lanes preserve the output
+buffer; disabled writes do not allocate pages. Invalid requests cannot change data.
+Sparse writes allocate all needed pages before modifying bytes; allocation failure
+may leave zero-filled pages but no partial byte updates. Buffers must not alias
+backing storage. Timing and ROM permissions remain owner policies.
 
 `SimulationLifecycle` enforces initialize/warmup/measure/drain/finished. The
 measurement window ends when injection stops; drain remains functionally checked.
@@ -142,3 +151,42 @@ finite buffers and timed links. Load issues at 0/1 ns, arrives at 2/3 ns, comput
 latency is 8 ns with II=1, and stores take 2 ns: last completion must be 13 ns.
 The failure fixture cancels one branch without cancelling the independent chain.
 This is a compute occupancy placeholder, with no numerical algorithm claim.
+
+## ECC storage and compute timing
+
+`EccMemory<Storage>` composes the shared storage API with actual 64+8 SECDED. The
+capacity is a positive multiple of 8; word indices address little-endian 64-bit
+codewords. Parity storage is independent, initially zero, and fault injection can
+flip any of the 72 data/check bits. It supports either ByteStore or SparseStore.
+
+- Full writes replace data and ECC without reading the old word, including a bad
+  old codeword. Zero byte masks are no-ops.
+- Partial writes read/decode once, merge enabled bytes, encode/write once. A
+  correctable old word is corrected before merging. An uncorrectable old word
+  aborts the write without changing its stored bytes or check bits.
+- Reads return corrected data but do not repair physical storage. Uncorrectable
+  reads return status plus zero data, never an apparently valid poisoned value.
+- `scrub_word` reads/decodes one word and repairs only corrected words; clean and
+  uncorrectable words are never rewritten. Owners choose the address sequence,
+  interval and arbitration with demand traffic.
+- Each result carries the exact read/write/decode/encode operation counts; service
+  statistics also count corrections, uncorrectable observations, RMWs and repairs.
+  Repeated observations of the same fault count repeatedly until repaired.
+
+These are functional services, with no hidden wait or global scheduler. The
+SystemC owner must serialize a complete multi-stage RMW/scrub sequence for a word
+and schedule visibility at completion. The storage reliability consumer shares a
+2 ns bank and 1 ns codec between scrub and demand: a corrected scrub occupies
+read/decode/encode/write for 6 ns; demand arriving at 1 ns finishes at 12 ns,
+versus 7 ns without the competing scrub. Both dense and sparse backends preserve
+the demand update. This example is serialized per word; it does not claim a
+multi-bank ECC scheduler, RTL-calibrated latency or physical protection coverage.
+Allocation exceptions are infrastructure failures, not modeled ECC errors.
+
+`ComputeTiming` converts positive work units to latency using
+`ceil(work_units / units_per_cycle) + pipeline_cycles`, then multiplies by the
+SystemC clock period with overflow checks. Initiation interval is independently
+`initiation_cycles * period`. `resource(work_units)` creates a finite
+`ResourceTiming` for homogeneous jobs of that size; variable-size jobs require
+separate owner scheduling, not silently changing an active resource. Work units
+are caller-defined (MACs/bytes/elements); no numerical algorithm or PPA is implied.
