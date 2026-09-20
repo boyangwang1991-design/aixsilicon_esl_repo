@@ -41,7 +41,9 @@ P0 是首批能力，不表示一个步骤内全部交付；P1 为首批稳定�
 
 B-C0/B-C1 无依赖的项可同批开展；其他批次不能绕过输入合同。特别禁止将 `latency=8, II=1` 实现成每 8 拍接收一次：必须检查首完成延迟、稳态吞吐、在途容量和输出背压。
 
-本轮存储可靠性验收：公共/模型 [集成证据](../runs/common-reliability-final-20260918/checks.json)、[模板证据](../runs/common-reliability-template-20260918/checks.json)、[NPU 消费者证据](../runs/common-reliability-npu-20260918/checks.json)。PC02/PC10/PC11/PW04 按各行限定服务范围收敛，其他任务状态不继承。
+存储可靠性批次验收（已完成）：公共/模型 [集成证据](../runs/common-reliability-final-20260918/checks.json)、[模板证据](../runs/common-reliability-template-20260918/checks.json)、[NPU 消费者证据](../runs/common-reliability-npu-20260918/checks.json)。PC02/PC10/PC11/PW04 按各行限定服务范围收敛，其他任务状态不继承。
+
+本轮配置闭环入口：[SystemC 多 Bank 系统](../systems/multibank/README.md)；[配置/回放/失败专项](../runs/multibank-final2-20260918/checks.json)；[源码/安装/搬迁](../runs/multibank-integration-final2-20260918/checks.json)。本轮是明确能力子集，不扩写为任意拓扑、完整 AXI 或通用检查点已完成。
 
 ### 1. 建模基础组件
 
@@ -65,47 +67,47 @@ B-C0/B-C1 无依赖的项可同批开展；其他批次不能绕过输入合同�
 | ID / 优先级 | 公共能力与边界 | 依赖 / 复用对象 | 状态与完成判据 |
 |---|---|---|---|
 | PI01 / P0 | 统一事务/结果：地址、长度、mask、ID、parent/source、QoS、错误、epoch、阶段时间戳 | 所有组件、适配、事件、scoreboard | 实现中：Transaction/TransactionMetadata 与同步 TLM binding，拥有数据/mask 并恢复旧扩展；尚不代表完整 AXI 协议。 |
-| PI02 / P0 | 配置 schema 与参数/容量/连接/位宽/映射约束 | 组件、工作负载、扫描；TOOL01 | 部分已有：模型/registry/参考后端配置校验；公共 SystemC 配置 planned；未知参数、冲突、溢出、不可用组合在运行前拒绝并定位字段 |
-| PI03 / P0 | 公共组件能力声明、协议/profile/精度/限制与依赖 | inspect、装配、报告；PX01 | 部分已有：model.yaml/证据状态；公共包 common.yaml 实现中；声明有真实入口/用例，planned 不能被执行器当可用 |
+| PI02 / P0 | 配置 schema 与参数/容量/连接/位宽/映射约束 | 组件、工作负载、扫描；TOOL01 | 完成 multibank v1 配置范围：JSON schema 为默认值/标量唯一源，重复/未知 YAML 字段、几何/位宽/容量/映射约束在运行前拒绝；C++ 对 resolved cfg 防御性复验。其他 profile 逐项接入，不宣称任意模型参数通用化。 |
+| PI03 / P0 | 公共组件能力声明、协议/profile/精度/限制与依赖 | inspect、装配、报告；PX01 | 已落地 multibank capabilities.json（协议、精度、配置、限制）并由 inspect 返回，声明枚举与 schema 有一致性测试；common 包保留实际头文件/消费者清单，未实现能力不列入新系统支持范围。 |
 | PI04 / P1 | TLM/simple memory/stream/task/trace 适配；AXI 抽象按明确子集扩展 | PC07–PC09、PW02 | 实现中：同步 TLM 事务适配已实现/验证；其余 stream/task/可重放 trace 适配待补。 |
-| PI05 / P0→P1 | 配置装配、拓扑与未连接/方向/协议/位宽/地址冲突检查 | PI01–PI03、PC05；TOOL01/R33 | planned；先支持已实现组件的有限拓扑，输出最终解析配置；不能静默回退 legacy Python；所有权/时间 owner 检查不声称静态证明任意代码 |
+| PI05 / P0→P1 | 配置装配、拓扑与未连接/方向/协议/位宽/地址冲突检查 | PI01–PI03、PC05；TOOL01/R33 | 完成首个固定拓扑装配：按配置实例化 source/router/bank/return，输出 resolved/topology；检查端口存在、方向、协议、位宽、重绑/漏接和不支持的重连。地址分区/映射无别名；任意图装配仍不支持，不能静默回退。 |
 | PI06 / P0 | seed、随机子流、实例标识、同刻稳定 tie-break | 合成流量、仲裁、注错、扫描 | 实现中：DeterministicRng 使用固定 SplitMix64/FNV-1a 命名子流，重放/恢复/有界采样通过。 |
 | PI07 / P0 | 初始化→预热→测量→停止注入→drain→结束 | 所有系统、工作负载、统计窗口 | 实现中：SimulationLifecycle 明确 warmup/measure/drain/finish，未排空不能完成；独立 SystemC fixture 已验证。 |
 | PI08 / P0 | 无进展/watchdog、队列与资源快照、等待关系 | PC01/PC03、PI07、PA00 | 实现中：ProgressWatchdog 保留等待对象/原因/截止时刻，长服务不误报与超期停滞已测；系统队列快照接入待补。 |
 | PI09 / P2 | 检查点与恢复 | PI01/PI06/PI07、所有可序列化组件 | planned，晚做；需覆盖 SystemC 进程、未完成事务、事件、随机状态及依赖版本；仅保存 RAM 内容不称完整恢复 |
-| PI10 / P0 | run manifest：最终配置、版本/dirty hash、依赖、workload、seed、窗口、状态/结果绑定 | 验证/扫描/可视化/校准 | 部分已有：命令、日志、源码 hash、证据失效；统一 workload/seed/窗口 schema planned；离线可追溯，输入变化使证据失效，失败 run 不覆盖 |
+| PI10 / P0 | run manifest：最终配置、版本/dirty hash、依赖、workload、seed、窗口、状态/结果绑定 | 验证/扫描/可视化/校准 | 完成 multibank v1 运行记录：requested/resolved/拓扑/能力、实际源码与二进制 hash、工作负载/制品 hash、seed/RNG、SystemC/Python 依赖、构建环境和测量窗口绑定；失败/非法 YAML 留档，禁止覆盖，外部二进制标记来源未验证。旧后端统一迁移仍按需推进。 |
 
 ### 3. 工作负载与验证组件
 
 | ID / 优先级 | 公共能力与边界 | 依赖 / 复用对象 | 状态与完成判据 |
 |---|---|---|---|
 | PW01 / P0 | 合成流量：顺序、随机、stride、热点、突发、读写混合、端口相位 | PI01/PI02/PI06；Bank/互连/DMA/存储 | 实现中：TrafficSource 顺序/stride/随机/热点/读写混合已测；多 Bank 组合实际有限 outstanding 反馈。突发与端口相位配置待扩展。 |
-| PW02 / P1 | 标准 trace reader/writer、录制/回放 | PI01、PA00、PI06 | planned；版本/时间单位/依赖/source/截断标记，真实流量和仅观测 trace 区分；回放保持语义，不将缺依赖 trace 当可重放 |
+| PW02 / P1 | 标准 trace reader/writer、录制/回放 | PI01、PA00、PI06 | 完成 workload v1：公共 C++ WorkloadTrace 保留 ID/source/最早周期/读写/data/mask/前驱依赖，拒绝时钟不符/重复/前向引用/溢出；SystemC 回放等待前驱退休并保持背压，输入计划与截断观测分离。支持元数据子集见合同，不宣称完整 AXI trace。 |
 | PW03 / P0 | 闭环 DAG 引擎、有限 buffer、完成反馈、load/compute/store 重叠 | PC01/PC03/PC08 基础依赖、PI07 | 实现中：TaskGraph 已有确定性就绪、有限并发/output buffer、末消费者释放、失败传播/环拒绝/容量停滞 fixture；新增两个有限 load/compute/store SystemC 组合，解析完成时间 13 ns 与失败隔离通过。 |
 | PW04 / P0 | 计算资源占位：计算量/吞吐、latency/II、有限并发、完成事件 | PC03、PW03 | 已完成同尺寸任务计算占位：ComputeTiming 按工作量/吞吐向上取整并叠加流水级，独立配置 II/实例/容量，拒绝非法值/时间溢出；独立解析 fixture 与 task_pipeline 两种消费者通过。变长任务需 owner 调度，不修改活动资源延迟。 |
 | PW05 / P0 | scoreboard：数据、mask、映射、ID 顺序、最终状态 | PI01、PC02/PC05、PW01 | 实现中：多 Bank fixture 有独立地址/最终数据 oracle；MemoryScoreboard 已实现独立 mask oracle，并接入组合的最终数据检查。 |
 | PW06 / P0 | 协议/资源检查器：非法请求、重复完成、容量/带宽、事务/字节守恒 | PI01、PA00、PC01/PC03 | 实现中：公共接口拒绝重复/未知/提前完成与超容量，CSV 分析检查事务守恒；ConservationChecker/BandwidthChecker 已实现，独立负向注入和组合守恒通过；完整协议监视器待扩展。 |
 | PW07 / P1 | NPU 访存：shape/layout/tiling/GEMM/Attention/转置 | PC05、PW01/PW03 | planned；作为独立 workload，不绑定单一 SRAM；地址/字节量/依赖/结束条件自检，支持 stride/padding 对照 |
 | PW08 / P0 | 可重放背压、错误、bank 暂停、延迟扰动、带宽下降 | PI06、PI07、PC03、PW06 | 实现中：FaultSchedule 明确目标/半开时间窗，暂停/错误/延迟/带宽效果分离；组合实际应用 Bank 暂停恢复和 DAG 分支错误。随机窗口与其他效果接入待扩展。 |
-| PW09 / P0 | 解析微基准与独立公共 fixture | 每项公共组件、PA00 | 实现中：examples/common_primitives 已扩为 46 个 SystemC 场景，新增存储/ECC 时序与计算/中断策略；完整模型集成 113 个独立场景、323 次执行通过。后续公共能力继续新增解析 fixture。 |
+| PW09 / P0 | 解析微基准与独立公共 fixture | 每项公共组件、PA00 | 公共 fixture 已增至 47 个场景；新 multibank 生成/回放也通过三种集成路径，总计 116 个独立场景、332 次执行。专门验收覆盖依赖 12-cycle 解析预期、独立 mask oracle、观测/策略切换与失败点。 |
 | PW10 / P1 | RTL/测量 trace 校准、误差计算、训练/验证分离 | PI10、PW02、PA10 | planned；真实参考到位后定义误差指标/适用范围，不能用自身模型拟合自身或预设无依据误差门限 |
 
 ### 4. 统计、可视化与架构探索
 
 | ID / 优先级 | 公共能力与边界 | 依赖 / 首要用途 | 状态与完成判据 |
 |---|---|---|---|
-| PA00 / P0 | 统一事件/统计 schema、counter/gauge/span、占用/忙时/吞吐；off/counters/trace | PI01/PI06/PI10；全部组件和分析工具 | 实现中：ActivityMonitor + EventRecorder；off/counters/trace、整数 tick/parent/source/resource、截断标记与完整计数；通用 span/gauge 接入待补。 |
-| PA01 / P0 | 地址映射查看器 | PC05、PW01/PW07、PA00 | 实现中：common_explore 离线报告显示实际请求 address→bank，8 组交织/XOR 扫描；tensor/padding 交互视图待扩展。 |
-| PA02 / P0 | 事务时间线 | PI01、PA00 | 实现中：统一 CSV 服务起止时间线与事务关联已可离线查看；排队/路由/重组阶段等待原因待补。 |
-| PA03 / P0 | Bank 热力图 | PC03/PC05、PA00 | 实现中：Bank 时间窗平均活动事务热图已落地，明确区别 busy 利用率；读写/RMW/冲突细分待补。 |
-| PA04 / P1 | 链路热力图 | PC09、PA00 | planned；吞吐、拥塞、credit stall、跨组流量；请求和返回链路分开，不能把 bank 空闲推断成无瓶颈 |
-| PA05 / P1 | 队列监视器 | PC01、PA00 | planned；占用/高水位/full 周期/HOL/credit 等待；“满”与“无服务”分开解释 |
-| PA06 / P1 | 拓扑查看器 | PI03/PI05 | planned；端口、组件、bank、链路、位宽、容量来自最终配置；避免手绘拓扑与实际装配漂移 |
+| PA00 / P0 | 统一事件/统计 schema、counter/gauge/span、占用/忙时/吞吐；off/counters/trace | PI01/PI06/PI10；全部组件和分析工具 | 实现中：统一事件读入供旧公共报告和 multibank 共用，增加 enqueue/response_ready/四类等待原因，off/counters/trace 行为对照通过；通用 span/gauge API 扩展仍待做。 |
+| PA01 / P0 | 地址映射查看器 | PC05、PW01/PW07、PA00 | 实现中：multibank 报告将实际地址、Bank 与时序关联，XOR 4-Bank 分布有真实验收；tensor/padding 交互视图待扩展。 |
+| PA02 / P0 | 事务时间线 | PI01、PA00 | 完成 multibank 首版阶段：排队→准入→Bank 服务→返回就绪→退休，区分仲裁/II/Bank 容量/全局响应 credit；当前路由为组合逻辑、单 Bank 请求不需重组，不画虚构阶段。其他模型阶段接入仍待做。 |
+| PA03 / P0 | Bank 热力图 | PC03/PC05、PA00 | 实现中：按测量窗口计算 Bank 平均活动服务数（含空 Bank），分母/零窗/截断标记明确；完整 busy/read/write/RMW 专项热图仍待接入。 |
+| PA04 / P1 | 链路热力图 | PC09、PA00 | 部分落地：multibank 显示每源实际返回字节、响应阶段与 credit 等待；多跳链路热图和跨组流量仍待接入。 |
+| PA05 / P1 | 队列监视器 | PC01、PA00 | 部分落地：multibank 单项 ingress 队列占用积分按预热窗口裁剪，满容量与 II/仲裁等待分开；通用多深度 HOL/水位图仍待扩展。 |
+| PA06 / P1 | 拓扑查看器 | PI03/PI05 | 完成 multibank 配置拓扑查看：SVG 连线来自经过校验的实际连接表，节点/端口显示类型、位宽、容量、时序参数；其他拓扑可复用输出合同，未支持任意图执行。 |
 | PA07 / P1 | NPU 执行时间线 | PW03/PW04/PW07、PA02 | planned；load/compute/store、buffer 等待、计算空闲；重叠区间按交集/并集计算不双计 |
-| PA08 / P1 | 延迟分析器 | PA00、PW01/PW02 | 实现中：离线 nearest-rank p95/p99 与截断禁止完整延迟结论，协议负向测试通过；尾部等待原因待补。 |
-| PA09 / P0 | SystemC 参数扫描 | PI02/PI06/PI10、PW01、PA00 | 实现中：common_explore 对 8 组实际 SystemC 配置各运行 off/trace，保留逐点失败/日志/事件；通用配置扫描待扩展。 |
-| PA10 / P0→P1 | 方案比较、最差退化、资源代理指标与 Pareto | PA09、PI10 | 实现中：有效点与串行基线完成时间比较；资源代理/Pareto 与跨 workload 最差退化待补。 |
-| PA11 / P0 | 自动离线报告与制品归档 | PA01–PA03、PA09–PA10、PI10 | 实现中：results.json + 日志/CSV + 离线 report.html 已生成，绑定可执行文件和脚本 SHA256；更完整运行来源绑定待补。 |
+| PA08 / P1 | 延迟分析器 | PA00、PW01/PW02 | 实现中：nearest-rank p95/p99、样本/窗口/截断口径清晰，事件与 SystemC 汇总延迟交叉检查；事务记录关联等待原因，尾部专项排序视图可后续扩展。 |
+| PA09 / P0 | SystemC 参数扫描 | PI02/PI06/PI10、PW01、PA00 | 完成 multibank 全参数 schema 范围的笛卡尔扫描，最多 256 点，真实 SystemC 构建/运行并保留失败点与日志；不再绑定原 8 组硬编码案例。其他后端需显式新增适配。 |
+| PA10 / P0→P1 | 方案比较、最差退化、资源代理指标与 Pareto | PA09、PI10 | 实现中：仅相同 workload hash/时钟/事务数/最终数据且成功的点计算完成时间比；不同工作量不混比，资源代理/Pareto 和跨 workload 最差退化待补。 |
+| PA11 / P0 | 自动离线报告与制品归档 | PA01–PA03、PA09–PA10、PI10 | 完成 multibank 首版离线归档：run/sweep JSON、输入计划、事件、拓扑图/时间线/热图和失败报告均绑定输入/代码/依赖；父扫描绑定共享二进制，子点保留完整记录。其他报告格式仍按需汇入。 |
 
 三个首要图形工具固定为 PA01 地址映射、PA03 Bank 热力图、PA02 事务时间线。它们消费同一份事件与统计合同，不分别复制解析器和单位转换；Python 可做离线分析/可视化/批次编排，不代替 SystemC 模型或另造仿真内核。
 
@@ -114,7 +116,7 @@ B-C0/B-C1 无依赖的项可同批开展；其他批次不能绕过输入合同�
 | ID / 优先级 | 工作 | 状态与退出条件 |
 |---|---|---|
 | PX01 / P0 | 公共目录分层、manifest、标准包与安装导出 | 实现中：AixEslCommon 草案与独立消费者；目标职责见下表。只随真实资产创建目录；迁移保留稳定公开 include/target，旧实现移除而非复制；源码/安装/搬迁三种消费验证 |
-| PX02 / P0 | 公共组件完成后统一试用，模型仅承担消费者角色 | 实现中：本轮存储可靠性独立验证与共享资源试用完成；公共/现有模型 source/install/relocated 回归 113 场景、323 次执行通过，证据 runs/common-reliability-final-20260918/checks.json。完整余项继续按 TODO 推进。 |
+| PX02 / P0 | 公共组件完成后统一试用，模型仅承担消费者角色 | 本轮配置→装配→SystemC→回放→扫描→报告闭环统一试用完成；集成证据 runs/multibank-integration-final2-20260918/checks.json，功能/失败专项见 runs/multibank-final2-20260918/checks.json。其他未实现公共能力继续按各行推进。 |
 
 | 目标目录职责 | 资产归属与迁移约束 |
 |---|---|

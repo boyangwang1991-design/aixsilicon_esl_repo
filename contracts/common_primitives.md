@@ -190,3 +190,10 @@ SystemC clock period with overflow checks. Initiation interval is independently
 `ResourceTiming` for homogeneous jobs of that size; variable-size jobs require
 separate owner scheduling, not silently changing an active resource. Work units
 are caller-defined (MACs/bytes/elements); no numerical algorithm or PPA is implied.
+
+`WorkloadTrace` reads/writes versioned, bounded request plans with owned transaction
+bytes, cyclic masks, integer earliest cycles and topologically ordered dependencies.
+Its period must match the consumer clock; invalid or forward references are rejected.
+The consumer defines retirement and preserves requests under rejection. This is
+separate from EventRecorder's bounded observation stream. See the multibank contract
+for the v1 record layout and its supported metadata subset.

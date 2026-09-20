@@ -13,8 +13,8 @@ import subprocess
 from pathlib import Path
 
 
-def analyze(path: Path) -> dict:
-    """Strict v1 event reader; truncated traces cannot support complete latency claims."""
+def read_events(path: Path) -> tuple[float, int, list[dict]]:
+    """Shared strict v1 transport reader; consumers validate their phase contracts."""
     with path.open() as stream:
         header = stream.readline().strip()
         match = re.fullmatch(r'# aix-esl-events-v1,tick_seconds=([0-9.eE+-]+),dropped=(\d+)', header)
@@ -27,6 +27,28 @@ def analyze(path: Path) -> dict:
         if reader.fieldnames != ['tick', 'id', 'parent', 'source', 'phase', 'resource', 'value']:
             raise ValueError('event columns')
         events = list(reader)
+    previous = 0
+    for event in events:
+        if None in event or any(value is None for value in event.values()):
+            raise ValueError('event row width')
+        for key in ('tick', 'id', 'parent', 'value'):
+            if not event[key].isascii() or not event[key].isdecimal():
+                raise ValueError(f'event unsigned integer: {key}')
+            if int(event[key]) > 2**64 - 1:
+                raise ValueError(f'event uint64 overflow: {key}')
+        tick = int(event['tick'])
+        if tick < previous:
+            raise ValueError('event time order')
+        previous = tick
+        for key in ('source', 'phase', 'resource'):
+            if not re.fullmatch(r'[A-Za-z0-9_.:/-]+', event[key]):
+                raise ValueError(f'event token: {key}')
+    return tick_seconds, dropped, events
+
+
+def analyze(path: Path) -> dict:
+    """Composition v1 phase analysis; truncated traces cannot support latency claims."""
+    tick_seconds, dropped, events = read_events(path)
     accepted, service, completed, retired = {}, {}, {}, {}
     samples, timeline, mapping = [], [], []
     previous = 0

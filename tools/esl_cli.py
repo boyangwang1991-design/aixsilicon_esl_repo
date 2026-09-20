@@ -51,6 +51,12 @@ def cmd_inspect(args):
             item['manifest'] = contracts.validate_model(REPO_ROOT / asset['path'] / 'model.yaml')
         elif asset['kind'] == 'common':
             item['manifest'] = contracts.validate_common(REPO_ROOT / asset['path'] / 'common.yaml')
+        elif asset['kind'] == 'example':
+            capability = REPO_ROOT / asset['path'] / 'capabilities.json'
+            if capability.is_file():
+                item['capabilities'] = json.loads(capability.read_text())
+                if item['capabilities'].get('id') != asset['id']:
+                    raise ValueError('example capability/registry ID mismatch')
         available.append(item)
     return _out({'command': 'inspect', 'status': 'PASS', 'available': available,
                  'resolved_id': selected[0]['id'] if requested else None,
@@ -236,8 +242,19 @@ def main(argv=None):
     npu.add_argument('--config', type=Path, help='flat architecture YAML')
     npu.add_argument('--workload', type=Path, help='topological DAG trace')
     npu.add_argument('--quick', action='store_true', help='small search smoke; not full exploration')
+    bank = sub.add_parser('multibank', help='configured SystemC common-component system')
+    bank.add_argument('action', choices=['resolve', 'run', 'sweep'])
+    bank.add_argument('--config', type=Path, required=True)
+    bank.add_argument('--output', type=Path)
+    bank.add_argument('--workload', type=Path, help='versioned workload trace; run only')
+    bank.add_argument('--executable', type=Path, help='external binary; provenance explicitly unverified')
+    bank.add_argument('--cmake', default='cmake')
+    bank.add_argument('--timeout', type=int, default=30)
     args = parser.parse_args(argv)
     try:
+        if args.command == 'multibank':
+            import multibank
+            return multibank.main(args)
         if args.command == 'npu-sram':
             import npu_explore
             return npu_explore.main(args)

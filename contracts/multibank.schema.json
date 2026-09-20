@@ -1,0 +1,190 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SystemC multibank profile v1",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "type": "integer"
+    },
+    "ports": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 64,
+      "default": 2
+    },
+    "banks": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 64,
+      "default": 4
+    },
+    "capacity": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 16777216,
+      "default": 4096
+    },
+    "stripe": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 4096,
+      "default": 16
+    },
+    "bytes": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 4096,
+      "default": 16
+    },
+    "requests": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 100000,
+      "default": 16
+    },
+    "outstanding": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 65536,
+      "default": 8
+    },
+    "bank_capacity": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 65536,
+      "default": 8
+    },
+    "latency": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 1000000,
+      "default": 8
+    },
+    "interval": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 1000000,
+      "default": 1
+    },
+    "response_cycles": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 1000000,
+      "default": 2
+    },
+    "period_ps": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 1000000,
+      "default": 1000
+    },
+    "phase_cycles": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 10000000,
+      "default": 0
+    },
+    "warmup_cycles": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9999999,
+      "default": 0
+    },
+    "max_cycles": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 10000000,
+      "default": 10000
+    },
+    "write_percent": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100,
+      "default": 50
+    },
+    "trace_limit": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 1000000,
+      "default": 100000
+    },
+    "seed": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 18446744073709551615,
+      "default": 17
+    },
+    "stride": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 18446744073709551615,
+      "default": 64
+    },
+    "mapping": {
+      "type": "string",
+      "enum": [
+        "stripe",
+        "xor",
+        "contiguous"
+      ],
+      "default": "stripe"
+    },
+    "arbitration": {
+      "type": "string",
+      "enum": [
+        "rr",
+        "priority"
+      ],
+      "default": "rr"
+    },
+    "storage": {
+      "type": "string",
+      "enum": [
+        "dense",
+        "sparse"
+      ],
+      "default": "dense"
+    },
+    "pattern": {
+      "type": "string",
+      "enum": [
+        "stride",
+        "sequential",
+        "random",
+        "hotspot"
+      ],
+      "default": "stride"
+    },
+    "observation": {
+      "type": "string",
+      "enum": [
+        "trace",
+        "counters",
+        "off"
+      ],
+      "default": "trace"
+    },
+    "connections": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "from",
+          "to"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "from": {
+            "type": "string"
+          },
+          "to": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

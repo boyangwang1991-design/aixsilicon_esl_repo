@@ -1,0 +1,10 @@
+base:
+  schema_version: 1
+  ports: 2
+  banks: 4
+  seed: 17
+  write_percent: 50
+matrix:
+  mapping: [stripe, xor]
+  storage: [dense, sparse]
+  interval: [1, 8]

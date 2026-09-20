@@ -30,6 +30,7 @@ headers:
 - systemc/include/aix/esl/storage_access.hpp
 - systemc/include/aix/esl/ecc_memory.hpp
 - systemc/include/aix/esl/compute_timing.hpp
+- systemc/include/aix/esl/workload_trace.hpp
 consumers:
 - models/dma
 - models/uart
@@ -38,3 +39,4 @@ consumers:
 - models/ram
 - models/rom
 - examples/common_primitives
+- systems/multibank

@@ -1,0 +1,22 @@
+{
+  "id": "aixsilicon:esl:multibank:0.1.0",
+  "backend": "SystemC",
+  "precision": "cycle-stepped resource model; completion-visible data",
+  "config_schema": "contracts/multibank.schema.json",
+  "request_protocol": "memory_request_v1",
+  "response_protocol": "memory_response_v1",
+  "workload_format": "aix-esl-workload-v1",
+  "event_format": "aix-esl-events-v1",
+  "storage": ["dense", "sparse"],
+  "mapping": ["stripe", "xor", "contiguous"],
+  "arbitration": ["rr", "priority"],
+  "limits": [
+    "Fixed-width aligned requests confined to one bank",
+    "One pending request and one retired response per source per cycle",
+    "One issue per bank per cycle; independent configured latency and II",
+    "Bank and global credits retained until in-order response retirement",
+    "Dependencies release after retirement; trace must be topologically ordered",
+    "Fixed router/bank/return topology; arbitrary rewiring is rejected",
+    "No pin-level AXI, ECC, checkpoint or RTL calibration in this system profile"
+  ]
+}

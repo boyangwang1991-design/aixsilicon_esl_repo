@@ -27,3 +27,5 @@
 组合 fixture 使用固定地址/数据 oracle，分别以不同映射/时序策略访问同一 ByteStore。common_explore 进一步对八组映射/latency/II 配置比较 off/trace 完成时间，保留失败，不把不同策略的速度差解释为功能差。分析脚本的单元测试只验证文件协议及离线统计，不替代 SystemC 模型测试。
 
 新增存储可靠性场景：`common_storage_dense/sparse` 对同一 burst/mask/跨页/非法请求合同和 ECC RMW/scrub 运行独立 oracle；`common_storage_timed_dense/timed_sparse/timed_baseline` 以实际 SystemC 共享 bank/codec 对照 12 ns/7 ns，检查资源排空和最终数据。新增策略场景 `common_policy_compute` 验证尾部工作量取整、溢出、latency 与 II 及完成 credit，`common_policy_interrupts` 验证边沿/电平、同采样 W1C 优先级、mask 和门限。task_pipeline 同时作为 ComputeTiming 的第二个消费者，解析完成时间保持 13 ns。
+
+工作负载 fixture `common_workload_trace` 验证读写 roundtrip、clock/ID/依赖/hex/mask/溢出拒绝，共 47 个公共场景。第二消费者 systems/multibank 在实际 SystemC 中生成并回放，配置/依赖/观测与失败场景由 tools/validate_multibank.py 独立验证；Python 不推进仿真时间。

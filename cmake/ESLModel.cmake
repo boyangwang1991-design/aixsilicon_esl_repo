@@ -41,6 +41,7 @@ function(esl_model name package)
         set(_repo "${_esl_cmake}/..")
         file(GLOB_RECURSE _doc_files RELATIVE "${_repo}"
             "${_repo}/docs/*.md" "${_repo}/models/*.md" "${_repo}/examples/*.md"
+            "${_repo}/systems/*.md"
             "${_repo}/common/*.md" "${_repo}/reference/*.md" "${_repo}/tests/*.md")
         list(APPEND _doc_files README.md registry.yaml)
         foreach(_file IN LISTS _doc_files)

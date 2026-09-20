@@ -1,0 +1,18 @@
+cmake_minimum_required(VERSION 3.19)
+project(AixEslMultibank LANGUAGES CXX)
+if(ESL_MODELS_SOURCE_DIR)
+    if(NOT TARGET aix::esl::common)
+        add_subdirectory("${ESL_MODELS_SOURCE_DIR}/common" common)
+    endif()
+else()
+    find_package(AixEslCommon 0.1 CONFIG REQUIRED)
+endif()
+add_executable(multibank_run systemc/main.cpp)
+target_link_libraries(multibank_run PRIVATE aix::esl::common)
+enable_testing()
+add_test(NAME multibank_generate COMMAND multibank_run
+    "${CMAKE_CURRENT_SOURCE_DIR}/configs/default.cfg" - "${CMAKE_CURRENT_BINARY_DIR}/generated")
+add_test(NAME multibank_replay COMMAND multibank_run
+    "${CMAKE_CURRENT_SOURCE_DIR}/configs/default.cfg" "${CMAKE_CURRENT_BINARY_DIR}/generated.workload.trace" "${CMAKE_CURRENT_BINARY_DIR}/replayed")
+set_tests_properties(multibank_generate PROPERTIES TIMEOUT 20 FIXTURES_SETUP recorded_workload)
+set_tests_properties(multibank_replay PROPERTIES TIMEOUT 20 FIXTURES_REQUIRED recorded_workload)

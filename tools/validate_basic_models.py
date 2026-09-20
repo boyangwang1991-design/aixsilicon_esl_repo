@@ -32,12 +32,13 @@ def main() -> int:
                    'models/timer', 'models/irq_controller', 'models/uart', 'models/gpio', 'models/dma',
                    'common', 'cmake', 'contracts', 'examples/basic_system',
                    'examples/interrupt_system', 'examples/peripheral_system', 'examples/dma_system',
-                   'examples/common_primitives']:
+                   'examples/common_primitives', 'systems/multibank']:
         for p in sorted((ROOT / folder).rglob('*')):
             if p.is_file():
                 result['source_sha256'][str(p.relative_to(ROOT))] = hashlib.sha256(p.read_bytes()).hexdigest()
 
-    for filename in ['CMakeLists.txt', 'tools/validate_basic_models.py', 'tools/esl_contracts.py']:
+    for filename in ['CMakeLists.txt', 'tools/validate_basic_models.py', 'tools/esl_contracts.py',
+                     'tools/esl_cli.py', 'tools/multibank.py', 'tools/common_explore.py', 'tools/validate_multibank.py']:
         result['source_sha256'][filename] = hashlib.sha256((ROOT / filename).read_bytes()).hexdigest()
 
     def run(label: str, command: list[str]) -> None:
@@ -55,10 +56,11 @@ def main() -> int:
             result['test_cases'] = sorted(set(result['test_cases']) | set(cases))
 
     def consumer(label: str, extra: list[str]) -> None:
-        for example in ['common_primitives', 'basic_system', 'interrupt_system', 'peripheral_system', 'dma_system']:
+        for example in ['common_primitives', 'basic_system', 'interrupt_system', 'peripheral_system', 'dma_system', 'multibank']:
             step = f'{label}-{example}'
             build = str(out / step)
-            run(step + '-configure', [cmake, '-S', str(ROOT / 'examples' / example), '-B', build, *extra])
+            source = ROOT / ('systems' if example == 'multibank' else 'examples') / example
+            run(step + '-configure', [cmake, '-S', str(source), '-B', build, *extra])
             run(step + '-build', [cmake, '--build', build, '-j', '4'])
             run(step + '-test', [ctest, '--test-dir', build, '--output-on-failure', '--no-tests=error', '--output-junit', 'results.xml'])
 

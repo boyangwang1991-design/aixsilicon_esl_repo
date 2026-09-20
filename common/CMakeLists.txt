@@ -54,3 +54,7 @@ install(FILES systemc/include/aix/esl/storage_access.hpp systemc/include/aix/esl
     DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/aix/esl")
 install(FILES systemc/include/aix/esl/compute_timing.hpp
     DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/aix/esl")
+install(FILES systemc/include/aix/esl/workload_trace.hpp
+    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/aix/esl")
+install(FILES ../contracts/multibank.md ../contracts/multibank.schema.json
+    DESTINATION "${CMAKE_INSTALL_DATADIR}/aix-esl/contracts")

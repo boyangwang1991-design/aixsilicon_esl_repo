@@ -24,3 +24,5 @@ uv run python tools/common_explore.py sweep --executable build/common-source/com
 输出 results.json、逐点日志/事件和 report.html；8 组配置各执行 off/trace，对比完成时间并检查最终数据。Python 只编排真实 SystemC 程序并离线分析。
 
 存储可靠性扩展：ByteStore/SparseStore 已统一 burst 与 mask 合同；`EccMemory<Storage>` 支持真实 SECDED 部分写 RMW、单字 scrub、纠错/不可纠正错误与精确操作计数。SystemC 组合负责资源预留和可见时刻，详见公共合同。`ComputeTiming` 从工作量/吞吐构造有限计算资源；InterruptState 可按显式采样点区分边沿和电平并处理同刻 W1C。
+
+工作负载补充 `WorkloadTrace`：严格的版本化读写计划，保留字节数据、mask、ID、source、最早注入周期与前驱依赖。观测 trace 不作为回放输入。配置驱动的系统消费者见 systems/multibank。
