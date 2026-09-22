@@ -15,7 +15,22 @@ int sc_main(int argc,char**argv){try{
             for(uint64_t a=0;a<c.capacity;++a){auto p=mapper.map(a);CHECK(mapper.inverse(p.bank,p.local)==a);positions.insert(p.bank*(c.capacity/c.banks)+p.local);}CHECK(positions.size()==c.capacity);
         }
         c.mapping="region";c.regions={{0,16384,0,{0,1},"xor",32,0,1},{16384,16384,0,{2,3},"modulo",64,0,0}};Mapper mapper(c);
-        for(uint64_t a=0;a<c.capacity;++a){auto p=mapper.map(a);CHECK(mapper.inverse(p.bank,p.local)==a);}std::cout<<"PASS mapping full address bijections\n";return 0;
+        for(uint64_t a=0;a<c.capacity;++a){auto p=mapper.map(a);CHECK(mapper.inverse(p.bank,p.local)==a);}
+        for (auto vector : std::vector<std::vector<uint64_t>>{{0,1,0},{32,0,0},{64,0,32},{96,1,32},{16384,2,0},{16448,3,0},{32767,3,8191}}) {
+            auto p = mapper.map(vector[0]); CHECK(p.bank == vector[1] && p.local == vector[2]);
+        }
+        auto holes = c; holes.regions[1].base = 24576; holes.regions[1].length = 8192;
+        Mapper partial(holes);
+        bool rejected = false; try { partial.map(16384); } catch (const std::out_of_range&) { rejected = true; } CHECK(rejected);
+        rejected = false; try { partial.inverse(2,4096); } catch (const std::out_of_range&) { rejected = true; } CHECK(rejected);
+        for (unsigned fault = 0; fault < 3; ++fault) {
+            auto bad = c;
+            if (fault == 0) bad.regions[1].banks = {0,1};
+            if (fault == 1) bad.regions[0].banks = {0,0};
+            if (fault == 2) bad.regions[1].base = 8192;
+            rejected = false; try { Mapper invalid(bad); } catch (const std::invalid_argument&) { rejected = true; } CHECK(rejected);
+        }
+        std::cout<<"PASS mapping full address bijections and region oracles\n";return 0;
     }
     if(test=="ecc"){c.ecc_bytes=8;c.ecc_lanes=1;}
     if(test=="hierarchy"){c.groups=2;c.topology="hierarchical";c.remote_bytes=8;}

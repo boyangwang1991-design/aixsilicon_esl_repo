@@ -7,6 +7,7 @@
 #include <aix/esl/ordered_completion.hpp>
 #include <aix/esl/resource_timing.hpp>
 #include <aix/esl/traffic_source.hpp>
+#include <aix/esl/burst_schedule.hpp>
 #include <aix/esl/verification.hpp>
 #include <aix/esl/simulation_lifecycle.hpp>
 #include <algorithm>
@@ -83,14 +84,19 @@ struct MultiBank : sc_module {
         auto pattern = config.pattern == "random" ? TrafficSource::Pattern::random : config.pattern == "hotspot" ? TrafficSource::Pattern::hotspot :
                        config.pattern == "sequential" ? TrafficSource::Pattern::sequential : TrafficSource::Pattern::stride;
         std::vector<TrafficSource> sources;
-        for (unsigned p = 0; p < config.ports; ++p)
+        std::vector<BurstSchedule> schedules;
+        for (unsigned p = 0; p < config.ports; ++p) {
             sources.emplace_back(p * (config.capacity / config.ports), config.capacity / config.ports, config.bytes,
                                  pattern, config.stride, config.write_percent, config.seed, "port" + std::to_string(p));
+            schedules.emplace_back(config.requests, config.burst_requests, config.burst_period_cycles,
+                                   std::uint64_t(p) * config.phase_cycles);
+            (void)schedules.back().total_bytes(config.bytes);
+        }
         for (unsigned i = 0; i < config.requests; ++i) for (unsigned p = 0; p < config.ports; ++p) {
             auto transaction = sources[p].next();
             transaction.metadata.id = std::uint64_t(i) * config.ports + p;
             transaction.metadata.source = p;
-            workload.push_back({std::move(transaction), std::uint64_t(p) * config.phase_cycles, {}});
+            workload.push_back({std::move(transaction), schedules[p].earliest(i), {}});
         }
     }
     void event(const Transaction& transaction, const std::string& phase, const std::string& resource, std::uint64_t value = 0) {
@@ -202,10 +208,14 @@ struct MultiBank : sc_module {
         for (const auto& item : events.counts()) { if (!first) summary << ','; first = false; summary << '"' << item.first << "\":" << item.second; }
         summary << "}}\n";
         std::ofstream pending(prefix + ".pending.json");
-        pending << "{\"outstanding\":" << completions.outstanding() << ",\"ports\":[";
+        pending << "{\"schema_version\":1,\"cycle\":" << cycle
+                << ",\"period_ps\":" << config.period_ps
+                << ",\"outstanding\":" << completions.outstanding()
+                << ",\"capacity\":" << config.outstanding << ",\"ports\":[";
         for (unsigned p = 0; p < config.ports; ++p) {
             if (p) pending << ',';
-            pending << "{\"port\":" << p << ",\"remaining\":" << ports[p].size() - next[p];
+            pending << "{\"port\":" << p << ",\"remaining\":" << ports[p].size() - next[p]
+                    << ",\"queued\":" << (queued[p] ? "true" : "false");
             if (next[p] < ports[p].size()) {
                 const auto& request = workload[ports[p][next[p]]];
                 pending << ",\"next_id\":" << request.transaction.metadata.id << ",\"earliest_cycle\":" << request.earliest_cycle << ",\"waiting_on\":[";
@@ -214,6 +224,26 @@ struct MultiBank : sc_module {
                 pending << ']';
             }
             pending << '}';
+        }
+        pending << "],\"banks\":[";
+        for (unsigned bank = 0; bank < config.banks; ++bank) {
+            if (bank) pending << ',';
+            pending << "{\"bank\":" << bank << ",\"outstanding\":" << resources[bank]->outstanding()
+                    << ",\"capacity\":" << config.bank_capacity << '}';
+        }
+        pending << "],\"flights\":[";
+        first = true;
+        for (const auto& flight : flights) {
+            if (!first) pending << ',';
+            first = false;
+            const auto& transaction = flight.transaction;
+            // Report processed state, not a prediction based on the snapshot time.
+            // At max_cycles, events due at that boundary have not been processed.
+            pending << "{\"id\":" << transaction.metadata.id << ",\"source\":" << transaction.metadata.source
+                    << ",\"bank\":" << flight.bank << ",\"accepted_cycle\":" << flight.accepted_cycle
+                    << ",\"service_ready_cycle\":" << flight.ticket.ready.value() / config.period_ps
+                    << ",\"response_ready_cycle\":" << (flight.ticket.ready + duration(config.response_cycles)).value() / config.period_ps
+                    << ",\"stage\":\"" << (flight.returned ? "retirement" : flight.visible ? "response" : "service") << "\"}";
         }
         pending << "]}\n";
         require(summary.good() && pending.good(), "result write failed");

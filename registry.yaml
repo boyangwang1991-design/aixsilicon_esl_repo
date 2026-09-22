@@ -6,7 +6,7 @@ assets:
   path: models/npu_sram_controller
   status: available
   description: 多端口 SRAM SystemC 性能模型：有限资源、交织、冲突仲裁、同 ID 保序、闭环 NPU 流量
-  evidence: runs/multibank-npu-20260918/checks.json
+  evidence: runs/common-regions-npu-20260922/checks.json
 - id: aixsilicon:esl:common:0.1.0
   aliases:
   - aixsilicon:esl:queue:bounded:0.1.0
@@ -15,22 +15,22 @@ assets:
   path: common
   status: available
   description: SystemC 公共包；明确能力子集见 common.yaml 与公共合同，完整扩展范围见 TODO
-  evidence: runs/multibank-integration-final2-20260918/checks.json
+  evidence: runs/common-fault-service-integration-20260922/checks.json
 - id: aixsilicon:esl:resource:service:0.1.0
   kind: common
-  path: common/systemc
+  path: primitives
   status: planned
   description: 非流水服务资源（有限容量、排队、起止与释放）
 - id: aixsilicon:esl:buffer:pool:0.1.0
   kind: common
-  path: common/systemc
+  path: primitives
   status: planned
   description: 固定块/slot 分配（原子分配、generation、防提前释放）
 - id: aixsilicon:esl:observe:core:0.1.0
   kind: common
-  path: common/systemc
+  path: infrastructure
   status: planned
-  description: Counter/Gauge/Span/Event 埋点与收集
+  description: 独立观察包与自动收集扩展；已交付聚合 API 随 common 包提供
 - id: aixsilicon:esl:dma:0.1.0
   aliases:
   - aixsilicon:esl:dma:command:0.1.0

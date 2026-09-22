@@ -21,3 +21,13 @@ ctest --test-dir build/common-installed --output-on-failure
 移动 prefix 后必须用新的 build 目录重新 configure；统一 tools/validate_basic_models.py 执行源码/安装/搬迁及真实模型回归。此公共包可单独安装；模型内部使用相同 canonical 头文件，不要求模型用户在代码里操作队列/租约。源码 include 路径不应出现在导出 target 中。
 
 等待 queue.changed_event 或 gate.idle_event 前先检查谓词，delta 通知可能合并。业务 reset 不能依赖 clear 自动产生完成记录；BlockingLease 构造本身申请 credit，不能再手动 enter。具体数据/时间/容量边界见 [合同](../../contracts/common_primitives.md)。
+
+## 源码分层与 manifest v2
+
+common.yaml 的 schema_version=2，headers 改为相对仓库根的唯一实现路径；
+schema_version=1 的旧相对 common 路径仍由校验器识别。资产 ID/公开 include/target/package
+均不变，安装后仍为 include/aix/esl/*.hpp。直接硬编码旧 common/systemc/include 的消费者
+应改为链接 aix::esl::common；不提供旧实现副本或链接别名。内部 Mmio32 位于 services，仍不安装。
+
+包本身没有 Python 构建依赖；源码方式通过聚合 target 获得各层 include 路径，安装方式只获得
+安装 prefix 的 include 路径。安装验证对比实际导出头文件与 manifest 的完整集合，并检查源码路径泄漏。

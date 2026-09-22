@@ -1,4 +1,5 @@
 #include "npu_sram_controller/mapping.hpp"
+#include <aix/esl/region_mapper.hpp>
 #include <algorithm>
 #include <fstream>
 #include <map>
@@ -7,6 +8,19 @@
 #include <stdexcept>
 namespace aix::esl::npu_sram_controller {
 static bool pow2(uint64_t x){return x && !(x&(x-1));}
+static ::aix::esl::RegionMapper region_mapper(const Config& config) {
+    std::vector<::aix::esl::RegionMapper::Region> regions;
+    for (const auto& r : config.regions)
+        regions.push_back({r.base, r.length, r.local_base, r.banks, r.stripe,
+                          r.policy == "xor" ? ::aix::esl::AddressMapper::Policy::xor_interleaved :
+                                              ::aix::esl::AddressMapper::Policy::interleaved,
+                          r.shift, r.rotation});
+    return {config.capacity, config.banks, config.capacity / config.banks, config.groups, std::move(regions)};
+}
+Mapper::Mapper(const Config& c) : c_(c) {
+    c_.validate();
+    if (c_.mapping == "region") regions_ = std::make_shared<const ::aix::esl::RegionMapper>(region_mapper(c_));
+}
 void Config::validate() const {
     auto require=[](bool ok,const char* why){if(!ok)throw std::invalid_argument(why);};
     require(ports>0&&ports<=8&&pow2(banks)&&banks<=64,"ports/banks");
@@ -27,21 +41,14 @@ void Config::validate() const {
     require(!ecc_bytes||(word_bytes%ecc_bytes==0&&stripe_bytes%ecc_bytes==0),"ECC alignment");
     require(ecc_lanes&&ecc_ii&&ecc_latency&&ecc_group<=1&&macro_word_write<=1&&cycle_limit,"ECC/resources");
     require((mapping=="region")==!regions.empty()&&regions.size()<=8,"region table");
-    std::vector<std::pair<uint64_t,uint64_t>> logical;
-    std::vector<std::vector<std::pair<uint64_t,uint64_t>>> physical(banks);
     for(auto& r:regions){
         require(r.length&&pow2(r.banks.size())&&pow2(r.stripe)&&r.stripe>=8&&r.stripe<=2048,"region shape");
         require(r.base<=capacity&&r.length<=capacity-r.base&&r.base%r.stripe==0&&r.length%(r.banks.size()*r.stripe)==0,"region range");
         require(r.policy=="modulo"||r.policy=="xor","region policy");
         require(r.shift<=16&&r.rotation<r.banks.size()&&r.local_base%word_bytes==0,"region layout");
         require(!ecc_bytes||r.stripe%ecc_bytes==0,"region ECC alignment");
-        logical.push_back({r.base,r.base+r.length}); std::set<unsigned> unique;
-        for(auto b:r.banks){require(b<banks&&unique.insert(b).second,"region banks");
-            require(r.local_base<=capacity/banks&&r.length/r.banks.size()<=capacity/banks-r.local_base,"region physical capacity");
-            physical[b].push_back({r.local_base,r.local_base+r.length/r.banks.size()});}
     }
-    auto no_overlap=[&](auto ranges){std::sort(ranges.begin(),ranges.end());for(size_t i=1;i<ranges.size();++i)require(ranges[i-1].second<=ranges[i].first,"region alias");};
-    no_overlap(logical);for(auto& p:physical)no_overlap(p);
+    if (!regions.empty()) (void)region_mapper(*this); // public bounds/subset/alias contract
 }
 Config Config::read(const std::string& path){
     Config c;std::ifstream in(path);if(!in)throw std::runtime_error("config open");
@@ -70,10 +77,8 @@ Config Config::read(const std::string& path){
 Location Mapper::map(uint64_t a)const{
     if(a>=c_.capacity)throw std::out_of_range("address");
     if(c_.mapping=="region"){
-        for(auto& r:c_.regions)if(a>=r.base&&a-r.base<r.length){auto q=(a-r.base)/r.stripe,h=q/r.banks.size();unsigned b=q%r.banks.size();
-            if(r.policy=="xor")b^=(h>>r.shift)&(r.banks.size()-1);b=(b+r.rotation)%r.banks.size();
-            return {r.banks[b],r.local_base+h*r.stripe+(a-r.base)%r.stripe};}
-        throw std::out_of_range("region hole");
+        const auto location = regions_->map(a);
+        return {location.bank, location.local};
     }
     if(c_.mapping=="contiguous")return {unsigned(a/(c_.capacity/c_.banks)),a%(c_.capacity/c_.banks)};
     auto q=a/c_.stripe_bytes,h=q/c_.banks;unsigned b=q%c_.banks,B=c_.banks/c_.groups;
@@ -87,11 +92,7 @@ Location Mapper::map(uint64_t a)const{
 }
 uint64_t Mapper::inverse(unsigned b,uint64_t local)const{
     if(b>=c_.banks||local>=c_.capacity/c_.banks)throw std::out_of_range("physical address");
-    if(c_.mapping=="region")for(auto& r:c_.regions){auto it=std::find(r.banks.begin(),r.banks.end(),b);
-        if(it!=r.banks.end()&&local>=r.local_base&&local-r.local_base<r.length/r.banks.size()){
-            auto off=local-r.local_base,h=off/r.stripe;unsigned low=(it-r.banks.begin()+r.banks.size()-r.rotation)%r.banks.size();
-            if(r.policy=="xor")low^=(h>>r.shift)&(r.banks.size()-1);return r.base+(h*r.banks.size()+low)*r.stripe+off%r.stripe;}}
-    if(c_.mapping=="region")throw std::out_of_range("physical hole");
+    if(c_.mapping=="region") return regions_->inverse(b, local);
     if(c_.mapping=="contiguous")return b*(c_.capacity/c_.banks)+local;
     auto h=local/c_.stripe_bytes;unsigned B=c_.banks/c_.groups;
     if(c_.group_first)b=(b%B)*c_.groups+b/B;

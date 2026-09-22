@@ -6,8 +6,40 @@ import sys
 from pathlib import Path
 
 import yaml
+import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+def test_common_layer_ownership_and_hash_coverage():
+    sys.path.insert(0, str(ROOT / 'tools'))
+    import esl_contracts
+    import multibank
+    import npu_explore
+    manifest = esl_contracts.validate_common(ROOT / 'common/common.yaml')
+    assert manifest['schema_version'] == 2
+    assert not list((ROOT / 'common/systemc').rglob('*.hpp'))
+    actual = set()
+    for layer in ('primitives', 'infrastructure', 'adapters', 'services', 'workloads', 'verification'):
+        actual.update(str(p.relative_to(ROOT)) for p in (ROOT / layer).rglob('*.hpp') if p.name != 'mmio32.hpp')
+    assert actual == set(manifest['headers'])
+    assert set(manifest['headers']) <= multibank.source_hashes().keys()
+    assert 'services/systemc/include/aix/esl/byte_store.hpp' in npu_explore.source_hashes()
+
+
+@pytest.mark.parametrize('bad', [
+    '../escape.hpp', 'services/systemc/include/aix/esl/../../escape.hpp',
+    'services/systemc/include/aix/esl/mmio32.hpp',
+])
+def test_common_manifest_rejects_invalid_header_paths(tmp_path, bad):
+    sys.path.insert(0, str(ROOT / 'tools'))
+    import esl_contracts
+    data = yaml.safe_load((ROOT / 'common/common.yaml').read_text())
+    data['headers'][0] = bad
+    path = tmp_path / 'common.yaml'
+    path.write_text(yaml.safe_dump(data))
+    with pytest.raises(ValueError, match='invalid common public header path'):
+        esl_contracts.validate_common(path)
 
 
 def test_registry_paths_and_target_namespace():

@@ -11,7 +11,6 @@ add_library(aix::esl::common ALIAS aix_esl_common)
 set_target_properties(aix_esl_common PROPERTIES EXPORT_NAME common)
 target_compile_features(aix_esl_common INTERFACE cxx_std_${ESL_CXX_STANDARD})
 target_include_directories(aix_esl_common INTERFACE
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/systemc/include>
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 target_link_libraries(aix_esl_common INTERFACE SystemC::systemc)
 set(ESL_PACKAGE AixEslCommon)
@@ -27,34 +26,15 @@ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/AixEslCommonConfig.cmake"
     "${CMAKE_CURRENT_BINARY_DIR}/AixEslCommonConfigVersion.cmake" DESTINATION "${_package_dir}")
 install(FILES ../cmake/ESLSystemC.cmake DESTINATION "${_package_dir}/cmake")
 install(FILES ../contracts/environment.json DESTINATION "${_package_dir}/contracts")
-# Only these versioned public headers are exported; MMIO helper remains private.
-install(FILES systemc/include/aix/esl/bounded_queue.hpp systemc/include/aix/esl/blocking_gate.hpp
-    systemc/include/aix/esl/byte_store.hpp systemc/include/aix/esl/activity_monitor.hpp
-    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/aix/esl")
+# Source implementations have one owner; public include names remain flat.
+foreach(layer primitives infrastructure adapters services workloads verification)
+    target_include_directories(aix_esl_common INTERFACE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../${layer}/systemc/include>)
+    install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../${layer}/systemc/include/"
+        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}" FILES_MATCHING PATTERN "*.hpp"
+        PATTERN "mmio32.hpp" EXCLUDE)
+endforeach()
 install(FILES README.md common.yaml DESTINATION "${CMAKE_INSTALL_DATADIR}/aix-esl/common")
 install(DIRECTORY docs/ DESTINATION "${CMAKE_INSTALL_DATADIR}/aix-esl/common/docs")
-install(FILES ../contracts/common_primitives.md DESTINATION "${CMAKE_INSTALL_DATADIR}/aix-esl/contracts")
-install(FILES
-    systemc/include/aix/esl/resource_timing.hpp
-    systemc/include/aix/esl/address_mapper.hpp
-    systemc/include/aix/esl/arbiter.hpp
-    systemc/include/aix/esl/transaction.hpp
-    systemc/include/aix/esl/ordered_completion.hpp
-    systemc/include/aix/esl/deterministic_rng.hpp
-    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/aix/esl")
-install(FILES systemc/include/aix/esl/register_bank.hpp systemc/include/aix/esl/secded.hpp
-    systemc/include/aix/esl/task_graph.hpp DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/aix/esl")
-install(FILES systemc/include/aix/esl/event_recorder.hpp systemc/include/aix/esl/traffic_source.hpp
-    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/aix/esl")
-install(FILES systemc/include/aix/esl/timed_channel.hpp systemc/include/aix/esl/sparse_store.hpp
-    systemc/include/aix/esl/simulation_lifecycle.hpp DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/aix/esl")
-install(FILES systemc/include/aix/esl/verification.hpp systemc/include/aix/esl/fault_schedule.hpp
-    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/aix/esl")
-install(FILES systemc/include/aix/esl/storage_access.hpp systemc/include/aix/esl/ecc_memory.hpp
-    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/aix/esl")
-install(FILES systemc/include/aix/esl/compute_timing.hpp
-    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/aix/esl")
-install(FILES systemc/include/aix/esl/workload_trace.hpp
-    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/aix/esl")
-install(FILES ../contracts/multibank.md ../contracts/multibank.schema.json
+install(FILES ../contracts/common_primitives.md ../contracts/multibank.md ../contracts/multibank.schema.json
     DESTINATION "${CMAKE_INSTALL_DATADIR}/aix-esl/contracts")

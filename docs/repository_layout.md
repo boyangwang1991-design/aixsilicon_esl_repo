@@ -9,7 +9,13 @@ models/<name>/               SystemC 可复用模型或明确标记的 planned �
   docs/                     design / integration / verification
   tests/systemc/            模型专项；组合检查可复用 examples 中的消费者
   examples/integration/     单模型外部消费者（同时承担 standalone）
-common/systemc/include/      目标模型共用的内部 C++ 组件
+common/                     聚合包构建、manifest 与文档
+primitives/systemc/include/ 队列/credit/仲裁/映射/资源/链路
+infrastructure/systemc/include/ 统计/事件/RNG/生命周期
+adapters/systemc/include/   事务/TLM 绑定与分片
+services/systemc/include/   字节存储/ECC/寄存器服务
+workloads/systemc/include/  流量/任务 DAG/计算占位/回放
+verification/systemc/include/ 检查器与故障计划
 examples/<system>/          实际 SystemC 系统装配、工作负载、scoreboard、CMake
   systemc/                  仿真顶层；不复制模型实现
   README.md                 配置、连接、运行与能力边界
@@ -53,3 +59,11 @@ runs/                      被忽略的运行日志、构建与 hash 证据
 SystemC B0 的 32 次 CTest 全部通过（含 source/install/relocated 三种消费者），证据 `runs/layout-refactor-20260918/checks.json`。新环境路径的 2 项 CTest 通过；7 项 Python 工具/迁移检查通过；旧 Python 配置/合同及 T01–T03 数据/周期检查通过。参考检查与目标检查分别统计。
 
 本次没有变更四个可用模型的公共 ABI，当时未将 timer/irq_controller 草案升级可用；后续实现状态以 registry 和任务账本为准。全仓 make check / pre-commit 的状态单独记录，不用局部回归代替全仓门禁。
+
+## 公共包分层迁移（PX01）
+
+common/systemc/include/aix/esl 的头文件按上述职责单次移动，不保留副本。
+公开 `<aix/esl/*.hpp>`、`aix::esl::common`、AixEslCommon 0.1 包名与版本保持不变；
+common.yaml v2 使用相对仓库根路径。完整映射由 manifest 记录。
+新增的 infrastructure 层承载 PI/PA 的实际公共实现，与建模 primitives 分离。
+源码/安装/搬迁消费者及 NPU 依赖哈希随迁移验证，旧 run 证据保持原始路径不改写。

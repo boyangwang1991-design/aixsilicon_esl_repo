@@ -7,10 +7,21 @@
   "response_protocol": "memory_response_v1",
   "workload_format": "aix-esl-workload-v1",
   "event_format": "aix-esl-events-v1",
-  "storage": ["dense", "sparse"],
-  "mapping": ["stripe", "xor", "contiguous"],
-  "arbitration": ["rr", "priority"],
+  "storage": [
+    "dense",
+    "sparse"
+  ],
+  "mapping": [
+    "stripe",
+    "xor",
+    "contiguous"
+  ],
+  "arbitration": [
+    "rr",
+    "priority"
+  ],
   "limits": [
+    "Finite temporal bursts: fixed request count per burst, start-to-start period and per-source phase; partial final burst allowed",
     "Fixed-width aligned requests confined to one bank",
     "One pending request and one retired response per source per cycle",
     "One issue per bank per cycle; independent configured latency and II",

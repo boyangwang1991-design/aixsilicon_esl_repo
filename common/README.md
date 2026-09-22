@@ -26,3 +26,13 @@ uv run python tools/common_explore.py sweep --executable build/common-source/com
 存储可靠性扩展：ByteStore/SparseStore 已统一 burst 与 mask 合同；`EccMemory<Storage>` 支持真实 SECDED 部分写 RMW、单字 scrub、纠错/不可纠正错误与精确操作计数。SystemC 组合负责资源预留和可见时刻，详见公共合同。`ComputeTiming` 从工作量/吞吐构造有限计算资源；InterruptState 可按显式采样点区分边沿和电平并处理同刻 W1C。
 
 工作负载补充 `WorkloadTrace`：严格的版本化读写计划，保留字节数据、mask、ID、source、最早注入周期与前驱依赖。观测 trace 不作为回放输入。配置驱动的系统消费者见 systems/multibank。
+
+通用 `Counter/Gauge/Span` 已提供计数、占用/忙时积分与完成区间汇总，详见公共合同。实现已按职责迁至 primitives/infrastructure/adapters/services/workloads/verification；common 保留聚合入口，公开 include 与 target 不变。
+
+公共 `RegionMapper` 提供无别名区域表、Bank 子集/窗口/旋转和正逆映射，由独立存储 fixture 与 NPU 区域模式共同消费；不扩大 NPU 已声明的配置范围。
+
+`BurstSchedule` 将有限请求数按批次周期和相位释放，复用 TrafficSource 地址/读写生成及 WorkloadTrace 录制；它不引入 AXI burst 协议，详细边界见公共合同。
+
+`FaultService` 将 FaultSchedule 的暂停/错误/额外延迟/准入速率效果应用于单发射有限资源；
+seeded 窗口只在构造时随机化，查询无副作用，windows() 可导出重放。消费者负责完成时的
+错误响应和数据提交，不自动改变未接入模型的故障能力。

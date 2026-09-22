@@ -11,8 +11,12 @@ function(esl_model name package)
     target_compile_features(aix_esl_${name} PUBLIC cxx_std_${ESL_CXX_STANDARD})
     target_include_directories(aix_esl_${name} PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/systemc/include>
-        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
-        PRIVATE "${_esl_cmake}/../common/systemc/include")
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+    # Models consume the same canonical implementation privately; exported model
+    # headers do not expose common types or source-tree paths.
+    foreach(layer primitives infrastructure adapters services workloads verification)
+        target_include_directories(aix_esl_${name} PRIVATE "${_esl_cmake}/../${layer}/systemc/include")
+    endforeach()
     target_link_libraries(aix_esl_${name} PUBLIC SystemC::systemc ${M_LIBRARIES})
     set(_package_dir "${CMAKE_INSTALL_LIBDIR}/cmake/${package}")
     set(ESL_PACKAGE ${package})

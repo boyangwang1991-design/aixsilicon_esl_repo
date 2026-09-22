@@ -7,6 +7,7 @@
 #include <aix/esl/traffic_source.hpp>
 #include <aix/esl/verification.hpp>
 #include <aix/esl/fault_schedule.hpp>
+#include <aix/esl/fault_service.hpp>
 #include <fstream>
 #include <iostream>
 #include <memory>
@@ -15,8 +16,8 @@ using namespace aix::esl;
 using namespace sc_core;
 static void check(bool ok,const char* why){if(!ok)throw std::runtime_error(why);}
 struct System:sc_module{
-    struct Flight{unsigned port,bank;uint64_t tag;ResourceTiming::Ticket ticket;Transaction transaction;};
-    std::vector<std::unique_ptr<ResourceTiming>> banks;
+    struct Flight{unsigned port,bank;uint64_t tag;FaultService::Ticket ticket;Transaction transaction;};
+    std::vector<std::unique_ptr<FaultService>> banks;
     std::vector<Arbiter> arbiters;
     ByteStore memory{4096};AddressMapper mapper;
     OrderedCompletion rob{8};EventRecorder recorder;
@@ -31,7 +32,8 @@ struct System:sc_module{
     System(sc_module_name name,bool xored,bool trace,unsigned latency,unsigned ii,bool fault=false):sc_module(name),
         mapper(4096,4,16,1,xored?AddressMapper::Policy::xor_interleaved:AddressMapper::Policy::interleaved),
         recorder(trace?EventRecorder::Mode::trace:EventRecorder::Mode::off),inject_fault(fault),waiting(2){
-        for(unsigned bank=0;bank<4;++bank){banks.emplace_back(new ResourceTiming(sc_time(latency,SC_NS),sc_time(ii,SC_NS),1,8));arbiters.emplace_back(2);}
+        for(unsigned bank=0;bank<4;++bank){banks.emplace_back(new FaultService(sc_time(latency,SC_NS),sc_time(ii,SC_NS),8,
+            inject_fault ? faults : FaultSchedule({}), "bank" + std::to_string(bank)));arbiters.emplace_back(2);}
         for(unsigned port=0;port<2;++port)sources.emplace_back(port*2048,2048,16,TrafficSource::Pattern::stride,64,100,17,"port"+std::to_string(port));
         SC_THREAD(run);
     }
@@ -51,7 +53,6 @@ struct System:sc_module{
                 check(rob.barrier_ready()&&flights.empty(),"transaction conservation");passed=true;finish_tick=sc_time_stamp().value();sc_stop();return;}
             for(unsigned p=0;p<2;++p)if(issued[p]<16&&!waiting[p])waiting[p]=sources[p].next();
             for(unsigned bank=0;bank<4;++bank){std::vector<bool> ready(2,false);
-                if(inject_fault&&faults.at("bank"+std::to_string(bank)).pause)continue;
                 for(unsigned p=0;p<2;++p)ready[p]=waiting[p]&&mapper.map(waiting[p]->address).bank==bank;
                 if(rob.outstanding()==8||(!ready[0]&&!ready[1]))continue;
                 auto ticket=banks[bank]->reserve();if(!ticket)continue;

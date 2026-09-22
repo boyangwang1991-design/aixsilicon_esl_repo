@@ -13,6 +13,6 @@
 - IRQ 输出由单一 SC_METHOD 驱动，寄存器副作用与级联 IRQ 经 delta-cycle 传播。读取 sc_signal 前让系统到达稳定 delta；不假定 b_transport 返回时所有级联输出已更新。
 - 不支持 AT、DMI、debug、窄访问、部分字节写或周期精确总线时序。DMI=false，debug 返回 0。
 
-共用实现位于 common/systemc/include/aix/esl/mmio32.hpp，仅作为模型内部 helper，不是独立发布 ABI。完整测试见 examples/interrupt_system。
+共用实现位于 services/systemc/include/aix/esl/mmio32.hpp，仅作为模型内部 helper，不是独立发布 ABI。完整测试见 examples/interrupt_system。
 
 UART/GPIO 的字节/信号接口及寄存器定义见各模型 docs/design.md 和 docs/integration.md，消费者为 examples/peripheral_system。UART drain 完成依赖外部 TX FIFO 的消费者继续读取，idle 包含 TX 队列但不包含 RX 缓存；GPIO idle 仅指 MMIO 空闲，drain 时引脚采样继续。UART ERROR/GPIO PENDING 同刻 set 优先于 W1C。

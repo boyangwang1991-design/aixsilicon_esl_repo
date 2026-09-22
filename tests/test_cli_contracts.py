@@ -221,10 +221,14 @@ def test_common_delivery_requires_public_api_and_consumers(tmp_path, fault):
     shutil.copytree(source, tmp_path / 'common')
     path = tmp_path / 'common/common.yaml'
     data = yaml.safe_load(path.read_text())
+    for header in data['headers']:
+        destination = tmp_path / header
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(ROOT / header, destination)
     for consumer in data['consumers']:
         (tmp_path / consumer).mkdir(parents=True, exist_ok=True)
     if fault == 'missing_header':
-        (tmp_path / 'common' / data['headers'][0]).unlink()
+        (tmp_path / data['headers'][0]).unlink()
     elif fault == 'wrong_target':
         data['build']['target'] = 'aix::esl::imaginary'
     else:

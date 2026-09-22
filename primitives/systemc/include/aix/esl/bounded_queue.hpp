@@ -40,6 +40,7 @@ public:
     bool full() const { return size() == capacity_; }
     std::size_t size() const { return values_.size(); }
     std::size_t capacity() const { return capacity_; }
+    std::size_t available() const { return capacity_ - size(); }
     const sc_core::sc_event& changed_event() const { return changed_; }
     ActivityStats stats() const { return monitor_.snapshot(); }
 private:

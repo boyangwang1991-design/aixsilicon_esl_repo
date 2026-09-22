@@ -11,6 +11,7 @@ struct Config {
     unsigned ports, banks, capacity, stripe, bytes, requests, outstanding, bank_capacity;
     unsigned latency, interval, response_cycles, period_ps, phase_cycles, warmup_cycles, max_cycles;
     unsigned write_percent, trace_limit;
+    unsigned burst_requests = 1, burst_period_cycles = 0;
     std::uint64_t seed, stride;
     std::string mapping, arbitration, storage, pattern, observation;
     static Config read(const std::string& path) {
@@ -40,6 +41,9 @@ struct Config {
         FIELD(outstanding); FIELD(bank_capacity); FIELD(latency); FIELD(interval); FIELD(response_cycles);
         FIELD(period_ps); FIELD(phase_cycles); FIELD(warmup_cycles); FIELD(max_cycles);
         FIELD(write_percent); FIELD(trace_limit);
+        // Additive v1 fields: old resolved files preserve all-ready generation.
+        if (fields.count("burst_requests")) { FIELD(burst_requests); }
+        if (fields.count("burst_period_cycles")) { FIELD(burst_period_cycles); }
 #undef FIELD
         c.seed = WorkloadTrace::integer(take("seed")); c.stride = WorkloadTrace::integer(take("stride"));
         c.mapping = take("mapping"); c.arbitration = take("arbitration"); c.storage = take("storage");
@@ -56,6 +60,7 @@ struct Config {
                 (capacity / ports) % bytes == 0 && stripe % bytes == 0 &&
                 (capacity / banks) % bytes == 0 && stride % bytes == 0, "mapping/source alignment");
         require(requests && std::uint64_t(requests) * ports <= 100000, "workload request budget");
+        require(burst_requests && burst_requests <= 100000 && burst_period_cycles <= 10000000, "burst size/period");
         require(outstanding && outstanding <= 65536 && bank_capacity && bank_capacity <= 65536, "finite credits");
         require(latency && latency <= 1000000 && interval && interval <= 1000000 && response_cycles <= 1000000,
                 "resource/response timing");

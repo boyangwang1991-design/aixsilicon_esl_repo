@@ -3,7 +3,7 @@
 The configuration SSOT is multibank.schema.json. YAML resolves defaults before
 execution; cross-field geometry and connection checks run before invoking SystemC.
 The flat `key=value` runtime configuration is fully resolved, versioned and rejects
-missing/unknown/duplicate fields. C++ repeats safety constraints at its public input
+missing/unknown/duplicate fields (the additive v1 burst fields may be omitted for legacy all-ready defaults). C++ repeats safety constraints at its public input
 boundary. Python never advances target time. CMake consumers may supply the resolved
 file directly. The fixed topology is described in systems/multibank/capabilities.json.
 
@@ -34,6 +34,26 @@ writers use the public C++ WorkloadTrace API. The recording is the input plan, n
 a candidate-dependent acceptance/completion log. Closed-loop replay therefore
 retains finite backpressure rather than replaying predetermined return times.
 
+## Synthetic temporal bursts
+
+`requests` is the total request count **per source**, not the number of bursts.
+`burst_requests` (default 1) gives requests per batch; `burst_period_cycles`
+(default 0) is the start-to-start interval. Source p request i has earliest cycle
+`p * phase_cycles + floor(i / burst_requests) * burst_period_cycles`.
+The final batch can be partial. All requests remain fixed-width and single-bank;
+this is temporal traffic batching, not an AXI burst protocol. Address pattern and
+read/write selection continue across batches without resetting RNG or the cursor.
+The request ID remains `i * ports + p`, and total bytes are requests * ports * bytes.
+
+A source still offers at most one request per cycle with finite outstanding credits.
+Rejection preserves the request; delayed batches can accumulate as pending input,
+but do not reschedule later releases relative to actual completion. Record/replay
+stores these earliest cycles in the existing workload v1 format. When replaying,
+the supplied workload controls release times, so generator burst/phase fields have
+no effect on that input. Releases past max_cycles yield budget failure with the
+unsubmitted head retained in pending.json; they do not silently shorten the plan.
+Old resolved v1 files without burst fields retain burst_requests=1/period=0.
+
 ## Observability
 
 The shared aix-esl-events-v1 envelope uses integer SystemC resolution ticks. This
@@ -49,6 +69,21 @@ exclusive whole-system stalled cycles. Each source has one eligible queued head;
 its enqueue→accept span defines queue occupancy. Source phase/dependency waiting
 precedes enqueue and is not included in admission latency. Pending snapshots retain
 blocked dependency IDs and remaining requests on failure.
+
+`simulation.pending.json` schema_version 1 is available in all observation modes.
+It records the snapshot cycle/period_ps, global outstanding/capacity, per-bank
+outstanding/capacity, per-source remaining/queued/head/dependencies, and all owned
+flights (ID/source/bank, accepted/service-ready/response-ready cycles, stage).
+Remaining counts requests not yet admitted; queued means the source head has been
+enqueued but not accepted. Bank/global credits include completed data until response
+retirement; their totals must equal the number of flights. Flight stage is processed
+state: service (data not yet visible), response (visible but not marked response-ready),
+or retirement (response-ready but not yet retired). Ready cycles are scheduled times,
+not proof that those transitions occurred. On max_cycles exhaustion, that boundary's
+events have not been processed. Successful drain leaves zero credits/flights/remaining.
+The cycle limit is an execution budget, not a progress-based deadlock detector; a
+long valid service or future workload release may exceed it. This snapshot does not
+claim generic wait-graph analysis or integration of the public ProgressWatchdog.
 
 The analysis window begins at warmup_cycles and ends at drain completion. Latency
 samples are transactions accepted within that interval, including drained tails.

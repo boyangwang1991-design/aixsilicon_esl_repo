@@ -23,6 +23,8 @@ def test_defaults_match_standalone_fixture():
     {'bytes': 12}, {'ports': 3}, {'stride': 3}, {'interval': 0},
     {'warmup_cycles': 10, 'max_cycles': 10}, {'ports': 64, 'requests': 100000},
     {'storage': 'python'}, {'observation': False}, {'seed': 2**64},
+    {'burst_requests': 0}, {'burst_requests': True}, {'burst_period_cycles': -1},
+    {'burst_period_cycles': 10000001},
 ])
 def test_invalid_config_rejected(config):
     with pytest.raises(ValueError):

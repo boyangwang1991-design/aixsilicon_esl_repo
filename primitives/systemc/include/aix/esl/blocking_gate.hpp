@@ -26,6 +26,8 @@ public:
     bool accepting() const { return open_; }
     std::size_t outstanding() const { return count_; }
     std::size_t capacity() const { return capacity_; }
+    // Free credits do not imply admission when drain has closed the gate.
+    std::size_t available() const { return capacity_ - count_; }
     bool resume() { if (!idle()) return false; open_ = true; return true; }
     const sc_core::sc_event& idle_event() const { return idle_event_; }
     ActivityStats stats() const { return monitor_.snapshot(); }

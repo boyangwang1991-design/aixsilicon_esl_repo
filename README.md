@@ -43,10 +43,13 @@ esl new model demo --template register_target --output /new/path
 esl run reference/legacy_python/examples/mini_pipeline/system.yaml
 esl sweep reference/legacy_python/examples/mini_pipeline/experiment.yaml
 esl compare runs/reference-A/result.json runs/reference-B/result.json
+esl multibank run --config systems/multibank/configs/baseline.yaml --output runs/multibank-baseline
+esl multibank sweep --config systems/multibank/configs/sweep.yaml --output runs/multibank-sweep
 ```
 
 > 示例命令须先由实际 `--help` 核对；源码入口为 `tools/esl_cli.py`。
-> run/sweep 必须显式选择历史参考后端；非法对象或未支持的 SystemC 后端返回错误。
+> 顶层 run/sweep 必须显式选择历史参考后端；SystemC 多 Bank 系统使用 multibank run/sweep，
+> SRAM 专项使用 npu-sram 子命令。非法对象或未支持的后端返回错误。
 > SystemC 是目标模型主体，Python 仅作可选算法参考或工程辅助；当前资产完成范围见任务账本。
 
 ## 状态

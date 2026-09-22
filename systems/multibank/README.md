@@ -35,7 +35,7 @@ ctest --test-dir build/multibank --output-on-failure
 ## 配置与装配边界
 
 可替换 ports/banks、stripe/xor/contiguous 映射、rr/priority 仲裁、dense/sparse 后端、
-latency/interval、有限全局及 Bank credit、响应延迟、读写混合、流量模式、seed、端口相位和预热窗口。
+latency/interval、有限全局及 Bank credit、响应延迟、读写混合、流量模式、seed、端口相位、突发批次和预热窗口。
 所有请求固定宽度且对齐，必须落在一个 Bank；不声称 AXI pin-level、跨 Bank 重组、ECC 或检查点能力。
 
 实际拓扑为 source request → router → Bank → ordered return → source response。
@@ -60,7 +60,11 @@ Bank 服务 latency 和启动间隔 II 独立；服务完成至响应消费期�
 ingress 占用积分、返回字节和等待原因（仲裁/Bank II/Bank 容量/全局响应 credit）。
 等待计数单位为 request-cycles，多个请求可同时等待，不能解释为独占周期。
 Bank 热图是并行服务占用，不是利用率；截断报告明确标记，p95/p99 不给完整结论。
-无进展到 max_cycles 会失败并留下 pending.json、原始日志和事件，不以 sc_stop 冒充成功。
+到 max_cycles 仍未排空会失败并留下 simulation.pending.json、原始日志和事件。
+该上限是执行预算，不等于已检测到死锁；合法的长服务或未来请求也可能超限。
+快照包含全局/各 Bank credit 占用与容量、源队列和未满足依赖、在途事务阶段及服务/响应到期周期，
+off/counters/trace 下均可用。阶段反映已处理状态，截止周期到期的事件尚未执行，详见
+[快照合同](../../contracts/multibank.md)。
 
 ## 验证
 
@@ -68,3 +72,15 @@ Bank 热图是并行服务占用，不是利用率；截断报告明确标记，
 依赖等待退休的 12-cycle 解析案例、独立 masked-write 数据 oracle、容量压力、预热、截断、
 非法 trace/连接、watchdog 失败留存、实际笛卡尔扫描和失败点保留。
 `tools/validate_basic_models.py` 额外验证源码/安装/搬迁三种消费路径。
+
+## 有限突发示例
+
+```bash
+uv run python tools/esl_cli.py multibank run --config systems/multibank/configs/bursts.yaml --output runs/multibank-bursts
+```
+
+每源 requests 个请求按 burst_requests 分批，burst_period_cycles 指定批次起始间隔，
+phase_cycles 指定相邻源的相位差。最后一批可不足，默认周期 0 保持旧版全部就绪行为。
+示例为 5 个请求、2/2/1 三批，释放周期 0/10/20；单 credit、2-cycle 服务加 1-cycle 响应，
+准入周期为 0/3/10/13/20，最后在周期 23 退休。背压不重新生成地址/读写或移动后续释放时刻。
+实际 workload.trace 保留释放计划；回放以 trace 为准。超过执行预算的未来批次会保留失败诊断。

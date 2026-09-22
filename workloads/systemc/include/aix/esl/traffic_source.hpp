@@ -10,7 +10,8 @@ public:
     TrafficSource(uint64_t base,uint64_t span,unsigned bytes,Pattern pattern,uint64_t stride,
                   unsigned write_percent,uint64_t seed,const std::string& stream)
         :base_(base),slots_(bytes?span/bytes:0),bytes_(bytes),pattern_(pattern),stride_(stride),writes_(write_percent),rng_(seed,stream){
-        if(!bytes||!span||span%bytes||base%bytes||span-1>UINT64_MAX-base||write_percent>100||stride%bytes)
+        if((pattern!=Pattern::sequential&&pattern!=Pattern::stride&&pattern!=Pattern::random&&pattern!=Pattern::hotspot)||
+           !bytes||!span||span%bytes||base%bytes||span-1>UINT64_MAX-base||write_percent>100||stride%bytes)
             throw std::invalid_argument("traffic geometry/rate");
     }
     Transaction next(){

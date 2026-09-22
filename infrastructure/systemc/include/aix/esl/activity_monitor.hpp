@@ -1,4 +1,5 @@
 #pragma once
+#include <aix/esl/statistics.hpp>
 #include <systemc>
 #include <algorithm>
 #include <cstddef>
@@ -34,9 +35,7 @@ private:
     ActivityStats stats_;
     std::uint64_t start_, last_;
     static void add(ActivityStats& s, std::uint64_t& target, std::uint64_t value) {
-        const auto max = std::numeric_limits<std::uint64_t>::max();
-        if (value > max - target) { target = max; s.overflow = true; }
-        else target += value;
+        detail::saturating_add(target, value, s.overflow);
     }
     static void integrate(ActivityStats& s, std::uint64_t ticks) {
         const auto max = std::numeric_limits<std::uint64_t>::max();

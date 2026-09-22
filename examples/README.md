@@ -1,6 +1,6 @@
 # SystemC 系统示例
 
-本目录只保存多个模型的显式装配、工作负载和系统 scoreboard。单模型接入可放 models/<name>/examples/integration，或在模型文档引用已有共享消费者；公共实现放 common/systemc。
+本目录只保存多个模型的显式装配、工作负载和系统 scoreboard。单模型接入可放 models/<name>/examples/integration，或在模型文档引用已有共享消费者；公共实现按职责分层，由 common 聚合导出。
 
 - [basic_system](basic_system/README.md)：已运行的 B0 双主机/总线/RAM/ROM，支持源码与安装消费。
 - [interrupt_system](interrupt_system/README.md)：B1 timer/IRQ 子集，含寄存器、IRQ/reset 与标准集成验证。

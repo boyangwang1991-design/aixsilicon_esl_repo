@@ -9,7 +9,8 @@ public:
     AddressMapper(uint64_t capacity, unsigned banks, unsigned stripe, unsigned groups=1,
                   Policy policy=Policy::interleaved, unsigned xor_shift=0)
         : capacity_(capacity), banks_(banks), stripe_(stripe), groups_(groups), policy_(policy), shift_(xor_shift) {
-        if (!capacity || !banks || !stripe || !groups || banks%groups ||
+        if ((policy != Policy::contiguous && policy != Policy::interleaved && policy != Policy::xor_interleaved) ||
+            !capacity || !banks || !stripe || !groups || banks%groups ||
             capacity%(uint64_t(banks)*stripe) || xor_shift>=64 ||
             (policy==Policy::xor_interleaved && (banks&(banks-1))))
             throw std::invalid_argument("mapping capacity/banks/stripe/groups/XOR");

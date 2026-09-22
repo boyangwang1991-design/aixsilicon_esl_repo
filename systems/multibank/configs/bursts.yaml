@@ -1,0 +1,10 @@
+# Five fixed-width requests in batches of 2/2/1, released at cycles 0/10/20.
+# One credit and a 2+1-cycle response path give retirement at 3/6/13/16/23.
+ports: 1
+requests: 5
+burst_requests: 2
+burst_period_cycles: 10
+latency: 2
+response_cycles: 1
+outstanding: 1
+bank_capacity: 1

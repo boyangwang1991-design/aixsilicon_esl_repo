@@ -81,8 +81,10 @@ def source_hashes():
         ROOT / "tools/esl_cli.py",
     ]
     paths += list((ROOT / "cmake").glob("*")) + [
-        ROOT / "common/systemc/include/aix/esl/byte_store.hpp",
-        ROOT / "common/systemc/include/aix/esl/storage_access.hpp",
+        ROOT / "services/systemc/include/aix/esl/byte_store.hpp",
+        ROOT / "services/systemc/include/aix/esl/storage_access.hpp",
+        ROOT / "primitives/systemc/include/aix/esl/address_mapper.hpp",
+        ROOT / "primitives/systemc/include/aix/esl/region_mapper.hpp",
         ROOT / "contracts/environment.json",
     ]
     return {

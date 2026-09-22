@@ -30,7 +30,8 @@ def main() -> int:
     result = {'status': 'RUNNING', 'steps': [], 'source_sha256': {}, 'test_executions': 0, 'test_cases': []}
     for folder in ['models/ram', 'models/rom', 'models/host_master', 'models/tlm_bus',
                    'models/timer', 'models/irq_controller', 'models/uart', 'models/gpio', 'models/dma',
-                   'common', 'cmake', 'contracts', 'examples/basic_system',
+                   'common', 'primitives', 'infrastructure', 'adapters', 'services', 'workloads', 'verification',
+                   'cmake', 'contracts', 'examples/basic_system',
                    'examples/interrupt_system', 'examples/peripheral_system', 'examples/dma_system',
                    'examples/common_primitives', 'systems/multibank']:
         for p in sorted((ROOT / folder).rglob('*')):
@@ -85,11 +86,13 @@ def main() -> int:
                 raise RuntimeError(f'source path leaked into exported package: {path}')
         docroot = relocated / 'share/aix-esl'
         missing_headers = [h for h in common['headers'] if not
-                           (relocated / 'include' / Path(h).relative_to('systemc/include')).is_file()]
+                           (relocated / 'include/aix/esl' / Path(h).name).is_file()]
+        expected_headers = {Path(h).name for h in common['headers']}
+        installed_headers = {h.name for h in (relocated / 'include/aix/esl').glob('*.hpp')}
         private_exported = (relocated / 'include/aix/esl/mmio32.hpp').exists()
         result['common_package'] = {'missing_public_headers': missing_headers,
                                     'private_mmio_exported': private_exported}
-        if missing_headers or private_exported:
+        if missing_headers or private_exported or installed_headers != expected_headers:
             raise RuntimeError('common installed public/private header contract mismatch')
         broken = []
         for doc in docroot.rglob('*.md'):
@@ -105,6 +108,9 @@ def main() -> int:
         if broken or not result['installed_documentation']['mmio_contract_present']:
             raise RuntimeError('installed documentation incomplete; see checks.json')
         result['unique_test_cases'] = len(result['test_cases'])
+        if any(hashlib.sha256((ROOT / path).read_bytes()).hexdigest() != digest
+               for path, digest in result['source_sha256'].items()):
+            raise RuntimeError('source changed during verification')
         result['status'] = 'PASS'
     except (RuntimeError, OSError, subprocess.TimeoutExpired) as exc:
         result['status'] = 'FAIL'

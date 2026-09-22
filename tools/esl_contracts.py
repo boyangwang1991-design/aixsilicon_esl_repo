@@ -154,7 +154,7 @@ def validate_common(path):
     data = load(path)
     fields(data, {'schema_version', 'id', 'build', 'headers', 'consumers'},
            {'schema_version', 'id', 'build', 'headers', 'consumers'})
-    if data['schema_version'] != 1 or data['id'] != 'aixsilicon:esl:common:0.1.0':
+    if data['schema_version'] not in (1, 2) or data['id'] != 'aixsilicon:esl:common:0.1.0':
         raise ValueError('unsupported common package schema/id')
     expected = {'backend': 'cmake', 'package': 'AixEslCommon', 'target': 'aix::esl::common',
                 'cxx_standard': 17, 'entry': 'CMakeLists.txt'}
@@ -163,10 +163,17 @@ def validate_common(path):
     headers = data['headers']
     if not isinstance(headers, list) or not headers or len(set(headers)) != len(headers):
         raise ValueError('common headers must be a nonempty unique list')
-    if any(not isinstance(h, str) or not h.startswith('systemc/include/aix/esl/') or not h.endswith('.hpp')
-           for h in headers):
+    prefix = r'(?:primitives|infrastructure|adapters|services|workloads|verification)/' if data['schema_version'] == 2 else ''
+    if any(not isinstance(h, str) or not re.fullmatch(prefix + r'systemc/include/aix/esl/[a-z_]+\.hpp', h)
+           or h.endswith('/mmio32.hpp') for h in headers):
         raise ValueError('invalid common public header path')
-    for relative in [*headers, 'CMakeLists.txt', 'README.md', 'docs/design.md',
+    if len({Path(h).name for h in headers}) != len(headers):
+        raise ValueError('duplicate common public include name')
+    header_root = path.parent.parent if data['schema_version'] == 2 else path.parent
+    for relative in headers:
+        if not inside(header_root, relative).is_file():
+            raise ValueError(f'missing common public header: {relative}')
+    for relative in ['CMakeLists.txt', 'README.md', 'docs/design.md',
                      'docs/integration.md', 'docs/verification.md']:
         if not inside(path.parent, relative).is_file():
             raise ValueError(f'missing common delivery file: {relative}')

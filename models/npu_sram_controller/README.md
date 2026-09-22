@@ -29,3 +29,5 @@ UV_CACHE_DIR=/tmp/aix-uv-cache uv run --no-sync python repos/aixsilicon_esl_repo
 所有性能结果是未校准资源模型中的相对比较，不是实际 SRAM macro 面积/频率或 NPU 芯片承诺。
 
 最终交付见 [综合结论与三张支撑图表](reports/20260918/report.md)。生成的 JSON、YAML、HTML 不纳入报告交付，验证摘要仅保留在本地已忽略的 `runs/`。工具仍支持重新生成可视化；`reports/` 不参与模型源码哈希。
+
+区域映射内部复用公共 RegionMapper；原有配置、最多 8 区域、modulo/xor 与 ECC 对齐限制保持不变。模型仍负责 group_first/local_xor 等专属策略，公共类型不要求消费者直接包含或链接。

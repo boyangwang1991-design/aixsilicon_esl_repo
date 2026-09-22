@@ -185,6 +185,18 @@
           }
         }
       }
+    },
+    "burst_requests": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 100000,
+      "default": 1
+    },
+    "burst_period_cycles": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 10000000,
+      "default": 0
     }
   }
 }

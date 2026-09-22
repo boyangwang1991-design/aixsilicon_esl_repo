@@ -135,7 +135,8 @@ def write_resolved(config, directory):
 
 def source_hashes():
     paths = []
-    for folder in ('systems/multibank', 'common', 'cmake', 'contracts'):
+    for folder in ('systems/multibank', 'common', 'primitives', 'infrastructure', 'adapters',
+                   'services', 'workloads', 'verification', 'cmake', 'contracts'):
         paths += [p for p in (ROOT / folder).rglob('*') if p.is_file() and '__pycache__' not in p.parts]
     paths += [Path(__file__), ROOT / 'tools/common_explore.py', ROOT / 'tools/esl_cli.py']
     return {str(path.relative_to(ROOT)): digest(path) for path in sorted(paths)}

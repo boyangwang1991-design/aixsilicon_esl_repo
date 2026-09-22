@@ -39,6 +39,9 @@ public:
         active_.erase(it);
     }
     size_t outstanding() const { return active_.size(); }
+    size_t capacity() const { return capacity_; }
+    // Capacity headroom only; initiation intervals may still reject reserve().
+    size_t available() const { return capacity_ - active_.size(); }
     // Reset is only legal after drain: no silent cancellation of work owned elsewhere.
     void reset() {
         if (!active_.empty()) throw std::logic_error("resource reset requires drain");

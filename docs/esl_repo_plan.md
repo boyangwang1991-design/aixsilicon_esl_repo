@@ -356,7 +356,7 @@ esl compare runs/baseline/result.json runs/double_buffer/result.json
 
 `inspect`是轻量能力发现，返回模型/模板/profile、支持的参数、capabilities与可用状态，供CLI和Skill共同使用；不需要数据库。
 
-当前 `run` 只接受显式 legacy-python-mini-pipeline 后端，校验配置、独立数值 oracle 和服务时间界限；SystemC 模型通过 CMake 消费者构建与验证。通用 SystemC 配置装配是后续目标。
+当前顶层 `run` 只接受显式 legacy-python-mini-pipeline 后端，校验配置、独立数值 oracle 和服务时间界限。SystemC 已有 `multibank run/sweep` 固定拓扑配置入口（见 systems/multibank/README.md）和 `npu-sram` 专项入口；模型也可通过 CMake 消费者构建与验证。任意拓扑的通用 SystemC 配置装配仍是后续目标。
 
 | 检查 | 何时执行 | 失败怎么处理 |
 |---|---|---|
