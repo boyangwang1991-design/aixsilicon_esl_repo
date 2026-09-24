@@ -8,6 +8,7 @@
 
 | ID | 任务与下一步 | 状态 | 完成证据要求 |
 |---|---|---|---|
+| MESH01 | 文王总线：同步 Mesh/NIU/DMA/command/sync 实数据探索基线 | 已接入原生 SRAM/显式 DDR、片段与 DMA 并发窗口、逐片组播；已建立固定 Decode 干扰基线；已实现NIU整形/SRAM入口QoS；全 P0、端到端QoS、CDC 与 RTL 校准待补 | [模型入口](../models/npu_mesh/README.md)、[范围与差距](../models/npu_mesh/docs/gaps.md)、[验证](../models/npu_mesh/reports/20260924-memory/checks.json)、[BM 扫描](../models/npu_mesh/reports/20260924-memory/report.md) |
 | IP01 | 基础 IP 规划及 planned 登记 | 规划完成；B0 四模型及 timer/IRQ/UART/GPIO/DMA 已实现，其余 planned | [检查证据](../runs/planning-validation-2026-09-18/checks.json)；[唯一资产索引](base_ip_models.md)，注册状态以 registry 为准 |
 | IP02 | 按 basic_system 的 B0 → B1 → B2 实现基础系统 | B0/B1/B2 已有证据；暂停新模型扩展，公共组件完成后再统一试用 | [B0 验证](basic_models_validation.md)，含源码/安装/搬迁消费者 |
 | LAYOUT01 | 目标模型/系统示例/环境测试/历史 Python 分离 | 完成；SystemC/环境/迁移回归 PASS | [目录与兼容性](repository_layout.md)；[回归证据](../runs/layout-refactor-20260918/checks.json) |
@@ -366,3 +367,5 @@ X09–X11是用户指定的Performance-Oriented ESL验收范围；不因基础�
 | C02 | 同一物理内存重复owner或旧聚合时间与新内存时间并存，显式配置能被检查发现；不能假称静态证明任意模型内部代码 | R33 |
 | C03 | 已有、缺失、不兼容三类fixture导出不同选择/缺口结果；mock结果始终标明 | R34/S18 |
 | C04 | 故意错误的字节量、地址范围、依赖/结束条件被负载自检发现；同语义两profile数据/终态对齐 | R35 |
+
+MESH01 最新干扰实验：[12点对照与阶段定位](../models/npu_mesh/reports/20260924-interference/report.md)；后续增量：[NIU整形与SRAM入口QoS](../models/npu_mesh/reports/20260924-qos/report.md)，端到端保证仍未实现。

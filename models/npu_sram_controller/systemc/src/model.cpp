@@ -265,6 +265,20 @@ bool Model::pop(unsigned port,bool write,Response& out){auto& p=*p_;if(port>=p.c
 }
 bool Model::idle()const{return p_->idle();}
 void Model::stop_scrub(){p_->scrubbing=false;}
+void Model::initialize(uint64_t address,const std::vector<uint8_t>& data){
+    if(!idle()||!p_->storage)throw std::logic_error("debug access requires idle full_data SRAM");
+    if(address>p_->c.capacity||data.size()>p_->c.capacity-address)throw std::invalid_argument("debug range");
+    std::vector<uint64_t> physical;
+    for(size_t i=0;i<data.size();++i){auto x=p_->mapper.map(address+i);physical.push_back(x.bank*(p_->c.capacity/p_->c.banks)+x.local);}
+    for(size_t i=0;i<data.size();++i)(*p_->storage)[physical[i]]=data[i];
+}
+std::vector<uint8_t> Model::inspect(uint64_t address,unsigned bytes)const{
+    if(!idle()||!p_->storage)throw std::logic_error("debug access requires idle full_data SRAM");
+    if(address>p_->c.capacity||bytes>p_->c.capacity-address)throw std::invalid_argument("debug range");
+    std::vector<uint8_t> data(bytes);
+    for(unsigned i=0;i<bytes;++i){auto x=p_->mapper.map(address+i);data[i]=(*p_->storage)[x.bank*(p_->c.capacity/p_->c.banks)+x.local];}
+    return data;
+}
 void Model::reset(){if(!idle())throw std::logic_error("reset requires drain");auto cfg=p_->c;auto observe=p_->observer;p_=std::make_unique<Impl>(cfg);p_->observer=observe;}
 void Model::inject(uint64_t a,unsigned n){if(!p_->c.ecc_bytes||n>2)throw std::invalid_argument("ECC injection");auto x=p_->mapper.map(a);p_->errors[{x.bank,x.local/p_->c.ecc_bytes}]=n;}
 void Model::set_observer(std::function<void(const std::string&)> fn){p_->observer=std::move(fn);}

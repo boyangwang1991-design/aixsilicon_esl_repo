@@ -1,0 +1,17 @@
+uv run --no-sync python bootstrap.py --agent-dir .roo --ensure
+materialize: SKIP skills unchanged (git:591a304d29af256ed8b8fd539d34b8f5bad6e85d:eb7416b78d6f1ec9902593343eea6febe6060e47f2b1a035877ef5576c429d3c) -> /home/eda/workspace/aixsilicon_workflow/.roo/skills
+uv run --no-sync python -m ruff check .roo/skills/aixsilicon-workspace-management/src .roo/skills/aixsilicon-workspace-management/tests .roo/skills/aixsilicon-workspace-management/scripts
+All checks passed!
+uv run --no-sync python .roo/skills/aixsilicon-workspace-management/scripts/sync_schemas.py --check --schemas-dir schemas --pkg-dir .roo/skills/aixsilicon-workspace-management/src/aixworkflow/schemas
+ok       change-bundle.schema.json
+ok       evidence-index.schema.json
+ok       flow.schema.json
+ok       tool-profile.schema.json
+ok       workspace-lock.schema.json
+ok       workspace-manifest.schema.json
+
+schemas in sync (6 files)
+uv run --no-sync python -m pytest .roo/skills/aixsilicon-workspace-management/tests -q --rootdir=.roo/skills/aixsilicon-workspace-management -o cache_dir=/home/eda/workspace/aixsilicon_workflow/cache/pytest
+........................................................................ [ 57%]
+.....................................................                    [100%]
+check: all passed

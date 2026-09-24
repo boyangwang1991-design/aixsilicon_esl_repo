@@ -1,0 +1,964 @@
+{
+  "overall_status": "PASS",
+  "execution_status": "OK",
+  "points": [
+    {
+      "point": 0,
+      "link_bytes": 16,
+      "depth": 2,
+      "split": false,
+      "centralized": false,
+      "outstanding": 16,
+      "packet_bytes": 256,
+      "credit_latency": 2,
+      "vcs_per_vn": 1,
+      "memory_endpoints": [
+        {
+          "router": 7,
+          "base": 0,
+          "size": 65536,
+          "bytes_per_cycle": 32,
+          "latency": 8,
+          "slots": 8
+        },
+        {
+          "router": 0,
+          "base": 65536,
+          "size": 65536,
+          "bytes_per_cycle": 32,
+          "latency": 8,
+          "slots": 8
+        }
+      ],
+      "cycles": 676,
+      "throughput": 27.266272189349113,
+      "latency": {
+        "decode": {
+          "p50": 312,
+          "p95": 526,
+          "p99": 562,
+          "max": 562
+        },
+        "prefill": {
+          "p50": 338,
+          "p95": 624,
+          "p99": 646,
+          "max": 646
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "point": 1,
+      "link_bytes": 16,
+      "depth": 2,
+      "split": true,
+      "centralized": false,
+      "outstanding": 16,
+      "packet_bytes": 256,
+      "credit_latency": 2,
+      "vcs_per_vn": 1,
+      "memory_endpoints": [
+        {
+          "router": 7,
+          "base": 0,
+          "size": 65536,
+          "bytes_per_cycle": 32,
+          "latency": 8,
+          "slots": 8
+        },
+        {
+          "router": 0,
+          "base": 65536,
+          "size": 65536,
+          "bytes_per_cycle": 32,
+          "latency": 8,
+          "slots": 8
+        }
+      ],
+      "cycles": 655,
+      "throughput": 28.140458015267175,
+      "latency": {
+        "decode": {
+          "p50": 292,
+          "p95": 494,
+          "p99": 541,
+          "max": 541
+        },
+        "prefill": {
+          "p50": 327,
+          "p95": 591,
+          "p99": 624,
+          "max": 624
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "point": 2,
+      "link_bytes": 16,
+      "depth": 8,
+      "split": false,
+      "centralized": false,
+      "outstanding": 16,
+      "packet_bytes": 256,
+      "credit_latency": 2,
+      "vcs_per_vn": 1,
+      "memory_endpoints": [
+        {
+          "router": 7,
+          "base": 0,
+          "size": 65536,
+          "bytes_per_cycle": 32,
+          "latency": 8,
+          "slots": 8
+        },
+        {
+          "router": 0,
+          "base": 65536,
+          "size": 65536,
+          "bytes_per_cycle": 32,
+          "latency": 8,
+          "slots": 8
+        }
+      ],
+      "cycles": 661,
+      "throughput": 27.88502269288956,
+      "latency": {
+        "decode": {
+          "p50": 316,
+          "p95": 518,
+          "p99": 547,
+          "max": 547
+        },
+        "prefill": {
+          "p50": 337,
+          "p95": 616,
+          "p99": 633,
+          "max": 633
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "point": 3,
+      "link_bytes": 16,
+      "depth": 8,
+      "split": true,
+      "centralized": false,
+      "outstanding": 16,
+      "packet_bytes": 256,
+      "credit_latency": 2,
+      "vcs_per_vn": 1,
+      "memory_endpoints": [
+        {
+          "router": 7,
+          "base": 0,
+          "size": 65536,
+          "bytes_per_cycle": 32,
+          "latency": 8,
+          "slots": 8
+        },
+        {
+          "router": 0,
+          "base": 65536,
+          "size": 65536,
+          "bytes_per_cycle": 32,
+          "latency": 8,
+          "slots": 8
+        }
+      ],
+      "cycles": 626,
+      "throughput": 29.44408945686901,
+      "latency": {
+        "decode": {
+          "p50": 285,
+          "p95": 483,
+          "p99": 512,
+          "max": 512
+        },
+        "prefill": {
+          "p50": 319,
+          "p95": 583,
+          "p99": 597,
+          "max": 597
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "point": 4,
+      "link_bytes": 32,
+      "depth": 2,
+      "split": false,
+      "centralized": false,
+      "outstanding": 16,
+      "packet_bytes": 256,
+      "credit_latency": 2,
+      "vcs_per_vn": 1,
+      "memory_endpoints": [
+        {
+          "router": 7,
+          "base": 0,
+          "size": 65536,
+          "bytes_per_cycle": 32,
+          "latency": 8,
+          "slots": 8
+        },
+        {
+          "router": 0,
+          "base": 65536,
+          "size": 65536,
+          "bytes_per_cycle": 32,
+          "latency": 8,
+          "slots": 8
+        }
+      ],
+      "cycles": 478,
+      "throughput": 38.56066945606695,
+      "latency": {
+        "decode": {
+          "p50": 191,
+          "p95": 328,
+          "p99": 364,
+          "max": 364
+        },
+        "prefill": {
+          "p50": 226,
+          "p95": 422,
+          "p99": 451,
+          "max": 451
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "point": 5,
+      "link_bytes": 32,
+      "depth": 2,
+      "split": true,
+      "centralized": false,
+      "outstanding": 16,
+      "packet_bytes": 256,
+      "credit_latency": 2,
+      "vcs_per_vn": 1,
+      "memory_endpoints": [
+        {
+          "router": 7,
+          "base": 0,
+          "size": 65536,
+          "bytes_per_cycle": 32,
+          "latency": 8,
+          "slots": 8
+        },
+        {
+          "router": 0,
+          "base": 65536,
+          "size": 65536,
+          "bytes_per_cycle": 32,
+          "latency": 8,
+          "slots": 8
+        }
+      ],
+      "cycles": 476,
+      "throughput": 38.72268907563025,
+      "latency": {
+        "decode": {
+          "p50": 189,
+          "p95": 325,
+          "p99": 362,
+          "max": 362
+        },
+        "prefill": {
+          "p50": 228,
+          "p95": 414,
+          "p99": 454,
+          "max": 454
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "point": 6,
+      "link_bytes": 32,
+      "depth": 8,
+      "split": false,
+      "centralized": false,
+      "outstanding": 16,
+      "packet_bytes": 256,
+      "credit_latency": 2,
+      "vcs_per_vn": 1,
+      "memory_endpoints": [
+        {
+          "router": 7,
+          "base": 0,
+          "size": 65536,
+          "bytes_per_cycle": 32,
+          "latency": 8,
+          "slots": 8
+        },
+        {
+          "router": 0,
+          "base": 65536,
+          "size": 65536,
+          "bytes_per_cycle": 32,
+          "latency": 8,
+          "slots": 8
+        }
+      ],
+      "cycles": 464,
+      "throughput": 39.724137931034484,
+      "latency": {
+        "decode": {
+          "p50": 177,
+          "p95": 321,
+          "p99": 350,
+          "max": 350
+        },
+        "prefill": {
+          "p50": 213,
+          "p95": 411,
+          "p99": 446,
+          "max": 446
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "point": 7,
+      "link_bytes": 32,
+      "depth": 8,
+      "split": true,
+      "centralized": false,
+      "outstanding": 16,
+      "packet_bytes": 256,
+      "credit_latency": 2,
+      "vcs_per_vn": 1,
+      "memory_endpoints": [
+        {
+          "router": 7,
+          "base": 0,
+          "size": 65536,
+          "bytes_per_cycle": 32,
+          "latency": 8,
+          "slots": 8
+        },
+        {
+          "router": 0,
+          "base": 65536,
+          "size": 65536,
+          "bytes_per_cycle": 32,
+          "latency": 8,
+          "slots": 8
+        }
+      ],
+      "cycles": 427,
+      "throughput": 43.166276346604214,
+      "latency": {
+        "decode": {
+          "p50": 173,
+          "p95": 282,
+          "p99": 313,
+          "max": 313
+        },
+        "prefill": {
+          "p50": 205,
+          "p95": 375,
+          "p99": 405,
+          "max": 405
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "point": 8,
+      "link_bytes": 64,
+      "depth": 2,
+      "split": false,
+      "centralized": false,
+      "outstanding": 16,
+      "packet_bytes": 256,
+      "credit_latency": 2,
+      "vcs_per_vn": 1,
+      "memory_endpoints": [
+        {
+          "router": 7,
+          "base": 0,
+          "size": 65536,
+          "bytes_per_cycle": 32,
+          "latency": 8,
+          "slots": 8
+        },
+        {
+          "router": 0,
+          "base": 65536,
+          "size": 65536,
+          "bytes_per_cycle": 32,
+          "latency": 8,
+          "slots": 8
+        }
+      ],
+      "cycles": 417,
+      "throughput": 44.201438848920866,
+      "latency": {
+        "decode": {
+          "p50": 144,
+          "p95": 256,
+          "p99": 303,
+          "max": 303
+        },
+        "prefill": {
+          "p50": 179,
+          "p95": 353,
+          "p99": 393,
+          "max": 393
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "point": 9,
+      "link_bytes": 64,
+      "depth": 2,
+      "split": true,
+      "centralized": false,
+      "outstanding": 16,
+      "packet_bytes": 256,
+      "credit_latency": 2,
+      "vcs_per_vn": 1,
+      "memory_endpoints": [
+        {
+          "router": 7,
+          "base": 0,
+          "size": 65536,
+          "bytes_per_cycle": 32,
+          "latency": 8,
+          "slots": 8
+        },
+        {
+          "router": 0,
+          "base": 65536,
+          "size": 65536,
+          "bytes_per_cycle": 32,
+          "latency": 8,
+          "slots": 8
+        }
+      ],
+      "cycles": 405,
+      "throughput": 45.51111111111111,
+      "latency": {
+        "decode": {
+          "p50": 146,
+          "p95": 254,
+          "p99": 291,
+          "max": 291
+        },
+        "prefill": {
+          "p50": 180,
+          "p95": 352,
+          "p99": 378,
+          "max": 378
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "point": 10,
+      "link_bytes": 64,
+      "depth": 8,
+      "split": false,
+      "centralized": false,
+      "outstanding": 16,
+      "packet_bytes": 256,
+      "credit_latency": 2,
+      "vcs_per_vn": 1,
+      "memory_endpoints": [
+        {
+          "router": 7,
+          "base": 0,
+          "size": 65536,
+          "bytes_per_cycle": 32,
+          "latency": 8,
+          "slots": 8
+        },
+        {
+          "router": 0,
+          "base": 65536,
+          "size": 65536,
+          "bytes_per_cycle": 32,
+          "latency": 8,
+          "slots": 8
+        }
+      ],
+      "cycles": 407,
+      "throughput": 45.287469287469285,
+      "latency": {
+        "decode": {
+          "p50": 137,
+          "p95": 247,
+          "p99": 293,
+          "max": 293
+        },
+        "prefill": {
+          "p50": 172,
+          "p95": 341,
+          "p99": 381,
+          "max": 381
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "point": 11,
+      "link_bytes": 64,
+      "depth": 8,
+      "split": true,
+      "centralized": false,
+      "outstanding": 16,
+      "packet_bytes": 256,
+      "credit_latency": 2,
+      "vcs_per_vn": 1,
+      "memory_endpoints": [
+        {
+          "router": 7,
+          "base": 0,
+          "size": 65536,
+          "bytes_per_cycle": 32,
+          "latency": 8,
+          "slots": 8
+        },
+        {
+          "router": 0,
+          "base": 65536,
+          "size": 65536,
+          "bytes_per_cycle": 32,
+          "latency": 8,
+          "slots": 8
+        }
+      ],
+      "cycles": 383,
+      "throughput": 48.12532637075718,
+      "latency": {
+        "decode": {
+          "p50": 138,
+          "p95": 232,
+          "p99": 269,
+          "max": 269
+        },
+        "prefill": {
+          "p50": 169,
+          "p95": 324,
+          "p99": 356,
+          "max": 356
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "point": 12,
+      "link_bytes": 32,
+      "depth": 8,
+      "split": false,
+      "centralized": true,
+      "outstanding": 16,
+      "packet_bytes": 256,
+      "credit_latency": 2,
+      "vcs_per_vn": 1,
+      "memory_endpoints": [
+        {
+          "router": 7,
+          "base": 0,
+          "size": 65536,
+          "bytes_per_cycle": 32,
+          "latency": 8,
+          "slots": 8
+        },
+        {
+          "router": 0,
+          "base": 65536,
+          "size": 65536,
+          "bytes_per_cycle": 32,
+          "latency": 8,
+          "slots": 8
+        }
+      ],
+      "cycles": 887,
+      "throughput": 20.780157835400225,
+      "latency": {
+        "decode": {
+          "p50": 373,
+          "p95": 715,
+          "p99": 761,
+          "max": 761
+        },
+        "prefill": {
+          "p50": 417,
+          "p95": 790,
+          "p99": 872,
+          "max": 872
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "point": 13,
+      "link_bytes": 32,
+      "depth": 8,
+      "split": false,
+      "centralized": false,
+      "outstanding": 4,
+      "packet_bytes": 256,
+      "credit_latency": 2,
+      "vcs_per_vn": 1,
+      "memory_endpoints": [
+        {
+          "router": 7,
+          "base": 0,
+          "size": 65536,
+          "bytes_per_cycle": 32,
+          "latency": 8,
+          "slots": 8
+        },
+        {
+          "router": 0,
+          "base": 65536,
+          "size": 65536,
+          "bytes_per_cycle": 32,
+          "latency": 8,
+          "slots": 8
+        }
+      ],
+      "cycles": 467,
+      "throughput": 39.46895074946467,
+      "latency": {
+        "decode": {
+          "p50": 296,
+          "p95": 334,
+          "p99": 343,
+          "max": 343
+        },
+        "prefill": {
+          "p50": 200,
+          "p95": 387,
+          "p99": 415,
+          "max": 415
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "point": 14,
+      "link_bytes": 32,
+      "depth": 8,
+      "split": false,
+      "centralized": false,
+      "outstanding": 16,
+      "packet_bytes": 64,
+      "credit_latency": 2,
+      "vcs_per_vn": 1,
+      "memory_endpoints": [
+        {
+          "router": 7,
+          "base": 0,
+          "size": 65536,
+          "bytes_per_cycle": 32,
+          "latency": 8,
+          "slots": 8
+        },
+        {
+          "router": 0,
+          "base": 65536,
+          "size": 65536,
+          "bytes_per_cycle": 32,
+          "latency": 8,
+          "slots": 8
+        }
+      ],
+      "cycles": 1098,
+      "throughput": 16.78688524590164,
+      "latency": {
+        "decode": {
+          "p50": 431,
+          "p95": 857,
+          "p99": 984,
+          "max": 984
+        },
+        "prefill": {
+          "p50": 474,
+          "p95": 947,
+          "p99": 1078,
+          "max": 1078
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "point": 15,
+      "link_bytes": 32,
+      "depth": 8,
+      "split": false,
+      "centralized": false,
+      "outstanding": 16,
+      "packet_bytes": 256,
+      "credit_latency": 8,
+      "vcs_per_vn": 1,
+      "memory_endpoints": [
+        {
+          "router": 7,
+          "base": 0,
+          "size": 65536,
+          "bytes_per_cycle": 32,
+          "latency": 8,
+          "slots": 8
+        },
+        {
+          "router": 0,
+          "base": 65536,
+          "size": 65536,
+          "bytes_per_cycle": 32,
+          "latency": 8,
+          "slots": 8
+        }
+      ],
+      "cycles": 446,
+      "throughput": 41.327354260089685,
+      "latency": {
+        "decode": {
+          "p50": 177,
+          "p95": 294,
+          "p99": 326,
+          "max": 326
+        },
+        "prefill": {
+          "p50": 212,
+          "p95": 392,
+          "p99": 413,
+          "max": 413
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "point": 16,
+      "link_bytes": 32,
+      "depth": 8,
+      "split": false,
+      "centralized": false,
+      "outstanding": 16,
+      "packet_bytes": 256,
+      "credit_latency": 2,
+      "vcs_per_vn": 2,
+      "memory_endpoints": [
+        {
+          "router": 7,
+          "base": 0,
+          "size": 65536,
+          "bytes_per_cycle": 32,
+          "latency": 8,
+          "slots": 8
+        },
+        {
+          "router": 0,
+          "base": 65536,
+          "size": 65536,
+          "bytes_per_cycle": 32,
+          "latency": 8,
+          "slots": 8
+        }
+      ],
+      "cycles": 437,
+      "throughput": 42.17848970251716,
+      "latency": {
+        "decode": {
+          "p50": 181,
+          "p95": 291,
+          "p99": 323,
+          "max": 323
+        },
+        "prefill": {
+          "p50": 211,
+          "p95": 390,
+          "p99": 410,
+          "max": 410
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "point": 17,
+      "link_bytes": 32,
+      "depth": 8,
+      "split": false,
+      "centralized": false,
+      "outstanding": 16,
+      "packet_bytes": 256,
+      "credit_latency": 2,
+      "vcs_per_vn": 1,
+      "memory_endpoints": [
+        {
+          "router": 0,
+          "base": 0,
+          "size": 65536,
+          "bytes_per_cycle": 32,
+          "latency": 8,
+          "slots": 8
+        },
+        {
+          "router": 1,
+          "base": 65536,
+          "size": 65536,
+          "bytes_per_cycle": 32,
+          "latency": 8,
+          "slots": 8
+        }
+      ],
+      "cycles": 462,
+      "throughput": 39.896103896103895,
+      "latency": {
+        "decode": {
+          "p50": 187,
+          "p95": 306,
+          "p99": 344,
+          "max": 344
+        },
+        "prefill": {
+          "p50": 217,
+          "p95": 397,
+          "p99": 435,
+          "max": 435
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "point": 18,
+      "link_bytes": 32,
+      "depth": 8,
+      "split": false,
+      "centralized": false,
+      "outstanding": 16,
+      "packet_bytes": 256,
+      "credit_latency": 2,
+      "vcs_per_vn": 1,
+      "memory_endpoints": [
+        {
+          "router": 7,
+          "base": 0,
+          "size": 65536,
+          "bytes_per_cycle": 16,
+          "latency": 8,
+          "slots": 8
+        },
+        {
+          "router": 0,
+          "base": 65536,
+          "size": 65536,
+          "bytes_per_cycle": 16,
+          "latency": 8,
+          "slots": 8
+        }
+      ],
+      "cycles": 634,
+      "throughput": 29.07255520504732,
+      "latency": {
+        "decode": {
+          "p50": 303,
+          "p95": 490,
+          "p99": 520,
+          "max": 520
+        },
+        "prefill": {
+          "p50": 318,
+          "p95": 584,
+          "p99": 606,
+          "max": 606
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "point": 19,
+      "link_bytes": 32,
+      "depth": 8,
+      "split": false,
+      "centralized": false,
+      "outstanding": 16,
+      "packet_bytes": 256,
+      "credit_latency": 2,
+      "vcs_per_vn": 1,
+      "memory_endpoints": [
+        {
+          "router": 7,
+          "base": 0,
+          "size": 65536,
+          "bytes_per_cycle": 32,
+          "latency": 40,
+          "slots": 8
+        },
+        {
+          "router": 0,
+          "base": 65536,
+          "size": 65536,
+          "bytes_per_cycle": 32,
+          "latency": 40,
+          "slots": 8
+        }
+      ],
+      "cycles": 712,
+      "throughput": 25.8876404494382,
+      "latency": {
+        "decode": {
+          "p50": 319,
+          "p95": 534,
+          "p99": 598,
+          "max": 598
+        },
+        "prefill": {
+          "p50": 336,
+          "p95": 599,
+          "p99": 653,
+          "max": 653
+        }
+      },
+      "status": "PASS"
+    }
+  ],
+  "interpretation": "relative uncalibrated resource model; no PPA or real inference prediction",
+  "status": "PASS",
+  "source_sha256": {
+    "cmake/ESLModel.cmake": "2265dca23cceaaf2e7230a0a95f30e8214388cd3ec163e1681403ca7b424b51e",
+    "cmake/ESLModelConfig.cmake.in": "edca498de5b88a61403e819d01e625b7ebb71ece52b7297c3beae524969bece3",
+    "cmake/ESLSystemC.cmake": "7a73a0ebfb6b1d91b8588c15b0c51b9afa57a42af738507d7327c160a6a86897",
+    "contracts/environment.json": "8007b3f779ac250406d74fc5163e94e5a65cb28fbd96dee90b25eed5a1fa9bf9",
+    "contracts/npu_mesh_axi_bus.md": "b69596170d2fa3c5c7a8185d852495b2a3372fb11119fd97b86dfb4dd04c74a7",
+    "models/npu_mesh/CMakeLists.txt": "d9c54f49f129c10444c7d55c05a1872d86f7a8236b0379dddebf9957f5d7b2b6",
+    "models/npu_mesh/README.md": "6b5f52ef9f31ac412cd415e6b935d1395a06617db00751d5307ac1f652a86604",
+    "models/npu_mesh/configs/baseline.yaml": "128a9fb6ca2f274f93eeff3727364f9398f0c7856b9ea3d364ce23bb7ad44a1a",
+    "models/npu_mesh/docs/bm.md": "8169be77f3202500c2d6e143c4ad189bce2612b017fd6a94db0ace17b883c689",
+    "models/npu_mesh/docs/design.md": "1adc767cf1c21aea33f32c8ec6b992a9adb88d63371fcabc9a8fa0cdef1d1a63",
+    "models/npu_mesh/docs/gaps.md": "5a8e3deaf0820c47b61a629803397e6eca018a94ce8de342e635481914d3912f",
+    "models/npu_mesh/docs/integration.md": "6a36d363fb18e68436d391032289fb26db924bc1e934e651104780af4c979678",
+    "models/npu_mesh/docs/verification.md": "5cd4093e953d4ad197b1059ba294f2e2127e8a9481b1e483f5d369c728438e0f",
+    "models/npu_mesh/examples/integration/CMakeLists.txt": "2506afef46a282d4e2a2956bd09bf86e330740433f96ac9997e20509bb008ece",
+    "models/npu_mesh/examples/integration/main.cpp": "b3a1b2cd3d6673e53c9762d93243d57d6f17ea64b6bdf29baae1d5909dae28c7",
+    "models/npu_mesh/model.yaml": "dd5b305a47683dd4c81ac188f57d401e39e3467e0f8539a694e4ad6d6e2a8079",
+    "models/npu_mesh/reference/python/oracle.py": "6f485994f2f99a7c3c0e9f287e7310ffc779981b7e7ee7eae0b751cd429b2699",
+    "models/npu_mesh/systemc/include/npu_mesh/axi.hpp": "b64017c3d5651a5eb6a3778e8f98cc466aac5a8dd0d7c39939c4ebb5c00eead2",
+    "models/npu_mesh/systemc/include/npu_mesh/config.hpp": "313f1f652acd501a41e4d8e5a624556555979d8afe63e7e9b5ddd7069df63144",
+    "models/npu_mesh/systemc/include/npu_mesh/model.hpp": "6244d1b1b9cc8053db958d106437a01abfdcb8a1ab225a71581aa6c09943333e",
+    "models/npu_mesh/systemc/src/axi.cpp": "7280f30d7f3f40fded1e09b2c83d0dd630a1a15c409cd2148c6326999aeaadfe",
+    "models/npu_mesh/systemc/src/dma.cpp": "a052718807a43d86156c20cebbe2e3450e83876deaf65a06280d82b8edc6517a",
+    "models/npu_mesh/systemc/src/model.cpp": "c375259e3cebc781fb47006d0689e0036f20350a85900469465f573ec3f52fc1",
+    "models/npu_mesh/systemc/src/network.cpp": "847477ffed62bdb7ba8c99070f29aba8d91a0c18d5b08c8ca99ce21abb94e196",
+    "models/npu_mesh/systemc/src/network.hpp": "5fc9160e2195bb5448b7003a06d0fcee8f5ddf29499203cc4595aa8410f09ab2",
+    "models/npu_mesh/systemc/src/runner.cpp": "205b67c75f0d5a6e9d4ab9c99af3466cd4727cf1580d8de69a5d24696e00b8ad",
+    "models/npu_mesh/tests/systemc/test_model.cpp": "b2e9980abf8a7cbc15b0bc27cb4448629c69daeb4ecb53b1a68481828ce5b30d",
+    "models/npu_mesh/tests/systemc/test_network.cpp": "4e0ed5ce64fe3414cfe0e8bbb1b5d55130946d63e09813649b7aaefdd972fbb6",
+    "services/systemc/include/aix/esl/byte_store.hpp": "be02d98c39d012c4d29435ab9e0cc52245bdbd4840dc96fc2af450caf9f4a771",
+    "services/systemc/include/aix/esl/storage_access.hpp": "3505f323feb358904b64eb102ec3907b85d8ee50d9820f4a1aedca1af8f10464",
+    "tests/test_mesh.py": "a3a2e30c2c394b72acf67e0c533c65e106a5265d3f3bdf6ba9b825233cd65038",
+    "tools/esl_cli.py": "3908cd5b16b7672b4c60388779e59db7db9996d928e2559c39ee07800a789e75",
+    "tools/mesh_explore.py": "cfe7a25cac150dee361023f2fb522ad2e0144e361881adbb7e27e48d8da3c591",
+    "tools/multibank.py": "b78a87b8be5349269f49eda4273949dfbe1d38c7125763e7b4c173362037aa0c"
+  }
+}

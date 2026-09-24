@@ -15,6 +15,10 @@ NPU 多 AXI SRAM 性能探索见 [模型与运行入口](models/npu_sram_control
 
 ## 定位
 
+文王总线建模入口：[NPU Mesh ESL](models/npu_mesh/README.md)。提供 SystemC 实数据模型、
+模块验证、独立 Python oracle、合成 BM 回放和参数扫描；能力边界见模型文档。
+本轮结果见 [验证与架构扫描报告](models/npu_mesh/reports/20260924-memory/report.md)。
+
 - **Repo 放资产，Skill 放方法**：本仓库的模型源码、公共组件、runtime、接口/schema、
   模板、generator、观察器、oracle、测试数据与示例系统；Skill 决定何时选择哪个模型、
   如何比较架构、如何解释结果。
@@ -57,3 +61,7 @@ esl multibank sweep --config systems/multibank/configs/sweep.yaml --output runs/
 当前实现与待办唯一维护在 [资产计划与进度](docs/esl_todo.md)。历史验收摘要不替代当前 SystemC 构建与标准集成证据。
 
 当前 CLI 合同与迁移行为见 [工具合同](contracts/tool_contracts.md)，逐项集成范围见 [覆盖说明](docs/integration_coverage.md)。
+
+Decode独占/混合流对照见[干扰基线与QoS推进建议](models/npu_mesh/reports/20260924-interference/report.md)。
+
+NIU整形与SRAM入口服务区分见[QoS实现及完整任务集对照](models/npu_mesh/reports/20260924-qos/report.md)。

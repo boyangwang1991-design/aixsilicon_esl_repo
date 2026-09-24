@@ -1,0 +1,93 @@
+Test project /home/eda/workspace/aixsilicon_workflow/repos/aixsilicon_esl_repo/runs/mesh-interference-validation/build
+      Start  1: mesh_network_bounds
+ 1/44 Test  #1: mesh_network_bounds ..............   Passed    0.04 sec
+      Start  2: mesh_memory_sram_data
+ 2/44 Test  #2: mesh_memory_sram_data ............   Passed    0.01 sec
+      Start  3: mesh_memory_sram_time
+ 3/44 Test  #3: mesh_memory_sram_time ............   Passed    0.03 sec
+      Start  4: mesh_memory_window
+ 4/44 Test  #4: mesh_memory_window ...............   Passed    0.04 sec
+      Start  5: mesh_memory_bank
+ 5/44 Test  #5: mesh_memory_bank .................   Passed    0.03 sec
+      Start  6: mesh_memory_ddr
+ 6/44 Test  #6: mesh_memory_ddr ..................   Passed    0.01 sec
+      Start  7: mesh_memory_multicast_large
+ 7/44 Test  #7: mesh_memory_multicast_large ......   Passed    0.21 sec
+      Start  8: mesh_memory_reset_native
+ 8/44 Test  #8: mesh_memory_reset_native .........   Passed    0.04 sec
+      Start  9: mesh_memory_partial
+ 9/44 Test  #9: mesh_memory_partial ..............   Passed    0.10 sec
+      Start 10: mesh_memory_cancel
+10/44 Test #10: mesh_memory_cancel ...............   Passed    0.09 sec
+      Start 11: mesh_memory_dma_reset
+11/44 Test #11: mesh_memory_dma_reset ............   Passed    0.05 sec
+      Start 12: mesh_memory_slow_fanout
+12/44 Test #12: mesh_memory_slow_fanout ..........   Passed    0.17 sec
+      Start 13: mesh_memory_reservation
+13/44 Test #13: mesh_memory_reservation ..........   Passed    0.02 sec
+      Start 14: mesh_memory_timeout_native
+14/44 Test #14: mesh_memory_timeout_native .......   Passed    0.09 sec
+      Start 15: mesh_data
+15/44 Test #15: mesh_data ........................   Passed    0.01 sec
+      Start 16: mesh_ordering
+16/44 Test #16: mesh_ordering ....................   Passed    0.01 sec
+      Start 17: mesh_backpressure
+17/44 Test #17: mesh_backpressure ................   Passed    0.01 sec
+      Start 18: mesh_dma
+18/44 Test #18: mesh_dma .........................   Passed    0.01 sec
+      Start 19: mesh_multicast
+19/44 Test #19: mesh_multicast ...................   Passed    0.01 sec
+      Start 20: mesh_reset
+20/44 Test #20: mesh_reset .......................   Passed    0.00 sec
+      Start 21: mesh_timeout
+21/44 Test #21: mesh_timeout .....................   Passed    0.00 sec
+      Start 22: mesh_timeout_tail
+22/44 Test #22: mesh_timeout_tail ................   Passed    0.01 sec
+      Start 23: mesh_dma_cancel
+23/44 Test #23: mesh_dma_cancel ..................   Passed    0.01 sec
+      Start 24: mesh_token
+24/44 Test #24: mesh_token .......................   Passed    0.00 sec
+      Start 25: mesh_command
+25/44 Test #25: mesh_command .....................   Passed    0.00 sec
+      Start 26: mesh_config
+26/44 Test #26: mesh_config ......................   Passed    0.01 sec
+      Start 27: mesh_split
+27/44 Test #27: mesh_split .......................   Passed    0.02 sec
+      Start 28: mesh_central
+28/44 Test #28: mesh_central .....................   Passed    0.01 sec
+      Start 29: mesh_axi
+29/44 Test #29: mesh_axi .........................   Passed    0.00 sec
+      Start 30: mesh_management
+30/44 Test #30: mesh_management ..................   Passed    0.00 sec
+      Start 31: npu_mapping
+31/44 Test #31: npu_mapping ......................   Passed    0.75 sec
+      Start 32: npu_data
+32/44 Test #32: npu_data .........................   Passed    0.02 sec
+      Start 33: npu_timing
+33/44 Test #33: npu_timing .......................   Passed    0.00 sec
+      Start 34: npu_backpressure
+34/44 Test #34: npu_backpressure .................   Passed    0.00 sec
+      Start 35: npu_ecc
+35/44 Test #35: npu_ecc ..........................   Passed    0.02 sec
+      Start 36: npu_hierarchy
+36/44 Test #36: npu_hierarchy ....................   Passed    0.03 sec
+      Start 37: npu_ordering
+37/44 Test #37: npu_ordering .....................   Passed    0.02 sec
+      Start 38: npu_negative
+38/44 Test #38: npu_negative .....................   Passed    0.00 sec
+      Start 39: npu_reset
+39/44 Test #39: npu_reset ........................   Passed    0.02 sec
+      Start 40: npu_pipeline
+40/44 Test #40: npu_pipeline .....................   Passed    0.00 sec
+      Start 41: npu_partial_race
+41/44 Test #41: npu_partial_race .................   Passed    0.00 sec
+      Start 42: npu_dual
+42/44 Test #42: npu_dual .........................   Passed    0.01 sec
+      Start 43: npu_hol
+43/44 Test #43: npu_hol ..........................   Passed    0.01 sec
+      Start 44: npu_aw_w
+44/44 Test #44: npu_aw_w .........................   Passed    0.00 sec
+
+100% tests passed out of 44
+
+Total Test time (real) =   1.96 sec

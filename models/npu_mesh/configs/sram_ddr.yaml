@@ -1,0 +1,38 @@
+# A memory endpoint with a DDR service curve and a banked SRAM endpoint.
+columns: 4
+rows: 2
+packet_bytes: 256
+fragment_window: 8
+dma_window: 4
+outstanding: 32
+return_bytes: 65536
+endpoints:
+- router: 7
+  base: 0
+  size: 65536
+  backend: ddr
+  bytes_per_cycle: 32
+  latency: 40
+  read_latency: 60
+  write_latency: 30
+  turnaround_cycles: 4
+  slots: 16
+- router: 0
+  base: 65536
+  size: 65536
+  backend: sram
+  slots: 16
+  sram:
+    ports: 8
+    banks: 8
+    groups: 2
+    word_bytes: 32
+    stripe_bytes: 128
+    bank_ii: 2
+    read_latency: 4
+    write_latency: 2
+    outstanding: 8
+    bank_entries: 4
+    w_beats: 4
+    rob_beats: 32
+    completion_entries: 4

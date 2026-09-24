@@ -22,7 +22,7 @@ add_subdirectory(common)
 message(STATUS "aixsilicon_esl_repo: Python assets run via pyproject/uv; SystemC=${ESL_ENABLE_SYSTEMC}")
 
 if(ESL_ENABLE_SYSTEMC)
-    foreach(model ram rom host_master tlm_bus timer irq_controller uart gpio dma npu_sram_controller)
+    foreach(model ram rom host_master tlm_bus timer irq_controller uart gpio dma npu_sram_controller npu_mesh)
         add_subdirectory(models/${model})
     endforeach()
 endif()

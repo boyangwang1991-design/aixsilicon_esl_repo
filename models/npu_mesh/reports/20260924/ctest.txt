@@ -1,0 +1,39 @@
+Test project /home/eda/workspace/aixsilicon_workflow/repos/aixsilicon_esl_repo/runs/mesh-validation-20260924-final/build
+      Start  1: mesh_network_bounds
+ 1/17 Test  #1: mesh_network_bounds ..............   Passed    0.04 sec
+      Start  2: mesh_data
+ 2/17 Test  #2: mesh_data ........................   Passed    0.01 sec
+      Start  3: mesh_ordering
+ 3/17 Test  #3: mesh_ordering ....................   Passed    0.01 sec
+      Start  4: mesh_backpressure
+ 4/17 Test  #4: mesh_backpressure ................   Passed    0.04 sec
+      Start  5: mesh_dma
+ 5/17 Test  #5: mesh_dma .........................   Passed    0.01 sec
+      Start  6: mesh_multicast
+ 6/17 Test  #6: mesh_multicast ...................   Passed    0.01 sec
+      Start  7: mesh_reset
+ 7/17 Test  #7: mesh_reset .......................   Passed    0.00 sec
+      Start  8: mesh_timeout
+ 8/17 Test  #8: mesh_timeout .....................   Passed    0.01 sec
+      Start  9: mesh_timeout_tail
+ 9/17 Test  #9: mesh_timeout_tail ................   Passed    0.01 sec
+      Start 10: mesh_dma_cancel
+10/17 Test #10: mesh_dma_cancel ..................   Passed    0.01 sec
+      Start 11: mesh_token
+11/17 Test #11: mesh_token .......................   Passed    0.00 sec
+      Start 12: mesh_command
+12/17 Test #12: mesh_command .....................   Passed    0.00 sec
+      Start 13: mesh_config
+13/17 Test #13: mesh_config ......................   Passed    0.01 sec
+      Start 14: mesh_split
+14/17 Test #14: mesh_split .......................   Passed    0.02 sec
+      Start 15: mesh_central
+15/17 Test #15: mesh_central .....................   Passed    0.01 sec
+      Start 16: mesh_axi
+16/17 Test #16: mesh_axi .........................   Passed    0.01 sec
+      Start 17: mesh_management
+17/17 Test #17: mesh_management ..................   Passed    0.00 sec
+
+100% tests passed out of 17
+
+Total Test time (real) =   0.20 sec

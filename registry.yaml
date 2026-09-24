@@ -1,12 +1,18 @@
 # ESL 资产唯一注册表；available 仅限 manifest/README 已验证能力。
 schema_version: aixsilicon.esl-registry/v1
 assets:
+- id: aixsilicon:esl:npu_mesh:0.1.0
+  kind: model
+  path: models/npu_mesh
+  status: available
+  description: 文王同步 Mesh 探索基线，实数据、有限 VC/credit、AXI beat 子集、DMA、合成 BM；未标定且非全 P0
+  evidence: models/npu_mesh/reports/20260924-qos/checks.json
 - id: aixsilicon:esl:npu_sram_controller:0.1.0
   kind: model
   path: models/npu_sram_controller
   status: available
   description: 多端口 SRAM SystemC 性能模型：有限资源、交织、冲突仲裁、同 ID 保序、闭环 NPU 流量
-  evidence: runs/common-regions-npu-20260922/checks.json
+  evidence: models/npu_mesh/reports/20260924-qos/checks.json
 - id: aixsilicon:esl:common:0.1.0
   aliases:
   - aixsilicon:esl:queue:bounded:0.1.0

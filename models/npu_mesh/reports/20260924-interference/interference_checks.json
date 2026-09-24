@@ -1,0 +1,2229 @@
+{
+  "overall_status": "PASS",
+  "execution_status": "OK",
+  "points": [
+    {
+      "name": "alone",
+      "latency": {
+        "p50": 43,
+        "p95": 43,
+        "p99": 43,
+        "max": 43,
+        "count": 128,
+        "min": 43,
+        "mean": 43.0
+      },
+      "accepted_to_done": {
+        "p50": 43,
+        "p95": 43,
+        "p99": 43,
+        "max": 43,
+        "count": 128,
+        "min": 43,
+        "mean": 43.0
+      },
+      "stages": {
+        "niu_before_injection": {
+          "p50": 1,
+          "p95": 1,
+          "p99": 1,
+          "max": 1,
+          "count": 128,
+          "min": 1,
+          "mean": 1.0
+        },
+        "request_transport": {
+          "p50": 7,
+          "p95": 7,
+          "p99": 7,
+          "max": 7,
+          "count": 128,
+          "min": 7,
+          "mean": 7.0
+        },
+        "target_queue_and_service": {
+          "p50": 20,
+          "p95": 20,
+          "p99": 20,
+          "max": 20,
+          "count": 128,
+          "min": 20,
+          "mean": 20.0
+        },
+        "response_transport": {
+          "p50": 15,
+          "p95": 15,
+          "p99": 15,
+          "max": 15,
+          "count": 128,
+          "min": 15,
+          "mean": 15.0
+        },
+        "admission": {
+          "p50": 0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0,
+          "count": 128,
+          "min": 0,
+          "mean": 0.0
+        }
+      },
+      "decode_window_bytes_per_cycle": 4.0,
+      "decode_window_completed": 128,
+      "decode_last_done": 12267,
+      "top_ports": [
+        {
+          "router": 0,
+          "output": 0,
+          "vn": 0,
+          "flits": 0,
+          "bytes": 0,
+          "credit_stalls": 0,
+          "allocation_stalls": 0,
+          "endpoint_stalls": 0,
+          "stall_events": 0
+        },
+        {
+          "router": 0,
+          "output": 0,
+          "vn": 1,
+          "flits": 0,
+          "bytes": 0,
+          "credit_stalls": 0,
+          "allocation_stalls": 0,
+          "endpoint_stalls": 0,
+          "stall_events": 0
+        },
+        {
+          "router": 0,
+          "output": 0,
+          "vn": 2,
+          "flits": 1152,
+          "bytes": 36864,
+          "credit_stalls": 0,
+          "allocation_stalls": 0,
+          "endpoint_stalls": 0,
+          "stall_events": 0
+        },
+        {
+          "router": 0,
+          "output": 0,
+          "vn": 3,
+          "flits": 16,
+          "bytes": 512,
+          "credit_stalls": 0,
+          "allocation_stalls": 0,
+          "endpoint_stalls": 0,
+          "stall_events": 0
+        },
+        {
+          "router": 0,
+          "output": 1,
+          "vn": 0,
+          "flits": 0,
+          "bytes": 0,
+          "credit_stalls": 0,
+          "allocation_stalls": 0,
+          "endpoint_stalls": 0,
+          "stall_events": 0
+        },
+        {
+          "router": 0,
+          "output": 1,
+          "vn": 1,
+          "flits": 0,
+          "bytes": 0,
+          "credit_stalls": 0,
+          "allocation_stalls": 0,
+          "endpoint_stalls": 0,
+          "stall_events": 0
+        },
+        {
+          "router": 0,
+          "output": 1,
+          "vn": 2,
+          "flits": 0,
+          "bytes": 0,
+          "credit_stalls": 0,
+          "allocation_stalls": 0,
+          "endpoint_stalls": 0,
+          "stall_events": 0
+        },
+        {
+          "router": 0,
+          "output": 1,
+          "vn": 3,
+          "flits": 0,
+          "bytes": 0,
+          "credit_stalls": 0,
+          "allocation_stalls": 0,
+          "endpoint_stalls": 0,
+          "stall_events": 0
+        }
+      ],
+      "counters": {
+        "cycles": 12269,
+        "admission_stalls": 0,
+        "credit_stalls": 0,
+        "allocation_stalls": 0,
+        "endpoint_stalls": 0
+      },
+      "sram": {
+        "bank_conflicts": 576,
+        "conflict_wait": 576,
+        "frontend_stall": 0,
+        "rob_stall": 0,
+        "queue_peak": 4
+      },
+      "p99_vs_reference_alone": 1.0,
+      "cohort_sha256": "3597027e2e2a854a6131abc8e92268662d7c37e33559815d12a27fec0eab8694"
+    },
+    {
+      "name": "prefill",
+      "latency": {
+        "p50": 43,
+        "p95": 48,
+        "p99": 48,
+        "max": 48,
+        "count": 128,
+        "min": 43,
+        "mean": 44.640625
+      },
+      "accepted_to_done": {
+        "p50": 43,
+        "p95": 48,
+        "p99": 48,
+        "max": 48,
+        "count": 128,
+        "min": 43,
+        "mean": 44.640625
+      },
+      "stages": {
+        "niu_before_injection": {
+          "p50": 1,
+          "p95": 1,
+          "p99": 1,
+          "max": 1,
+          "count": 128,
+          "min": 1,
+          "mean": 1.0
+        },
+        "request_transport": {
+          "p50": 7,
+          "p95": 7,
+          "p99": 7,
+          "max": 7,
+          "count": 128,
+          "min": 7,
+          "mean": 7.0
+        },
+        "target_queue_and_service": {
+          "p50": 20,
+          "p95": 24,
+          "p99": 24,
+          "max": 24,
+          "count": 128,
+          "min": 20,
+          "mean": 21.3125
+        },
+        "response_transport": {
+          "p50": 15,
+          "p95": 16,
+          "p99": 16,
+          "max": 16,
+          "count": 128,
+          "min": 15,
+          "mean": 15.328125
+        },
+        "admission": {
+          "p50": 0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0,
+          "count": 128,
+          "min": 0,
+          "mean": 0.0
+        }
+      },
+      "decode_window_bytes_per_cycle": 4.0,
+      "decode_window_completed": 128,
+      "decode_last_done": 12267,
+      "top_ports": [
+        {
+          "router": 0,
+          "output": 0,
+          "vn": 3,
+          "flits": 1168,
+          "bytes": 37376,
+          "credit_stalls": 0,
+          "allocation_stalls": 43,
+          "endpoint_stalls": 0,
+          "stall_events": 43
+        },
+        {
+          "router": 0,
+          "output": 0,
+          "vn": 0,
+          "flits": 0,
+          "bytes": 0,
+          "credit_stalls": 0,
+          "allocation_stalls": 0,
+          "endpoint_stalls": 0,
+          "stall_events": 0
+        },
+        {
+          "router": 0,
+          "output": 0,
+          "vn": 1,
+          "flits": 0,
+          "bytes": 0,
+          "credit_stalls": 0,
+          "allocation_stalls": 0,
+          "endpoint_stalls": 0,
+          "stall_events": 0
+        },
+        {
+          "router": 0,
+          "output": 0,
+          "vn": 2,
+          "flits": 1152,
+          "bytes": 36864,
+          "credit_stalls": 0,
+          "allocation_stalls": 0,
+          "endpoint_stalls": 0,
+          "stall_events": 0
+        },
+        {
+          "router": 0,
+          "output": 1,
+          "vn": 0,
+          "flits": 0,
+          "bytes": 0,
+          "credit_stalls": 0,
+          "allocation_stalls": 0,
+          "endpoint_stalls": 0,
+          "stall_events": 0
+        },
+        {
+          "router": 0,
+          "output": 1,
+          "vn": 1,
+          "flits": 0,
+          "bytes": 0,
+          "credit_stalls": 0,
+          "allocation_stalls": 0,
+          "endpoint_stalls": 0,
+          "stall_events": 0
+        },
+        {
+          "router": 0,
+          "output": 1,
+          "vn": 2,
+          "flits": 0,
+          "bytes": 0,
+          "credit_stalls": 0,
+          "allocation_stalls": 0,
+          "endpoint_stalls": 0,
+          "stall_events": 0
+        },
+        {
+          "router": 0,
+          "output": 1,
+          "vn": 3,
+          "flits": 0,
+          "bytes": 0,
+          "credit_stalls": 0,
+          "allocation_stalls": 0,
+          "endpoint_stalls": 0,
+          "stall_events": 0
+        }
+      ],
+      "counters": {
+        "cycles": 14706,
+        "admission_stalls": 0,
+        "credit_stalls": 0,
+        "allocation_stalls": 43,
+        "endpoint_stalls": 0
+      },
+      "sram": {
+        "bank_conflicts": 5268,
+        "conflict_wait": 5394,
+        "frontend_stall": 0,
+        "rob_stall": 0,
+        "queue_peak": 4
+      },
+      "p99_vs_reference_alone": 1.1162790697674418,
+      "cohort_sha256": "3597027e2e2a854a6131abc8e92268662d7c37e33559815d12a27fec0eab8694"
+    },
+    {
+      "name": "kv",
+      "latency": {
+        "p50": 43,
+        "p95": 50,
+        "p99": 51,
+        "max": 51,
+        "count": 128,
+        "min": 43,
+        "mean": 44.515625
+      },
+      "accepted_to_done": {
+        "p50": 43,
+        "p95": 50,
+        "p99": 51,
+        "max": 51,
+        "count": 128,
+        "min": 43,
+        "mean": 44.515625
+      },
+      "stages": {
+        "niu_before_injection": {
+          "p50": 1,
+          "p95": 1,
+          "p99": 1,
+          "max": 1,
+          "count": 128,
+          "min": 1,
+          "mean": 1.0
+        },
+        "request_transport": {
+          "p50": 7,
+          "p95": 7,
+          "p99": 7,
+          "max": 7,
+          "count": 128,
+          "min": 7,
+          "mean": 7.0
+        },
+        "target_queue_and_service": {
+          "p50": 20,
+          "p95": 27,
+          "p99": 28,
+          "max": 28,
+          "count": 128,
+          "min": 20,
+          "mean": 21.515625
+        },
+        "response_transport": {
+          "p50": 15,
+          "p95": 15,
+          "p99": 15,
+          "max": 15,
+          "count": 128,
+          "min": 15,
+          "mean": 15.0
+        },
+        "admission": {
+          "p50": 0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0,
+          "count": 128,
+          "min": 0,
+          "mean": 0.0
+        }
+      },
+      "decode_window_bytes_per_cycle": 4.0,
+      "decode_window_completed": 128,
+      "decode_last_done": 12267,
+      "top_ports": [
+        {
+          "router": 7,
+          "output": 1,
+          "vn": 2,
+          "flits": 10368,
+          "bytes": 331776,
+          "credit_stalls": 0,
+          "allocation_stalls": 748,
+          "endpoint_stalls": 0,
+          "stall_events": 748
+        },
+        {
+          "router": 6,
+          "output": 0,
+          "vn": 0,
+          "flits": 1152,
+          "bytes": 36864,
+          "credit_stalls": 0,
+          "allocation_stalls": 461,
+          "endpoint_stalls": 0,
+          "stall_events": 461
+        },
+        {
+          "router": 4,
+          "output": 3,
+          "vn": 1,
+          "flits": 10512,
+          "bytes": 336384,
+          "credit_stalls": 0,
+          "allocation_stalls": 78,
+          "endpoint_stalls": 0,
+          "stall_events": 78
+        },
+        {
+          "router": 5,
+          "output": 1,
+          "vn": 1,
+          "flits": 10512,
+          "bytes": 336384,
+          "credit_stalls": 0,
+          "allocation_stalls": 77,
+          "endpoint_stalls": 0,
+          "stall_events": 77
+        },
+        {
+          "router": 6,
+          "output": 1,
+          "vn": 1,
+          "flits": 10512,
+          "bytes": 336384,
+          "credit_stalls": 0,
+          "allocation_stalls": 74,
+          "endpoint_stalls": 0,
+          "stall_events": 74
+        },
+        {
+          "router": 0,
+          "output": 0,
+          "vn": 3,
+          "flits": 1168,
+          "bytes": 37376,
+          "credit_stalls": 0,
+          "allocation_stalls": 38,
+          "endpoint_stalls": 0,
+          "stall_events": 38
+        },
+        {
+          "router": 0,
+          "output": 0,
+          "vn": 0,
+          "flits": 0,
+          "bytes": 0,
+          "credit_stalls": 0,
+          "allocation_stalls": 0,
+          "endpoint_stalls": 0,
+          "stall_events": 0
+        },
+        {
+          "router": 0,
+          "output": 0,
+          "vn": 1,
+          "flits": 0,
+          "bytes": 0,
+          "credit_stalls": 0,
+          "allocation_stalls": 0,
+          "endpoint_stalls": 0,
+          "stall_events": 0
+        }
+      ],
+      "counters": {
+        "cycles": 15853,
+        "admission_stalls": 0,
+        "credit_stalls": 0,
+        "allocation_stalls": 1476,
+        "endpoint_stalls": 0
+      },
+      "sram": {
+        "bank_conflicts": 5266,
+        "conflict_wait": 5410,
+        "frontend_stall": 0,
+        "rob_stall": 0,
+        "queue_peak": 4
+      },
+      "p99_vs_reference_alone": 1.186046511627907,
+      "cohort_sha256": "3597027e2e2a854a6131abc8e92268662d7c37e33559815d12a27fec0eab8694"
+    },
+    {
+      "name": "mixed",
+      "latency": {
+        "p50": 44,
+        "p95": 53,
+        "p99": 53,
+        "max": 54,
+        "count": 128,
+        "min": 43,
+        "mean": 45.3671875
+      },
+      "accepted_to_done": {
+        "p50": 44,
+        "p95": 53,
+        "p99": 53,
+        "max": 54,
+        "count": 128,
+        "min": 43,
+        "mean": 45.3671875
+      },
+      "stages": {
+        "niu_before_injection": {
+          "p50": 1,
+          "p95": 1,
+          "p99": 1,
+          "max": 1,
+          "count": 128,
+          "min": 1,
+          "mean": 1.0
+        },
+        "request_transport": {
+          "p50": 7,
+          "p95": 8,
+          "p99": 8,
+          "max": 8,
+          "count": 128,
+          "min": 7,
+          "mean": 7.5
+        },
+        "target_queue_and_service": {
+          "p50": 20,
+          "p95": 29,
+          "p99": 29,
+          "max": 30,
+          "count": 128,
+          "min": 20,
+          "mean": 21.8671875
+        },
+        "response_transport": {
+          "p50": 15,
+          "p95": 15,
+          "p99": 15,
+          "max": 15,
+          "count": 128,
+          "min": 15,
+          "mean": 15.0
+        },
+        "admission": {
+          "p50": 0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0,
+          "count": 128,
+          "min": 0,
+          "mean": 0.0
+        }
+      },
+      "decode_window_bytes_per_cycle": 4.0,
+      "decode_window_completed": 128,
+      "decode_last_done": 12271,
+      "top_ports": [
+        {
+          "router": 4,
+          "output": 3,
+          "vn": 1,
+          "flits": 10512,
+          "bytes": 336384,
+          "credit_stalls": 0,
+          "allocation_stalls": 9087,
+          "endpoint_stalls": 0,
+          "stall_events": 9087
+        },
+        {
+          "router": 2,
+          "output": 1,
+          "vn": 1,
+          "flits": 10368,
+          "bytes": 331776,
+          "credit_stalls": 4475,
+          "allocation_stalls": 4536,
+          "endpoint_stalls": 0,
+          "stall_events": 9011
+        },
+        {
+          "router": 5,
+          "output": 1,
+          "vn": 1,
+          "flits": 10512,
+          "bytes": 336384,
+          "credit_stalls": 4567,
+          "allocation_stalls": 4394,
+          "endpoint_stalls": 0,
+          "stall_events": 8961
+        },
+        {
+          "router": 1,
+          "output": 1,
+          "vn": 1,
+          "flits": 10368,
+          "bytes": 331776,
+          "credit_stalls": 0,
+          "allocation_stalls": 8951,
+          "endpoint_stalls": 0,
+          "stall_events": 8951
+        },
+        {
+          "router": 6,
+          "output": 1,
+          "vn": 1,
+          "flits": 10512,
+          "bytes": 336384,
+          "credit_stalls": 0,
+          "allocation_stalls": 8048,
+          "endpoint_stalls": 0,
+          "stall_events": 8048
+        },
+        {
+          "router": 7,
+          "output": 1,
+          "vn": 2,
+          "flits": 10368,
+          "bytes": 331776,
+          "credit_stalls": 0,
+          "allocation_stalls": 543,
+          "endpoint_stalls": 0,
+          "stall_events": 543
+        },
+        {
+          "router": 6,
+          "output": 0,
+          "vn": 0,
+          "flits": 1152,
+          "bytes": 36864,
+          "credit_stalls": 0,
+          "allocation_stalls": 458,
+          "endpoint_stalls": 0,
+          "stall_events": 458
+        },
+        {
+          "router": 0,
+          "output": 0,
+          "vn": 3,
+          "flits": 2320,
+          "bytes": 74240,
+          "credit_stalls": 0,
+          "allocation_stalls": 65,
+          "endpoint_stalls": 0,
+          "stall_events": 65
+        }
+      ],
+      "counters": {
+        "cycles": 24032,
+        "admission_stalls": 0,
+        "credit_stalls": 11746,
+        "allocation_stalls": 36082,
+        "endpoint_stalls": 0
+      },
+      "sram": {
+        "bank_conflicts": 11813,
+        "conflict_wait": 15841,
+        "frontend_stall": 0,
+        "rob_stall": 0,
+        "queue_peak": 4
+      },
+      "p99_vs_reference_alone": 1.2325581395348837,
+      "cohort_sha256": "3597027e2e2a854a6131abc8e92268662d7c37e33559815d12a27fec0eab8694"
+    },
+    {
+      "name": "mixed_link64",
+      "latency": {
+        "p50": 43,
+        "p95": 57,
+        "p99": 59,
+        "max": 59,
+        "count": 128,
+        "min": 39,
+        "mean": 44.15625
+      },
+      "accepted_to_done": {
+        "p50": 43,
+        "p95": 57,
+        "p99": 59,
+        "max": 59,
+        "count": 128,
+        "min": 39,
+        "mean": 44.15625
+      },
+      "stages": {
+        "niu_before_injection": {
+          "p50": 1,
+          "p95": 1,
+          "p99": 1,
+          "max": 1,
+          "count": 128,
+          "min": 1,
+          "mean": 1.0
+        },
+        "request_transport": {
+          "p50": 7,
+          "p95": 8,
+          "p99": 8,
+          "max": 8,
+          "count": 128,
+          "min": 7,
+          "mean": 7.5
+        },
+        "target_queue_and_service": {
+          "p50": 22,
+          "p95": 38,
+          "p99": 40,
+          "max": 40,
+          "count": 128,
+          "min": 20,
+          "mean": 24.359375
+        },
+        "response_transport": {
+          "p50": 11,
+          "p95": 12,
+          "p99": 13,
+          "max": 13,
+          "count": 128,
+          "min": 11,
+          "mean": 11.296875
+        },
+        "admission": {
+          "p50": 0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0,
+          "count": 128,
+          "min": 0,
+          "mean": 0.0
+        }
+      },
+      "decode_window_bytes_per_cycle": 4.0,
+      "decode_window_completed": 128,
+      "decode_last_done": 12264,
+      "top_ports": [
+        {
+          "router": 4,
+          "output": 3,
+          "vn": 1,
+          "flits": 5840,
+          "bytes": 373760,
+          "credit_stalls": 0,
+          "allocation_stalls": 4591,
+          "endpoint_stalls": 0,
+          "stall_events": 4591
+        },
+        {
+          "router": 5,
+          "output": 1,
+          "vn": 1,
+          "flits": 5840,
+          "bytes": 373760,
+          "credit_stalls": 0,
+          "allocation_stalls": 4585,
+          "endpoint_stalls": 0,
+          "stall_events": 4585
+        },
+        {
+          "router": 1,
+          "output": 1,
+          "vn": 1,
+          "flits": 5760,
+          "bytes": 368640,
+          "credit_stalls": 0,
+          "allocation_stalls": 4472,
+          "endpoint_stalls": 0,
+          "stall_events": 4472
+        },
+        {
+          "router": 2,
+          "output": 1,
+          "vn": 1,
+          "flits": 5760,
+          "bytes": 368640,
+          "credit_stalls": 0,
+          "allocation_stalls": 4469,
+          "endpoint_stalls": 0,
+          "stall_events": 4469
+        },
+        {
+          "router": 6,
+          "output": 1,
+          "vn": 1,
+          "flits": 5840,
+          "bytes": 373760,
+          "credit_stalls": 0,
+          "allocation_stalls": 3675,
+          "endpoint_stalls": 0,
+          "stall_events": 3675
+        },
+        {
+          "router": 6,
+          "output": 0,
+          "vn": 0,
+          "flits": 1152,
+          "bytes": 73728,
+          "credit_stalls": 0,
+          "allocation_stalls": 441,
+          "endpoint_stalls": 0,
+          "stall_events": 441
+        },
+        {
+          "router": 0,
+          "output": 0,
+          "vn": 3,
+          "flits": 2320,
+          "bytes": 148480,
+          "credit_stalls": 0,
+          "allocation_stalls": 203,
+          "endpoint_stalls": 0,
+          "stall_events": 203
+        },
+        {
+          "router": 7,
+          "output": 4,
+          "vn": 1,
+          "flits": 640,
+          "bytes": 40960,
+          "credit_stalls": 0,
+          "allocation_stalls": 0,
+          "endpoint_stalls": 30,
+          "stall_events": 30
+        }
+      ],
+      "counters": {
+        "cycles": 14893,
+        "admission_stalls": 0,
+        "credit_stalls": 0,
+        "allocation_stalls": 22436,
+        "endpoint_stalls": 30
+      },
+      "sram": {
+        "bank_conflicts": 11824,
+        "conflict_wait": 15768,
+        "frontend_stall": 0,
+        "rob_stall": 0,
+        "queue_peak": 7
+      },
+      "p99_vs_reference_alone": 1.372093023255814,
+      "cohort_sha256": "3597027e2e2a854a6131abc8e92268662d7c37e33559815d12a27fec0eab8694"
+    },
+    {
+      "name": "mixed_slots32",
+      "latency": {
+        "p50": 44,
+        "p95": 53,
+        "p99": 53,
+        "max": 54,
+        "count": 128,
+        "min": 43,
+        "mean": 45.3671875
+      },
+      "accepted_to_done": {
+        "p50": 44,
+        "p95": 53,
+        "p99": 53,
+        "max": 54,
+        "count": 128,
+        "min": 43,
+        "mean": 45.3671875
+      },
+      "stages": {
+        "niu_before_injection": {
+          "p50": 1,
+          "p95": 1,
+          "p99": 1,
+          "max": 1,
+          "count": 128,
+          "min": 1,
+          "mean": 1.0
+        },
+        "request_transport": {
+          "p50": 7,
+          "p95": 8,
+          "p99": 8,
+          "max": 8,
+          "count": 128,
+          "min": 7,
+          "mean": 7.5
+        },
+        "target_queue_and_service": {
+          "p50": 20,
+          "p95": 29,
+          "p99": 29,
+          "max": 30,
+          "count": 128,
+          "min": 20,
+          "mean": 21.8671875
+        },
+        "response_transport": {
+          "p50": 15,
+          "p95": 15,
+          "p99": 15,
+          "max": 15,
+          "count": 128,
+          "min": 15,
+          "mean": 15.0
+        },
+        "admission": {
+          "p50": 0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0,
+          "count": 128,
+          "min": 0,
+          "mean": 0.0
+        }
+      },
+      "decode_window_bytes_per_cycle": 4.0,
+      "decode_window_completed": 128,
+      "decode_last_done": 12271,
+      "top_ports": [
+        {
+          "router": 4,
+          "output": 3,
+          "vn": 1,
+          "flits": 10512,
+          "bytes": 336384,
+          "credit_stalls": 0,
+          "allocation_stalls": 9087,
+          "endpoint_stalls": 0,
+          "stall_events": 9087
+        },
+        {
+          "router": 2,
+          "output": 1,
+          "vn": 1,
+          "flits": 10368,
+          "bytes": 331776,
+          "credit_stalls": 4475,
+          "allocation_stalls": 4536,
+          "endpoint_stalls": 0,
+          "stall_events": 9011
+        },
+        {
+          "router": 5,
+          "output": 1,
+          "vn": 1,
+          "flits": 10512,
+          "bytes": 336384,
+          "credit_stalls": 4567,
+          "allocation_stalls": 4394,
+          "endpoint_stalls": 0,
+          "stall_events": 8961
+        },
+        {
+          "router": 1,
+          "output": 1,
+          "vn": 1,
+          "flits": 10368,
+          "bytes": 331776,
+          "credit_stalls": 0,
+          "allocation_stalls": 8951,
+          "endpoint_stalls": 0,
+          "stall_events": 8951
+        },
+        {
+          "router": 6,
+          "output": 1,
+          "vn": 1,
+          "flits": 10512,
+          "bytes": 336384,
+          "credit_stalls": 0,
+          "allocation_stalls": 8048,
+          "endpoint_stalls": 0,
+          "stall_events": 8048
+        },
+        {
+          "router": 7,
+          "output": 1,
+          "vn": 2,
+          "flits": 10368,
+          "bytes": 331776,
+          "credit_stalls": 0,
+          "allocation_stalls": 543,
+          "endpoint_stalls": 0,
+          "stall_events": 543
+        },
+        {
+          "router": 6,
+          "output": 0,
+          "vn": 0,
+          "flits": 1152,
+          "bytes": 36864,
+          "credit_stalls": 0,
+          "allocation_stalls": 458,
+          "endpoint_stalls": 0,
+          "stall_events": 458
+        },
+        {
+          "router": 0,
+          "output": 0,
+          "vn": 3,
+          "flits": 2320,
+          "bytes": 74240,
+          "credit_stalls": 0,
+          "allocation_stalls": 65,
+          "endpoint_stalls": 0,
+          "stall_events": 65
+        }
+      ],
+      "counters": {
+        "cycles": 24032,
+        "admission_stalls": 0,
+        "credit_stalls": 11746,
+        "allocation_stalls": 36082,
+        "endpoint_stalls": 0
+      },
+      "sram": {
+        "bank_conflicts": 11813,
+        "conflict_wait": 15841,
+        "frontend_stall": 0,
+        "rob_stall": 0,
+        "queue_peak": 4
+      },
+      "p99_vs_reference_alone": 1.2325581395348837,
+      "cohort_sha256": "3597027e2e2a854a6131abc8e92268662d7c37e33559815d12a27fec0eab8694"
+    },
+    {
+      "name": "mixed_fragment2",
+      "latency": {
+        "p50": 44,
+        "p95": 49,
+        "p99": 56,
+        "max": 56,
+        "count": 128,
+        "min": 43,
+        "mean": 44.890625
+      },
+      "accepted_to_done": {
+        "p50": 44,
+        "p95": 49,
+        "p99": 56,
+        "max": 56,
+        "count": 128,
+        "min": 43,
+        "mean": 44.890625
+      },
+      "stages": {
+        "niu_before_injection": {
+          "p50": 1,
+          "p95": 1,
+          "p99": 1,
+          "max": 1,
+          "count": 128,
+          "min": 1,
+          "mean": 1.0
+        },
+        "request_transport": {
+          "p50": 7,
+          "p95": 8,
+          "p99": 8,
+          "max": 8,
+          "count": 128,
+          "min": 7,
+          "mean": 7.5
+        },
+        "target_queue_and_service": {
+          "p50": 20,
+          "p95": 25,
+          "p99": 32,
+          "max": 32,
+          "count": 128,
+          "min": 20,
+          "mean": 21.390625
+        },
+        "response_transport": {
+          "p50": 15,
+          "p95": 15,
+          "p99": 15,
+          "max": 15,
+          "count": 128,
+          "min": 15,
+          "mean": 15.0
+        },
+        "admission": {
+          "p50": 0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0,
+          "count": 128,
+          "min": 0,
+          "mean": 0.0
+        }
+      },
+      "decode_window_bytes_per_cycle": 4.0,
+      "decode_window_completed": 128,
+      "decode_last_done": 12268,
+      "top_ports": [
+        {
+          "router": 4,
+          "output": 3,
+          "vn": 1,
+          "flits": 10512,
+          "bytes": 336384,
+          "credit_stalls": 0,
+          "allocation_stalls": 8676,
+          "endpoint_stalls": 0,
+          "stall_events": 8676
+        },
+        {
+          "router": 1,
+          "output": 1,
+          "vn": 1,
+          "flits": 10368,
+          "bytes": 331776,
+          "credit_stalls": 0,
+          "allocation_stalls": 8592,
+          "endpoint_stalls": 0,
+          "stall_events": 8592
+        },
+        {
+          "router": 2,
+          "output": 1,
+          "vn": 1,
+          "flits": 10368,
+          "bytes": 331776,
+          "credit_stalls": 4224,
+          "allocation_stalls": 4364,
+          "endpoint_stalls": 0,
+          "stall_events": 8588
+        },
+        {
+          "router": 5,
+          "output": 1,
+          "vn": 1,
+          "flits": 10512,
+          "bytes": 336384,
+          "credit_stalls": 4400,
+          "allocation_stalls": 4103,
+          "endpoint_stalls": 0,
+          "stall_events": 8503
+        },
+        {
+          "router": 6,
+          "output": 1,
+          "vn": 1,
+          "flits": 10512,
+          "bytes": 336384,
+          "credit_stalls": 0,
+          "allocation_stalls": 7645,
+          "endpoint_stalls": 0,
+          "stall_events": 7645
+        },
+        {
+          "router": 0,
+          "output": 0,
+          "vn": 3,
+          "flits": 2320,
+          "bytes": 74240,
+          "credit_stalls": 0,
+          "allocation_stalls": 943,
+          "endpoint_stalls": 0,
+          "stall_events": 943
+        },
+        {
+          "router": 7,
+          "output": 1,
+          "vn": 2,
+          "flits": 10368,
+          "bytes": 331776,
+          "credit_stalls": 0,
+          "allocation_stalls": 388,
+          "endpoint_stalls": 0,
+          "stall_events": 388
+        },
+        {
+          "router": 6,
+          "output": 0,
+          "vn": 0,
+          "flits": 1152,
+          "bytes": 36864,
+          "credit_stalls": 0,
+          "allocation_stalls": 105,
+          "endpoint_stalls": 0,
+          "stall_events": 105
+        }
+      ],
+      "counters": {
+        "cycles": 24200,
+        "admission_stalls": 0,
+        "credit_stalls": 11133,
+        "allocation_stalls": 34816,
+        "endpoint_stalls": 0
+      },
+      "sram": {
+        "bank_conflicts": 10134,
+        "conflict_wait": 10756,
+        "frontend_stall": 0,
+        "rob_stall": 0,
+        "queue_peak": 4
+      },
+      "p99_vs_reference_alone": 1.302325581395349,
+      "cohort_sha256": "3597027e2e2a854a6131abc8e92268662d7c37e33559815d12a27fec0eab8694"
+    },
+    {
+      "name": "mixed_bank_ii1",
+      "latency": {
+        "p50": 41,
+        "p95": 47,
+        "p99": 47,
+        "max": 47,
+        "count": 128,
+        "min": 40,
+        "mean": 41.859375
+      },
+      "accepted_to_done": {
+        "p50": 41,
+        "p95": 47,
+        "p99": 47,
+        "max": 47,
+        "count": 128,
+        "min": 40,
+        "mean": 41.859375
+      },
+      "stages": {
+        "niu_before_injection": {
+          "p50": 1,
+          "p95": 1,
+          "p99": 1,
+          "max": 1,
+          "count": 128,
+          "min": 1,
+          "mean": 1.0
+        },
+        "request_transport": {
+          "p50": 7,
+          "p95": 8,
+          "p99": 8,
+          "max": 8,
+          "count": 128,
+          "min": 7,
+          "mean": 7.5
+        },
+        "target_queue_and_service": {
+          "p50": 17,
+          "p95": 23,
+          "p99": 23,
+          "max": 23,
+          "count": 128,
+          "min": 17,
+          "mean": 18.359375
+        },
+        "response_transport": {
+          "p50": 15,
+          "p95": 15,
+          "p99": 15,
+          "max": 15,
+          "count": 128,
+          "min": 15,
+          "mean": 15.0
+        },
+        "admission": {
+          "p50": 0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0,
+          "count": 128,
+          "min": 0,
+          "mean": 0.0
+        }
+      },
+      "decode_window_bytes_per_cycle": 4.0,
+      "decode_window_completed": 128,
+      "decode_last_done": 12269,
+      "top_ports": [
+        {
+          "router": 4,
+          "output": 3,
+          "vn": 1,
+          "flits": 10512,
+          "bytes": 336384,
+          "credit_stalls": 0,
+          "allocation_stalls": 9087,
+          "endpoint_stalls": 0,
+          "stall_events": 9087
+        },
+        {
+          "router": 5,
+          "output": 1,
+          "vn": 1,
+          "flits": 10512,
+          "bytes": 336384,
+          "credit_stalls": 4597,
+          "allocation_stalls": 4434,
+          "endpoint_stalls": 0,
+          "stall_events": 9031
+        },
+        {
+          "router": 2,
+          "output": 1,
+          "vn": 1,
+          "flits": 10368,
+          "bytes": 331776,
+          "credit_stalls": 4475,
+          "allocation_stalls": 4536,
+          "endpoint_stalls": 0,
+          "stall_events": 9011
+        },
+        {
+          "router": 1,
+          "output": 1,
+          "vn": 1,
+          "flits": 10368,
+          "bytes": 331776,
+          "credit_stalls": 0,
+          "allocation_stalls": 8951,
+          "endpoint_stalls": 0,
+          "stall_events": 8951
+        },
+        {
+          "router": 6,
+          "output": 1,
+          "vn": 1,
+          "flits": 10512,
+          "bytes": 336384,
+          "credit_stalls": 0,
+          "allocation_stalls": 8063,
+          "endpoint_stalls": 0,
+          "stall_events": 8063
+        },
+        {
+          "router": 7,
+          "output": 1,
+          "vn": 2,
+          "flits": 10368,
+          "bytes": 331776,
+          "credit_stalls": 0,
+          "allocation_stalls": 542,
+          "endpoint_stalls": 0,
+          "stall_events": 542
+        },
+        {
+          "router": 6,
+          "output": 0,
+          "vn": 0,
+          "flits": 1152,
+          "bytes": 36864,
+          "credit_stalls": 0,
+          "allocation_stalls": 402,
+          "endpoint_stalls": 0,
+          "stall_events": 402
+        },
+        {
+          "router": 0,
+          "output": 0,
+          "vn": 3,
+          "flits": 2320,
+          "bytes": 74240,
+          "credit_stalls": 0,
+          "allocation_stalls": 91,
+          "endpoint_stalls": 0,
+          "stall_events": 91
+        }
+      ],
+      "counters": {
+        "cycles": 24029,
+        "admission_stalls": 0,
+        "credit_stalls": 11728,
+        "allocation_stalls": 36106,
+        "endpoint_stalls": 0
+      },
+      "sram": {
+        "bank_conflicts": 3039,
+        "conflict_wait": 5082,
+        "frontend_stall": 0,
+        "rob_stall": 0,
+        "queue_peak": 4
+      },
+      "p99_vs_reference_alone": 1.0930232558139534,
+      "cohort_sha256": "3597027e2e2a854a6131abc8e92268662d7c37e33559815d12a27fec0eab8694"
+    },
+    {
+      "name": "mixed_ddr64",
+      "latency": {
+        "p50": 44,
+        "p95": 54,
+        "p99": 54,
+        "max": 54,
+        "count": 128,
+        "min": 43,
+        "mean": 45.703125
+      },
+      "accepted_to_done": {
+        "p50": 44,
+        "p95": 54,
+        "p99": 54,
+        "max": 54,
+        "count": 128,
+        "min": 43,
+        "mean": 45.703125
+      },
+      "stages": {
+        "niu_before_injection": {
+          "p50": 1,
+          "p95": 1,
+          "p99": 1,
+          "max": 1,
+          "count": 128,
+          "min": 1,
+          "mean": 1.0
+        },
+        "request_transport": {
+          "p50": 7,
+          "p95": 8,
+          "p99": 8,
+          "max": 8,
+          "count": 128,
+          "min": 7,
+          "mean": 7.5
+        },
+        "target_queue_and_service": {
+          "p50": 20,
+          "p95": 31,
+          "p99": 31,
+          "max": 31,
+          "count": 128,
+          "min": 20,
+          "mean": 22.203125
+        },
+        "response_transport": {
+          "p50": 15,
+          "p95": 15,
+          "p99": 15,
+          "max": 15,
+          "count": 128,
+          "min": 15,
+          "mean": 15.0
+        },
+        "admission": {
+          "p50": 0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0,
+          "count": 128,
+          "min": 0,
+          "mean": 0.0
+        }
+      },
+      "decode_window_bytes_per_cycle": 4.0,
+      "decode_window_completed": 128,
+      "decode_last_done": 12278,
+      "top_ports": [
+        {
+          "router": 4,
+          "output": 3,
+          "vn": 1,
+          "flits": 10512,
+          "bytes": 336384,
+          "credit_stalls": 0,
+          "allocation_stalls": 9091,
+          "endpoint_stalls": 0,
+          "stall_events": 9091
+        },
+        {
+          "router": 5,
+          "output": 1,
+          "vn": 1,
+          "flits": 10512,
+          "bytes": 336384,
+          "credit_stalls": 4592,
+          "allocation_stalls": 4404,
+          "endpoint_stalls": 0,
+          "stall_events": 8996
+        },
+        {
+          "router": 1,
+          "output": 1,
+          "vn": 1,
+          "flits": 10368,
+          "bytes": 331776,
+          "credit_stalls": 0,
+          "allocation_stalls": 8955,
+          "endpoint_stalls": 0,
+          "stall_events": 8955
+        },
+        {
+          "router": 2,
+          "output": 1,
+          "vn": 1,
+          "flits": 10368,
+          "bytes": 331776,
+          "credit_stalls": 4412,
+          "allocation_stalls": 4539,
+          "endpoint_stalls": 0,
+          "stall_events": 8951
+        },
+        {
+          "router": 6,
+          "output": 1,
+          "vn": 1,
+          "flits": 10512,
+          "bytes": 336384,
+          "credit_stalls": 0,
+          "allocation_stalls": 8062,
+          "endpoint_stalls": 0,
+          "stall_events": 8062
+        },
+        {
+          "router": 7,
+          "output": 1,
+          "vn": 2,
+          "flits": 10368,
+          "bytes": 331776,
+          "credit_stalls": 0,
+          "allocation_stalls": 539,
+          "endpoint_stalls": 0,
+          "stall_events": 539
+        },
+        {
+          "router": 6,
+          "output": 0,
+          "vn": 0,
+          "flits": 1152,
+          "bytes": 36864,
+          "credit_stalls": 0,
+          "allocation_stalls": 395,
+          "endpoint_stalls": 0,
+          "stall_events": 395
+        },
+        {
+          "router": 0,
+          "output": 0,
+          "vn": 3,
+          "flits": 2320,
+          "bytes": 74240,
+          "credit_stalls": 0,
+          "allocation_stalls": 41,
+          "endpoint_stalls": 0,
+          "stall_events": 41
+        }
+      ],
+      "counters": {
+        "cycles": 24030,
+        "admission_stalls": 0,
+        "credit_stalls": 11700,
+        "allocation_stalls": 36026,
+        "endpoint_stalls": 0
+      },
+      "sram": {
+        "bank_conflicts": 10786,
+        "conflict_wait": 11881,
+        "frontend_stall": 0,
+        "rob_stall": 0,
+        "queue_peak": 4
+      },
+      "p99_vs_reference_alone": 1.255813953488372,
+      "cohort_sha256": "3597027e2e2a854a6131abc8e92268662d7c37e33559815d12a27fec0eab8694"
+    },
+    {
+      "name": "mixed_background_half_rate",
+      "latency": {
+        "p50": 44,
+        "p95": 48,
+        "p99": 48,
+        "max": 48,
+        "count": 128,
+        "min": 43,
+        "mean": 45.046875
+      },
+      "accepted_to_done": {
+        "p50": 44,
+        "p95": 48,
+        "p99": 48,
+        "max": 48,
+        "count": 128,
+        "min": 43,
+        "mean": 45.046875
+      },
+      "stages": {
+        "niu_before_injection": {
+          "p50": 1,
+          "p95": 1,
+          "p99": 1,
+          "max": 1,
+          "count": 128,
+          "min": 1,
+          "mean": 1.0
+        },
+        "request_transport": {
+          "p50": 7,
+          "p95": 8,
+          "p99": 8,
+          "max": 8,
+          "count": 128,
+          "min": 7,
+          "mean": 7.5
+        },
+        "target_queue_and_service": {
+          "p50": 20,
+          "p95": 24,
+          "p99": 24,
+          "max": 24,
+          "count": 128,
+          "min": 20,
+          "mean": 21.546875
+        },
+        "response_transport": {
+          "p50": 15,
+          "p95": 15,
+          "p99": 15,
+          "max": 15,
+          "count": 128,
+          "min": 15,
+          "mean": 15.0
+        },
+        "admission": {
+          "p50": 0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0,
+          "count": 128,
+          "min": 0,
+          "mean": 0.0
+        }
+      },
+      "decode_window_bytes_per_cycle": 4.0,
+      "decode_window_completed": 128,
+      "decode_last_done": 12268,
+      "top_ports": [
+        {
+          "router": 4,
+          "output": 3,
+          "vn": 1,
+          "flits": 5328,
+          "bytes": 170496,
+          "credit_stalls": 0,
+          "allocation_stalls": 4608,
+          "endpoint_stalls": 0,
+          "stall_events": 4608
+        },
+        {
+          "router": 2,
+          "output": 1,
+          "vn": 1,
+          "flits": 5184,
+          "bytes": 165888,
+          "credit_stalls": 2236,
+          "allocation_stalls": 2292,
+          "endpoint_stalls": 0,
+          "stall_events": 4528
+        },
+        {
+          "router": 5,
+          "output": 1,
+          "vn": 1,
+          "flits": 5328,
+          "bytes": 170496,
+          "credit_stalls": 2332,
+          "allocation_stalls": 2175,
+          "endpoint_stalls": 0,
+          "stall_events": 4507
+        },
+        {
+          "router": 1,
+          "output": 1,
+          "vn": 1,
+          "flits": 5184,
+          "bytes": 165888,
+          "credit_stalls": 0,
+          "allocation_stalls": 4472,
+          "endpoint_stalls": 0,
+          "stall_events": 4472
+        },
+        {
+          "router": 6,
+          "output": 1,
+          "vn": 1,
+          "flits": 5328,
+          "bytes": 170496,
+          "credit_stalls": 0,
+          "allocation_stalls": 4044,
+          "endpoint_stalls": 0,
+          "stall_events": 4044
+        },
+        {
+          "router": 6,
+          "output": 0,
+          "vn": 0,
+          "flits": 576,
+          "bytes": 18432,
+          "credit_stalls": 0,
+          "allocation_stalls": 244,
+          "endpoint_stalls": 0,
+          "stall_events": 244
+        },
+        {
+          "router": 7,
+          "output": 1,
+          "vn": 2,
+          "flits": 5184,
+          "bytes": 165888,
+          "credit_stalls": 0,
+          "allocation_stalls": 215,
+          "endpoint_stalls": 0,
+          "stall_events": 215
+        },
+        {
+          "router": 0,
+          "output": 0,
+          "vn": 3,
+          "flits": 1168,
+          "bytes": 37376,
+          "credit_stalls": 0,
+          "allocation_stalls": 80,
+          "endpoint_stalls": 0,
+          "stall_events": 80
+        }
+      ],
+      "counters": {
+        "cycles": 13713,
+        "admission_stalls": 0,
+        "credit_stalls": 5951,
+        "allocation_stalls": 18130,
+        "endpoint_stalls": 0
+      },
+      "sram": {
+        "bank_conflicts": 5282,
+        "conflict_wait": 5457,
+        "frontend_stall": 0,
+        "rob_stall": 0,
+        "queue_peak": 4
+      },
+      "p99_vs_reference_alone": 1.1162790697674418,
+      "cohort_sha256": "3597027e2e2a854a6131abc8e92268662d7c37e33559815d12a27fec0eab8694"
+    },
+    {
+      "name": "mixed_phase17",
+      "latency": {
+        "p50": 44,
+        "p95": 51,
+        "p99": 51,
+        "max": 51,
+        "count": 128,
+        "min": 43,
+        "mean": 45.1484375
+      },
+      "accepted_to_done": {
+        "p50": 44,
+        "p95": 51,
+        "p99": 51,
+        "max": 51,
+        "count": 128,
+        "min": 43,
+        "mean": 45.1484375
+      },
+      "stages": {
+        "niu_before_injection": {
+          "p50": 1,
+          "p95": 1,
+          "p99": 1,
+          "max": 1,
+          "count": 128,
+          "min": 1,
+          "mean": 1.0
+        },
+        "request_transport": {
+          "p50": 7,
+          "p95": 8,
+          "p99": 8,
+          "max": 8,
+          "count": 128,
+          "min": 7,
+          "mean": 7.5
+        },
+        "target_queue_and_service": {
+          "p50": 20,
+          "p95": 27,
+          "p99": 27,
+          "max": 27,
+          "count": 128,
+          "min": 20,
+          "mean": 21.3359375
+        },
+        "response_transport": {
+          "p50": 15,
+          "p95": 16,
+          "p99": 16,
+          "max": 16,
+          "count": 128,
+          "min": 15,
+          "mean": 15.3125
+        },
+        "admission": {
+          "p50": 0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0,
+          "count": 128,
+          "min": 0,
+          "mean": 0.0
+        }
+      },
+      "decode_window_bytes_per_cycle": 4.0,
+      "decode_window_completed": 128,
+      "decode_last_done": 12268,
+      "top_ports": [
+        {
+          "router": 4,
+          "output": 3,
+          "vn": 1,
+          "flits": 10512,
+          "bytes": 336384,
+          "credit_stalls": 0,
+          "allocation_stalls": 9086,
+          "endpoint_stalls": 0,
+          "stall_events": 9086
+        },
+        {
+          "router": 5,
+          "output": 1,
+          "vn": 1,
+          "flits": 10512,
+          "bytes": 336384,
+          "credit_stalls": 4562,
+          "allocation_stalls": 4393,
+          "endpoint_stalls": 0,
+          "stall_events": 8955
+        },
+        {
+          "router": 1,
+          "output": 1,
+          "vn": 1,
+          "flits": 10368,
+          "bytes": 331776,
+          "credit_stalls": 0,
+          "allocation_stalls": 8950,
+          "endpoint_stalls": 0,
+          "stall_events": 8950
+        },
+        {
+          "router": 2,
+          "output": 1,
+          "vn": 1,
+          "flits": 10368,
+          "bytes": 331776,
+          "credit_stalls": 4474,
+          "allocation_stalls": 4472,
+          "endpoint_stalls": 0,
+          "stall_events": 8946
+        },
+        {
+          "router": 6,
+          "output": 1,
+          "vn": 1,
+          "flits": 10512,
+          "bytes": 336384,
+          "credit_stalls": 0,
+          "allocation_stalls": 8047,
+          "endpoint_stalls": 0,
+          "stall_events": 8047
+        },
+        {
+          "router": 7,
+          "output": 1,
+          "vn": 2,
+          "flits": 10368,
+          "bytes": 331776,
+          "credit_stalls": 0,
+          "allocation_stalls": 491,
+          "endpoint_stalls": 0,
+          "stall_events": 491
+        },
+        {
+          "router": 6,
+          "output": 0,
+          "vn": 0,
+          "flits": 1152,
+          "bytes": 36864,
+          "credit_stalls": 0,
+          "allocation_stalls": 471,
+          "endpoint_stalls": 0,
+          "stall_events": 471
+        },
+        {
+          "router": 0,
+          "output": 0,
+          "vn": 3,
+          "flits": 2320,
+          "bytes": 74240,
+          "credit_stalls": 0,
+          "allocation_stalls": 36,
+          "endpoint_stalls": 0,
+          "stall_events": 36
+        }
+      ],
+      "counters": {
+        "cycles": 24049,
+        "admission_stalls": 0,
+        "credit_stalls": 11754,
+        "allocation_stalls": 35946,
+        "endpoint_stalls": 0
+      },
+      "sram": {
+        "bank_conflicts": 11762,
+        "conflict_wait": 14764,
+        "frontend_stall": 0,
+        "rob_stall": 0,
+        "queue_peak": 4
+      },
+      "p99_vs_reference_alone": 1.186046511627907,
+      "cohort_sha256": "3597027e2e2a854a6131abc8e92268662d7c37e33559815d12a27fec0eab8694"
+    },
+    {
+      "name": "mixed_phase37",
+      "latency": {
+        "p50": 44,
+        "p95": 53,
+        "p99": 53,
+        "max": 54,
+        "count": 128,
+        "min": 43,
+        "mean": 45.1953125
+      },
+      "accepted_to_done": {
+        "p50": 44,
+        "p95": 53,
+        "p99": 53,
+        "max": 54,
+        "count": 128,
+        "min": 43,
+        "mean": 45.1953125
+      },
+      "stages": {
+        "niu_before_injection": {
+          "p50": 1,
+          "p95": 1,
+          "p99": 1,
+          "max": 1,
+          "count": 128,
+          "min": 1,
+          "mean": 1.0
+        },
+        "request_transport": {
+          "p50": 7,
+          "p95": 8,
+          "p99": 8,
+          "max": 8,
+          "count": 128,
+          "min": 7,
+          "mean": 7.5
+        },
+        "target_queue_and_service": {
+          "p50": 20,
+          "p95": 29,
+          "p99": 29,
+          "max": 29,
+          "count": 128,
+          "min": 20,
+          "mean": 21.671875
+        },
+        "response_transport": {
+          "p50": 15,
+          "p95": 15,
+          "p99": 16,
+          "max": 16,
+          "count": 128,
+          "min": 15,
+          "mean": 15.0234375
+        },
+        "admission": {
+          "p50": 0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0,
+          "count": 128,
+          "min": 0,
+          "mean": 0.0
+        }
+      },
+      "decode_window_bytes_per_cycle": 4.0,
+      "decode_window_completed": 128,
+      "decode_last_done": 12267,
+      "top_ports": [
+        {
+          "router": 4,
+          "output": 3,
+          "vn": 1,
+          "flits": 10512,
+          "bytes": 336384,
+          "credit_stalls": 0,
+          "allocation_stalls": 9054,
+          "endpoint_stalls": 0,
+          "stall_events": 9054
+        },
+        {
+          "router": 2,
+          "output": 1,
+          "vn": 1,
+          "flits": 10332,
+          "bytes": 330624,
+          "credit_stalls": 4458,
+          "allocation_stalls": 4520,
+          "endpoint_stalls": 0,
+          "stall_events": 8978
+        },
+        {
+          "router": 5,
+          "output": 1,
+          "vn": 1,
+          "flits": 10512,
+          "bytes": 336384,
+          "credit_stalls": 4548,
+          "allocation_stalls": 4378,
+          "endpoint_stalls": 0,
+          "stall_events": 8926
+        },
+        {
+          "router": 1,
+          "output": 1,
+          "vn": 1,
+          "flits": 10332,
+          "bytes": 330624,
+          "credit_stalls": 0,
+          "allocation_stalls": 8918,
+          "endpoint_stalls": 0,
+          "stall_events": 8918
+        },
+        {
+          "router": 6,
+          "output": 1,
+          "vn": 1,
+          "flits": 10512,
+          "bytes": 336384,
+          "credit_stalls": 0,
+          "allocation_stalls": 8023,
+          "endpoint_stalls": 0,
+          "stall_events": 8023
+        },
+        {
+          "router": 7,
+          "output": 1,
+          "vn": 2,
+          "flits": 10368,
+          "bytes": 331776,
+          "credit_stalls": 0,
+          "allocation_stalls": 493,
+          "endpoint_stalls": 0,
+          "stall_events": 493
+        },
+        {
+          "router": 6,
+          "output": 0,
+          "vn": 0,
+          "flits": 1152,
+          "bytes": 36864,
+          "credit_stalls": 0,
+          "allocation_stalls": 461,
+          "endpoint_stalls": 0,
+          "stall_events": 461
+        },
+        {
+          "router": 0,
+          "output": 0,
+          "vn": 3,
+          "flits": 2316,
+          "bytes": 74112,
+          "credit_stalls": 0,
+          "allocation_stalls": 76,
+          "endpoint_stalls": 0,
+          "stall_events": 76
+        }
+      ],
+      "counters": {
+        "cycles": 24037,
+        "admission_stalls": 0,
+        "credit_stalls": 11712,
+        "allocation_stalls": 35923,
+        "endpoint_stalls": 0
+      },
+      "sram": {
+        "bank_conflicts": 11774,
+        "conflict_wait": 14831,
+        "frontend_stall": 0,
+        "rob_stall": 0,
+        "queue_peak": 4
+      },
+      "p99_vs_reference_alone": 1.2325581395348837,
+      "cohort_sha256": "3597027e2e2a854a6131abc8e92268662d7c37e33559815d12a27fec0eab8694"
+    }
+  ],
+  "checks": [
+    {
+      "name": "matched_decode_cohort",
+      "status": "PASS"
+    },
+    {
+      "name": "all_byte_oracles_and_resource_checks",
+      "status": "PASS"
+    },
+    {
+      "name": "single_fragment_trace_stage_conservation",
+      "status": "PASS"
+    }
+  ],
+  "status": "PASS",
+  "source_sha256": {
+    "cmake/ESLModel.cmake": "2265dca23cceaaf2e7230a0a95f30e8214388cd3ec163e1681403ca7b424b51e",
+    "cmake/ESLModelConfig.cmake.in": "edca498de5b88a61403e819d01e625b7ebb71ece52b7297c3beae524969bece3",
+    "cmake/ESLSystemC.cmake": "7a73a0ebfb6b1d91b8588c15b0c51b9afa57a42af738507d7327c160a6a86897",
+    "contracts/environment.json": "8007b3f779ac250406d74fc5163e94e5a65cb28fbd96dee90b25eed5a1fa9bf9",
+    "contracts/npu_mesh_axi_bus.md": "b69596170d2fa3c5c7a8185d852495b2a3372fb11119fd97b86dfb4dd04c74a7",
+    "infrastructure/systemc/include/aix/esl/activity_monitor.hpp": "28deee062fc93436f4c4a0e8c1727bb0a95744d078254288c4ad2053785826da",
+    "infrastructure/systemc/include/aix/esl/deterministic_rng.hpp": "7cb46686758b21b9f57eeaac200f84400d93cc589ac32a7a83d64116a770e547",
+    "infrastructure/systemc/include/aix/esl/event_recorder.hpp": "39a18675264a8e1d2791b70bb42ce7c327f6abd9ef4842baeea2524982bed3b7",
+    "infrastructure/systemc/include/aix/esl/simulation_lifecycle.hpp": "a6cfc834fb678899b41387b661ebc9a08a5e8d095a0cb29f8eb691a816685dd7",
+    "infrastructure/systemc/include/aix/esl/statistics.hpp": "7f2dd295372c7822001d28dab6b108aa8ef201ff8a5b380f63f4d9be320c1cc9",
+    "models/npu_mesh/CMakeLists.txt": "e34b396e11f5ca5a22bd42a49d08aea7fa4e24d0da0f635d96f9590d20fd91ef",
+    "models/npu_mesh/README.md": "c76d2945e68397e62671967e99a7ef9866c7c63de6c35368661a4426a2c99a20",
+    "models/npu_mesh/configs/baseline.yaml": "128a9fb6ca2f274f93eeff3727364f9398f0c7856b9ea3d364ce23bb7ad44a1a",
+    "models/npu_mesh/configs/sram_ddr.yaml": "b81ce1b3f64fa81d28ae1bb23c48980ba15019f71b151972217345d9d7047bdb",
+    "models/npu_mesh/docs/bm.md": "8169be77f3202500c2d6e143c4ad189bce2612b017fd6a94db0ace17b883c689",
+    "models/npu_mesh/docs/design.md": "82f84eec1c6cfe0b28d5f5e6f23b82f7eef610871d2c608636aff8ac2659c3a4",
+    "models/npu_mesh/docs/gaps.md": "6300e2cd5149223c6752fcfdb7ae96997a118051fe62304af68d942373241fed",
+    "models/npu_mesh/docs/integration.md": "d860d6699c5fa82e3e21bd12f9f3c681e9f6fe14991f1669adf7882960e558be",
+    "models/npu_mesh/docs/interference.md": "b186c85e6405c07982c728ec756631a70e1229fa871fbf7e6666e7bf2d5c2449",
+    "models/npu_mesh/docs/memory.md": "0e6ecaf01fb0d32c9d929f4e80b83c6de07bc11b2e92065b92a04ab3f07d0dc6",
+    "models/npu_mesh/docs/verification.md": "1ba92b5582fd498e5a06878b8ecb406c4fbdf7f16803c7bdf28b5b1909d06ac5",
+    "models/npu_mesh/examples/integration/CMakeLists.txt": "2506afef46a282d4e2a2956bd09bf86e330740433f96ac9997e20509bb008ece",
+    "models/npu_mesh/examples/integration/main.cpp": "b0d1a7be6d472d9ba149196e4739b049eea852372ecc52fea9b46b168120c68f",
+    "models/npu_mesh/model.yaml": "ead26412ac0a5ea1c2b8e8f05347742cc72b5154a69c507590789f48d568993a",
+    "models/npu_mesh/reference/python/oracle.py": "6f485994f2f99a7c3c0e9f287e7310ffc779981b7e7ee7eae0b751cd429b2699",
+    "models/npu_mesh/systemc/include/npu_mesh/axi.hpp": "b64017c3d5651a5eb6a3778e8f98cc466aac5a8dd0d7c39939c4ebb5c00eead2",
+    "models/npu_mesh/systemc/include/npu_mesh/config.hpp": "435f6ee2f5012ed8a6d91b44c9b7327b2595e5144a92db1f28ad07622257e043",
+    "models/npu_mesh/systemc/include/npu_mesh/model.hpp": "35e9439295100a9397355761b4f9311f8e11f896c4a91fab828558a244597a20",
+    "models/npu_mesh/systemc/src/axi.cpp": "7280f30d7f3f40fded1e09b2c83d0dd630a1a15c409cd2148c6326999aeaadfe",
+    "models/npu_mesh/systemc/src/dma.cpp": "8219018f750b795aebc8310b91628c6fd724e984af29414b1ba18063ffdd66e8",
+    "models/npu_mesh/systemc/src/model.cpp": "ffabe1a5a105c519c94f7a8618dd862213d93f1f0faeca4e46e976108df64571",
+    "models/npu_mesh/systemc/src/network.cpp": "847477ffed62bdb7ba8c99070f29aba8d91a0c18d5b08c8ca99ce21abb94e196",
+    "models/npu_mesh/systemc/src/network.hpp": "a71346221e2a48de2c812d08bb573d25c96fa9a0cfa5b8fd3738d1892f49b1f8",
+    "models/npu_mesh/systemc/src/runner.cpp": "05b1d997c0bc430840c927792da76d0056440587f1259251b852bf85c0cc8bdb",
+    "models/npu_mesh/systemc/src/target.cpp": "18f3339816985e627d813fd72def5290b2b84159469db3cf132c8070fdd6adc5",
+    "models/npu_mesh/systemc/src/target.hpp": "c0df0bf15cb4abebe28bec01ef594ae93491a9f6916ba6a6c0dd99f0f8c9776a",
+    "models/npu_mesh/tests/systemc/test_memory.cpp": "623fae11739f714232e848041d952f2830dba91067b1a76b58fc922bca2f655b",
+    "models/npu_mesh/tests/systemc/test_model.cpp": "b2e9980abf8a7cbc15b0bc27cb4448629c69daeb4ecb53b1a68481828ce5b30d",
+    "models/npu_mesh/tests/systemc/test_network.cpp": "4e0ed5ce64fe3414cfe0e8bbb1b5d55130946d63e09813649b7aaefdd972fbb6",
+    "models/npu_sram_controller/CMakeLists.txt": "c2fdf29a186bf37ce6882fb605faf576d26eb33bf464deb381d6bc2ac38f045a",
+    "models/npu_sram_controller/README.md": "6ea3e98f10ec2ed9443401bc45fb6e2d2d817c8744d253300807ab6c051c2d33",
+    "models/npu_sram_controller/configs/baseline.yaml": "cf98ddd8c9e3bce0599b3126ab7d4c2a3252b89ee632832bb996204b239afcd0",
+    "models/npu_sram_controller/configs/ecc.yaml": "91a73b61d24779441cee0f285379b1bf05fd7abb998756bb661d8a51b1e723e0",
+    "models/npu_sram_controller/configs/hierarchical.yaml": "7f9bded900cc41085be5973b1a59c10aac2a0075b46c29537aef6e1638bf0495",
+    "models/npu_sram_controller/docs/blog/ai-accelerated-esl-modeling.md": "1d9a2e9f2e63ce53ef66270ed5313982631c2f2e901012acacde912d631f7c42",
+    "models/npu_sram_controller/docs/blog/figures/addresses_holdout_B32_G32_xor0.png": "567b83619840746f2f06718529067fe66095cb845c81b0d5628181fddee4ad62",
+    "models/npu_sram_controller/docs/blog/figures/banks_holdout_B32_G32_xor0.png": "f882bc330b7ecb3908a45c632597e0a1aa66f1863e910fa39acbd60daf6001c1",
+    "models/npu_sram_controller/docs/design.md": "faf9760d2a9a3f65e2b1f6c52a5533dcc5cd5eda0d5aff6f83532ef928eb0480",
+    "models/npu_sram_controller/docs/integration.md": "e7f11a164d8a6851def2e8a63c8505d726ea8045b6d58973bb34ed3c727bff4f",
+    "models/npu_sram_controller/docs/verification.md": "8275eb8cb2f5b9fd6af4e9f9892cb061e41081f8ab43b5b92d3028d6c28f2187",
+    "models/npu_sram_controller/examples/integration/CMakeLists.txt": "296439f9c8312f15b126024a521435828740ee6e95a93f85099059efbfa690c8",
+    "models/npu_sram_controller/examples/integration/main.cpp": "6babbe90e512f9d8550b8a6f63f27cb9d2da57017c8795054701b49d76ea7fed",
+    "models/npu_sram_controller/model.yaml": "113fa8629efccb0d00232365987f1a6777e76e07f25e0c63425a320747839735",
+    "models/npu_sram_controller/systemc/include/npu_sram_controller/config.hpp": "ed752a6246adc1d49562747f2fb8cde4e5c9c8319bba084d015e41a5d37a5fab",
+    "models/npu_sram_controller/systemc/include/npu_sram_controller/mapping.hpp": "dbac01ca65e55356ea35ac4efe935f3fc5e317e5808ece04db20f273fe4ec299",
+    "models/npu_sram_controller/systemc/include/npu_sram_controller/model.hpp": "784dbeb5a0cd76c02a1f414fb05e02f4bfc32fa5d6b677f8b32dc3adb4de2527",
+    "models/npu_sram_controller/systemc/src/fabric.hpp": "3ecff930bd92a149b4a38765b18e48b8070cb48372882365496a40191d619c9f",
+    "models/npu_sram_controller/systemc/src/mapping.cpp": "f5ff805bc97f442dcbad3af09e9ea3a1e49180b67be5555e9d5e49a3a961e449",
+    "models/npu_sram_controller/systemc/src/model.cpp": "400585006f77f28163935583ce23a98fdb6fcb35f76edd567b45f2089f74299b",
+    "models/npu_sram_controller/systemc/src/runner.cpp": "5d24726eea95c94d78c040f51e89eaedd7ee70d5d59101fa026c9593f973f23f",
+    "models/npu_sram_controller/tests/systemc/test_model.cpp": "0201405096d14ae2bb5c3709d93090f34d823518edea12f6daaed6bf1466f23c",
+    "primitives/systemc/include/aix/esl/address_mapper.hpp": "995075e36d84aa2632863bd25979cdbfea0747ab5335e494c3f7692cdd525a5e",
+    "primitives/systemc/include/aix/esl/arbiter.hpp": "660bd506ad207cf42c7f80c10f667fe3a3dab921532e99b85fe278e8c8f91107",
+    "primitives/systemc/include/aix/esl/blocking_gate.hpp": "c1db2830253f4b5c93de172d76292208624724fd24f8f632426f96f6fd2b9a66",
+    "primitives/systemc/include/aix/esl/bounded_queue.hpp": "8508a013702c8fb48232c869ce381cb5a3a4109c95fb1e5f2abcacc333962401",
+    "primitives/systemc/include/aix/esl/ordered_completion.hpp": "5750618fc4cf276c816676c1bce5a49f00dc19337d7a0b4bc63bb9bf0e39d16a",
+    "primitives/systemc/include/aix/esl/region_mapper.hpp": "f9085fe67030c6e79d1f2518575f0aa1384b702386736616a07d58948cebd49f",
+    "primitives/systemc/include/aix/esl/resource_timing.hpp": "a1a9f737a9bae52a70812f32d6e1c34b1cf92922dd84a1d377cc405f086b8adf",
+    "primitives/systemc/include/aix/esl/timed_channel.hpp": "0eb28d1c3ac3ac10e7dee32a65dad47be0e3f790d0123bdbc1d5f98ad61babf7",
+    "services/systemc/include/aix/esl/byte_store.hpp": "be02d98c39d012c4d29435ab9e0cc52245bdbd4840dc96fc2af450caf9f4a771",
+    "services/systemc/include/aix/esl/ecc_memory.hpp": "970d2ad01586b53af7b83e4d44a1367eb69d0045739ac11e6e7e4cde1572d8b1",
+    "services/systemc/include/aix/esl/mmio32.hpp": "bf13d659fe2a2199c3773f47bfd9adbf4a5c9aef132a6912973d0c43c1527522",
+    "services/systemc/include/aix/esl/register_bank.hpp": "25ba53685b615179c37eab1876ef76046e5a60f17a22edb06accaf3a38845ffb",
+    "services/systemc/include/aix/esl/secded.hpp": "32a55599da2eacd7bc1a7bd850716ee8927c7c2653ae7f7861ffe2ec54d37091",
+    "services/systemc/include/aix/esl/sparse_store.hpp": "9c7ae8ad4f37f4d8245aff0787e197c2c20f612a0a8142f57591c65bfa07c0fc",
+    "services/systemc/include/aix/esl/storage_access.hpp": "3505f323feb358904b64eb102ec3907b85d8ee50d9820f4a1aedca1af8f10464",
+    "tests/test_mesh.py": "8b21c011fc84c49a57666e96ec6e34b3129607789c35705cd9ac59ceef5deed8",
+    "tools/esl_cli.py": "dab8f9c0214f3d7814bc3b2468778da631f6c6265adcf2a5ea25a02801c03d92",
+    "tools/mesh_explore.py": "7095f6da0b74edbda5f061291847245387dfbb3087b333cd68be6fc2454e5e97",
+    "tools/mesh_interference.py": "3d6a9df2b6746be91971d90943bdb43fc7c985d08fbdb4f90bc3ca98238679b5",
+    "tools/multibank.py": "b78a87b8be5349269f49eda4273949dfbe1d38c7125763e7b4c173362037aa0c",
+    "tools/npu_explore.py": "bd52603b3163bd89993dd93bc1310ca6c13c4dc70b619427f73ef02ededec2bb"
+  }
+}

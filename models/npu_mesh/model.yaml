@@ -1,0 +1,58 @@
+schema_version: 1
+id: aixsilicon:esl:npu_mesh:0.1.0
+factory: aix::esl::npu_mesh::Model
+model_kinds: [behavioral, performance, microarchitecture]
+profiles:
+  resource:
+    timing_model: resource_contention
+    data_modes: [full_data]
+    interface_mode: command
+    transport: direct
+    capabilities: [niu_context_token_bucket, sram_ingress_priority_age, xy_mesh, finite_vc, credit_return, packetization, fragment_window, dma_window, source_replication, byte_masks, same_id_order, independent_commands, abort, fence, bm_replay, banked_sram_endpoint, ddr_service, partial_completion_ranges]
+ports:
+  submit:
+    direction: target
+    type: npu_mesh_request_v1
+    transport: direct
+    binding: optional
+parameters:
+  columns: {type: integer, default: 4, min: 1, max: 16}
+  rows: {type: integer, default: 2, min: 1, max: 16}
+  link_bytes: {type: integer, default: 32, min: 16, max: 128}
+  control_bytes: {type: integer, default: 8, min: 4, max: 32}
+  vcs_per_vn: {type: integer, default: 1, min: 1, max: 4}
+  depth: {type: integer, default: 8, min: 1, max: 256}
+  link_latency: {type: integer, default: 1, min: 1}
+  credit_latency: {type: integer, default: 2, min: 1}
+  router_latency: {type: integer, default: 1, min: 1}
+  packet_bytes: {type: integer, default: 256, min: 1}
+  outstanding: {type: integer, default: 16, min: 1}
+  return_bytes: {type: integer, default: 65536, min: 1}
+  command_depth: {type: integer, default: 8, min: 1}
+  command_latency: {type: integer, default: 2, min: 1}
+  timeout_cycles: {type: integer, default: 100000, min: 1}
+  max_transfer: {type: integer, default: 4096, min: 1, max: 1048576}
+  shape_bytes_per_cycle: {type: integer, default: 0, min: 0}
+  shape_burst_bytes: {type: integer, default: 4096, min: 1}
+  shape_context_min: {type: integer, default: 2, min: 0, max: 64}
+  fragment_window: {type: integer, default: 1, min: 1, max: 64}
+  dma_window: {type: integer, default: 1, min: 1, max: 64}
+  split: {type: boolean, default: false}
+  centralized: {type: boolean, default: false}
+  trace: {type: boolean, default: true}
+  endpoints: {type: region_array, required: true}
+assumptions:
+- synchronous_1ns_cycle_not_calibrated
+- transaction_beat_axi_incr_only_not_pin_vip
+- no_device_exclusive_coherence_or_atomic
+- bounded_fragment_window_and_same_axi_id_issue_order
+- native_sram_controller_or_explicit_ddr_service_no_dram_commands
+- native_sram_writes_drain_before_reset_or_timeout_completion
+- no_physical_cdc_dvfs_or_partial_link_reset
+- full_data_synthetic_bm_not_complete_npu_inference
+build:
+  backend: cmake
+  package: AixEslNpuMesh
+  target: aix::esl::npu_mesh
+  cxx_standard: 17
+  entry: CMakeLists.txt

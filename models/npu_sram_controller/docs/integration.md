@@ -32,3 +32,8 @@ pop(port,write,response) 代表一次 RREADY/BREADY 消费。未调用即为背�
 stop_scrub 后继续推进并消费响应直到 idle；任何已接纳读写/内部请求不能省略。reset 在 idle 时清空本实例（含存储/统计），在途调用抛出 logic_error。异常配置/非法输入抛出 invalid_argument/out_of_range；ECC 不可纠错通过 response.error 和 poison 表达，调用者负责传播任务失败。
 
 set_observer 接受只读事件回调，不能重入/修改模型。开启/关闭 observer 应得到相同完成时刻。生命周期、数据/时间所有权与不支持项详见 design.md。
+
+Mesh adapter 增加 `initialize(address,data)` / `inspect(address,bytes)` quiescent debug API：
+仅 idle 且 full_data=1 时可用，通过同一 Mapper/ByteStore 访问真实存储，无计时/计数副作用。
+initialize 先验证全部地址映射再写；不在活动请求中使用。Mesh 集成不调用本模型 reset 来
+取消活动写，而是送完已接收AW对应W并排空响应，保留已有写入。

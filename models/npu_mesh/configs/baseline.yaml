@@ -1,0 +1,12 @@
+columns: 4
+rows: 2
+link_bytes: 32
+control_bytes: 8
+depth: 8
+vcs_per_vn: 1
+packet_bytes: 256
+outstanding: 16
+split: false
+endpoints:
+- {router: 7, base: 0, size: 65536, bytes_per_cycle: 32, latency: 8, slots: 8}
+- {router: 0, base: 65536, size: 65536, bytes_per_cycle: 32, latency: 8, slots: 8}

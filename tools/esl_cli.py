@@ -242,6 +242,12 @@ def main(argv=None):
     npu.add_argument('--config', type=Path, help='flat architecture YAML')
     npu.add_argument('--workload', type=Path, help='topological DAG trace')
     npu.add_argument('--quick', action='store_true', help='small search smoke; not full exploration')
+    mesh = sub.add_parser('npu-mesh', help='SystemC mesh module verification and full-data BM exploration')
+    mesh.add_argument('action', choices=['run', 'validate', 'explore', 'memory-explore', 'interference', 'qos-explore'])
+    mesh.add_argument('--output', type=Path, required=True)
+    mesh.add_argument('--config', type=Path)
+    mesh.add_argument('--workload', type=Path, help='npu_mesh_bm/v1 JSON trace')
+    mesh.add_argument('--scenario', choices=['mixed', 'prefill', 'decode', 'hotspot', 'kv_migration', 'multicast', 'multicast_large'], default='mixed')
     bank = sub.add_parser('multibank', help='configured SystemC common-component system')
     bank.add_argument('action', choices=['resolve', 'run', 'sweep'])
     bank.add_argument('--config', type=Path, required=True)
@@ -252,6 +258,9 @@ def main(argv=None):
     bank.add_argument('--timeout', type=int, default=30)
     args = parser.parse_args(argv)
     try:
+        if args.command == 'npu-mesh':
+            import mesh_explore
+            return mesh_explore.main(args)
         if args.command == 'multibank':
             import multibank
             return multibank.main(args)

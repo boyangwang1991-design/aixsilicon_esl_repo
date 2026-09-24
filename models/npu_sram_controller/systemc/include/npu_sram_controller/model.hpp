@@ -42,6 +42,9 @@ public:
     void stop_scrub();
     void reset(); // quiescent only; clears memory and statistics
     void inject(uint64_t address,unsigned bit_errors);
+    // Quiescent debug access to the SAME mapped backing storage; no modeled time.
+    void initialize(uint64_t address, const std::vector<uint8_t>& data);
+    std::vector<uint8_t> inspect(uint64_t address, unsigned bytes) const;
     void set_observer(std::function<void(const std::string&)> observer);
     const Metrics& metrics() const;
     void report(std::ostream&) const;
